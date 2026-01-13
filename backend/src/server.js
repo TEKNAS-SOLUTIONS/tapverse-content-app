@@ -13,6 +13,9 @@ import imagesRouter from './routes/images.js';
 import seoStrategyRouter from './routes/seoStrategy.js';
 import googleAdsStrategyRouter from './routes/googleAdsStrategy.js';
 import facebookAdsStrategyRouter from './routes/facebookAdsStrategy.js';
+import schedulingRouter from './routes/scheduling.js';
+import emailNewslettersRouter from './routes/emailNewsletters.js';
+import analyticsRouter from './routes/analytics.js';
 
 const app = express();
 
@@ -61,6 +64,9 @@ app.use('/api/images', imagesRouter);
 app.use('/api/seo-strategy', seoStrategyRouter);
 app.use('/api/google-ads-strategy', googleAdsStrategyRouter);
 app.use('/api/facebook-ads-strategy', facebookAdsStrategyRouter);
+app.use('/api/scheduling', schedulingRouter);
+app.use('/api/email-newsletters', emailNewslettersRouter);
+app.use('/api/analytics', analyticsRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

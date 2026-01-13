@@ -1,0 +1,185 @@
+import React, { useState, useEffect } from 'react';
+import { emailNewslettersAPI, contentAPI } from '../services/api';
+
+function EmailNewsletter({ projectId }) {
+  const [newsletters, setNewsletters] = useState([]);
+  const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [selectedNewsletter, setSelectedNewsletter] = useState(null);
+
+  useEffect(() => {
+    if (projectId) {
+      loadNewsletters();
+      loadContent();
+    }
+  }, [projectId]);
+
+  const loadNewsletters = async () => {
+    try {
+      setLoading(true);
+      const response = await emailNewslettersAPI.getByProject(projectId);
+      if (response.data.success) {
+        setNewsletters(response.data.data);
+        if (response.data.data.length > 0 && !selectedNewsletter) {
+          setSelectedNewsletter(response.data.data[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading newsletters:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadContent = async () => {
+    try {
+      const response = await contentAPI.getByProject(projectId);
+      if (response.data.success) {
+        setContent(response.data.data.filter(c => c.content_type === 'blog'));
+      }
+    } catch (err) {
+      console.error('Error loading content:', err);
+    }
+  };
+
+  const generateNewsletter = async (sourceContentId = null) => {
+    try {
+      setGenerating(true);
+      const response = await emailNewslettersAPI.generate(projectId, {
+        sourceContentId,
+      });
+      if (response.data.success) {
+        setNewsletters([response.data.data, ...newsletters]);
+        setSelectedNewsletter(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error generating newsletter:', err);
+      alert(err.response?.data?.error || 'Failed to generate newsletter');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  if (loading && newsletters.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-gray-400">Loading newsletters...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Email Newsletters</h2>
+          <p className="text-gray-400 text-sm mt-1">Generate email newsletters from blog content</p>
+        </div>
+        <div className="flex gap-2">
+          {content.length > 0 && (
+            <select
+              onChange={(e) => e.target.value && generateNewsletter(e.target.value)}
+              className="bg-gray-700 text-white rounded-lg p-2 text-sm"
+              disabled={generating}
+            >
+              <option value="">Generate from blog...</option>
+              {content.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.title || 'Untitled'}
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={() => generateNewsletter()}
+            disabled={generating}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+          >
+            {generating ? 'Generating...' : '+ Generate Newsletter'}
+          </button>
+        </div>
+      </div>
+
+      {newsletters.length > 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <div className="bg-gray-800 rounded-lg p-4 space-y-2">
+              <h3 className="text-white font-semibold mb-3">Newsletters</h3>
+              {newsletters.map((newsletter) => (
+                <button
+                  key={newsletter.id}
+                  onClick={() => setSelectedNewsletter(newsletter)}
+                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                    selectedNewsletter?.id === newsletter.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  }`}
+                >
+                  <div className="text-sm font-medium truncate">{newsletter.subject_line}</div>
+                  <div className="text-xs mt-1 opacity-75">
+                    {new Date(newsletter.created_at).toLocaleDateString()}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="lg:col-span-2">
+            {selectedNewsletter && (
+              <div className="bg-gray-800 rounded-lg p-6 space-y-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Subject Line</h3>
+                  <p className="text-gray-300">{selectedNewsletter.subject_line}</p>
+                </div>
+
+                {selectedNewsletter.preview_text && (
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">Preview Text</h3>
+                    <p className="text-gray-300">{selectedNewsletter.preview_text}</p>
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Email Body</h3>
+                  <div
+                    className="bg-white rounded-lg p-4 text-gray-800"
+                    dangerouslySetInnerHTML={{ __html: selectedNewsletter.email_body }}
+                  />
+                </div>
+
+                {selectedNewsletter.cta_text && (
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">Call to Action</h3>
+                    <a
+                      href={selectedNewsletter.cta_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      {selectedNewsletter.cta_text}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-12 bg-gray-800 rounded-lg">
+          <p className="text-gray-400 mb-4">No newsletters generated yet</p>
+          <button
+            onClick={() => generateNewsletter()}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            Generate Your First Newsletter
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default EmailNewsletter;
+

@@ -6,6 +6,8 @@ import ArticleIdeas from '../components/ArticleIdeas';
 import SEOStrategy from '../components/SEOStrategy';
 import GoogleAdsStrategy from '../components/GoogleAdsStrategy';
 import FacebookAdsStrategy from '../components/FacebookAdsStrategy';
+import ContentScheduling from '../components/ContentScheduling';
+import EmailNewsletter from '../components/EmailNewsletter';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -13,7 +15,7 @@ function ProjectDetail() {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', or 'generate'
+  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', 'generate', 'scheduling', 'email'
 
   useEffect(() => {
     loadProject();
@@ -237,6 +239,28 @@ function ProjectDetail() {
           ✨ Direct Generate
           <span className="ml-2 text-sm opacity-75">Quick Content</span>
         </button>
+        <button
+          onClick={() => setActiveTab('scheduling')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'scheduling'
+              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          📅 Schedule
+          <span className="ml-2 text-sm opacity-75">Publish Content</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('email')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'email'
+              ? 'bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          ✉️ Email
+          <span className="ml-2 text-sm opacity-75">Newsletters</span>
+        </button>
       </div>
 
       {/* Content Area */}
@@ -263,6 +287,15 @@ function ProjectDetail() {
           client={client}
           project={project}
           onArticleGenerated={loadProject}
+        />
+      ) : activeTab === 'scheduling' ? (
+        <ContentScheduling 
+          projectId={projectId}
+          clientId={client?.id}
+        />
+      ) : activeTab === 'email' ? (
+        <EmailNewsletter 
+          projectId={projectId}
         />
       ) : (
         <ContentGenerator 

@@ -5,6 +5,7 @@ import Clients from './pages/Clients';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import AdminSetup from './pages/AdminSetup';
+import Analytics from './pages/Analytics';
 
 function App() {
   return (
@@ -17,6 +18,9 @@ function App() {
           <Route path="/projects/:projectId" element={<ProjectDetail />} />
           <Route path="/clients/:clientId/projects" element={<Projects />} />
           <Route path="/admin" element={<AdminSetup />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/analytics/client/:clientId" element={<Analytics />} />
+          <Route path="/analytics/client/:clientId/project/:projectId" element={<Analytics />} />
         </Routes>
       </Layout>
     </Router>

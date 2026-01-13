@@ -254,5 +254,66 @@ export const facebookAdsStrategyAPI = {
   delete: (id) => api.delete(`/facebook-ads-strategy/${id}`),
 };
 
+/**
+ * Content Scheduling API
+ */
+export const schedulingAPI = {
+  schedule: (data) => api.post('/scheduling/schedule', data),
+  getByProject: (projectId, filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return api.get(`/scheduling/project/${projectId}?${params}`);
+  },
+  getById: (id) => api.get(`/scheduling/${id}`),
+  updateStatus: (id, status, additionalData = {}) =>
+    api.put(`/scheduling/${id}/status`, { status, ...additionalData }),
+  cancel: (id) => api.post(`/scheduling/${id}/cancel`),
+  delete: (id) => api.delete(`/scheduling/${id}`),
+};
+
+/**
+ * Email Newsletters API
+ */
+export const emailNewslettersAPI = {
+  generate: (projectId, options = {}) =>
+    api.post('/email-newsletters/generate', { projectId, ...options }),
+  getByProject: (projectId) => api.get(`/email-newsletters/project/${projectId}`),
+  getById: (id) => api.get(`/email-newsletters/${id}`),
+  update: (id, data) => api.put(`/email-newsletters/${id}`, data),
+  delete: (id) => api.delete(`/email-newsletters/${id}`),
+};
+
+/**
+ * Analytics API
+ */
+export const analyticsAPI = {
+  record: (data) => api.post('/analytics/record', data),
+  getByProject: (projectId, dateRange = {}) => {
+    const params = new URLSearchParams();
+    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
+    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
+    return api.get(`/analytics/project/${projectId}?${params}`);
+  },
+  getByClient: (clientId, dateRange = {}) => {
+    const params = new URLSearchParams();
+    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
+    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
+    return api.get(`/analytics/client/${clientId}?${params}`);
+  },
+  getTopContent: (projectId, limit = 10, metric = 'views') =>
+    api.get(`/analytics/top-content/${projectId}?limit=${limit}&metric=${metric}`),
+  getSummary: (clientId, projectId = null, period = 'monthly') => {
+    const params = new URLSearchParams({ clientId, period });
+    if (projectId) params.append('projectId', projectId);
+    return api.get(`/analytics/summary?${params}`);
+  },
+  getPlatformBreakdown: (clientId, projectId = null, dateRange = {}) => {
+    const params = new URLSearchParams({ clientId });
+    if (projectId) params.append('projectId', projectId);
+    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
+    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
+    return api.get(`/analytics/platform-breakdown?${params}`);
+  },
+};
+
 export default api;
 
