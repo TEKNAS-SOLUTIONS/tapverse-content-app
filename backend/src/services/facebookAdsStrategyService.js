@@ -349,7 +349,8 @@ async function saveFacebookAdsStrategy(projectId, clientId, strategy) {
       JSON.stringify(strategy.audience_targeting || []),
       JSON.stringify(strategy.custom_audiences || []),
       JSON.stringify(strategy.lookalike_audiences || []),
-      JSON.stringify((strategy.audience_targeting || []).map(a => a.demographics || '')), // Extract demographics
+      JSON.stringify((strategy.audience_targeting || []).map(a => ({ demographics: a.demographics || '' }))), // Extract demographics
+      JSON.stringify(strategy.ad_creative_concepts || []),
       JSON.stringify((strategy.ad_creative_concepts || []).filter(c => c.type === 'Image')),
       JSON.stringify((strategy.ad_creative_concepts || []).filter(c => c.type === 'Video')),
       JSON.stringify((strategy.ad_creative_concepts || []).map(c => c.copy || '')),
