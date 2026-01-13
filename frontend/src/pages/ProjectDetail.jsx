@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { projectsAPI, clientsAPI } from '../services/api';
 import ContentGenerator from '../components/ContentGenerator';
 import ArticleIdeas from '../components/ArticleIdeas';
+import SEOStrategy from '../components/SEOStrategy';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -10,7 +11,7 @@ function ProjectDetail() {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('ideas'); // 'ideas' or 'generate'
+  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'ideas', 'generate', or 'seo-strategy'
 
   useEffect(() => {
     loadProject();
@@ -180,6 +181,17 @@ function ProjectDetail() {
       {/* Tab Navigation */}
       <div className="flex gap-2 bg-gray-800 p-2 rounded-xl">
         <button
+          onClick={() => setActiveTab('seo-strategy')}
+          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'seo-strategy'
+              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          🎯 SEO Strategy
+          <span className="ml-2 text-sm opacity-75">Comprehensive Plan</span>
+        </button>
+        <button
           onClick={() => setActiveTab('ideas')}
           className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'ideas'
@@ -204,7 +216,13 @@ function ProjectDetail() {
       </div>
 
       {/* Content Area */}
-      {activeTab === 'ideas' ? (
+      {activeTab === 'seo-strategy' ? (
+        <SEOStrategy 
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
+        />
+      ) : activeTab === 'ideas' ? (
         <ArticleIdeas 
           client={client}
           project={project}

@@ -191,5 +191,26 @@ export const articleIdeasAPI = {
     api.post('/article-ideas/trending', { industry, keywords }),
 };
 
+/**
+ * SEO Strategy API
+ */
+export const seoStrategyAPI = {
+  // Generate new SEO strategy for a project
+  generate: (projectId, clientData = {}, projectData = {}) =>
+    api.post('/seo-strategy/generate', { projectId, clientData, projectData }),
+  
+  // Get strategies for a project
+  getByProject: (projectId) => api.get(`/seo-strategy/project/${projectId}`),
+  
+  // Get specific strategy by ID
+  getById: (id) => api.get(`/seo-strategy/${id}`),
+  
+  // Update strategy
+  update: (id, data) => api.put(`/seo-strategy/${id}`, data),
+  
+  // Delete strategy
+  delete: (id) => api.delete(`/seo-strategy/${id}`),
+};
+
 export default api;
 

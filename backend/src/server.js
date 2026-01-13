@@ -10,6 +10,7 @@ import settingsRouter from './routes/settings.js';
 import articleIdeasRouter from './routes/articleIdeas.js';
 import videoRouter from './routes/video.js';
 import imagesRouter from './routes/images.js';
+import seoStrategyRouter from './routes/seoStrategy.js';
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/article-ideas', articleIdeasRouter);
 app.use('/api/video', videoRouter);
 app.use('/api/images', imagesRouter);
+app.use('/api/seo-strategy', seoStrategyRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

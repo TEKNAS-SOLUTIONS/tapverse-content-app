@@ -17,7 +17,7 @@ const client = new Anthropic({
 export async function generateContent(prompt, options = {}) {
   try {
     const {
-      model = config.api.claudeModel || 'claude-3-haiku-20240307',
+      model = config.api.claudeModel || 'claude-3-5-sonnet-20241022',
       maxTokens = 4096,
     } = options;
 
@@ -55,7 +55,7 @@ export async function generateContent(prompt, options = {}) {
 export async function generateContentWithSystem(systemPrompt, userPrompt, options = {}) {
   try {
     const {
-      model = config.api.claudeModel || 'claude-3-haiku-20240307',
+      model = config.api.claudeModel || 'claude-3-5-sonnet-20241022',
       maxTokens = 4096,
     } = options;
 
