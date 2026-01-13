@@ -12,6 +12,7 @@ import videoRouter from './routes/video.js';
 import imagesRouter from './routes/images.js';
 import seoStrategyRouter from './routes/seoStrategy.js';
 import googleAdsStrategyRouter from './routes/googleAdsStrategy.js';
+import facebookAdsStrategyRouter from './routes/facebookAdsStrategy.js';
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/video', videoRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/seo-strategy', seoStrategyRouter);
 app.use('/api/google-ads-strategy', googleAdsStrategyRouter);
+app.use('/api/facebook-ads-strategy', facebookAdsStrategyRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

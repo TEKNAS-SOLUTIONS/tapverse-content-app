@@ -5,6 +5,7 @@ import ContentGenerator from '../components/ContentGenerator';
 import ArticleIdeas from '../components/ArticleIdeas';
 import SEOStrategy from '../components/SEOStrategy';
 import GoogleAdsStrategy from '../components/GoogleAdsStrategy';
+import FacebookAdsStrategy from '../components/FacebookAdsStrategy';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -12,7 +13,7 @@ function ProjectDetail() {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'ideas', or 'generate'
+  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', or 'generate'
 
   useEffect(() => {
     loadProject();
@@ -204,6 +205,17 @@ function ProjectDetail() {
           <span className="ml-2 text-sm opacity-75">Campaign Strategy</span>
         </button>
         <button
+          onClick={() => setActiveTab('facebook-ads-strategy')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'facebook-ads-strategy'
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          📘 Facebook Ads
+          <span className="ml-2 text-sm opacity-75">Social Strategy</span>
+        </button>
+        <button
           onClick={() => setActiveTab('ideas')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'ideas'
@@ -236,6 +248,12 @@ function ProjectDetail() {
         />
       ) : activeTab === 'google-ads-strategy' ? (
         <GoogleAdsStrategy 
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
+        />
+      ) : activeTab === 'facebook-ads-strategy' ? (
+        <FacebookAdsStrategy 
           projectId={projectId}
           clientData={client}
           projectData={project}

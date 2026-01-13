@@ -233,5 +233,26 @@ export const googleAdsStrategyAPI = {
   delete: (id) => api.delete(`/google-ads-strategy/${id}`),
 };
 
+/**
+ * Facebook Ads Strategy API
+ */
+export const facebookAdsStrategyAPI = {
+  // Generate new Facebook Ads strategy for a project
+  generate: (projectId, clientData = {}, projectData = {}) =>
+    api.post('/facebook-ads-strategy/generate', { projectId, clientData, projectData }),
+  
+  // Get strategies for a project
+  getByProject: (projectId) => api.get(`/facebook-ads-strategy/project/${projectId}`),
+  
+  // Get specific strategy by ID
+  getById: (id) => api.get(`/facebook-ads-strategy/${id}`),
+  
+  // Update strategy
+  update: (id, data) => api.put(`/facebook-ads-strategy/${id}`, data),
+  
+  // Delete strategy
+  delete: (id) => api.delete(`/facebook-ads-strategy/${id}`),
+};
+
 export default api;
 
