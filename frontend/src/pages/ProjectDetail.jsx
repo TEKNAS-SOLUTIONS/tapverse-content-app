@@ -4,6 +4,7 @@ import { projectsAPI, clientsAPI } from '../services/api';
 import ContentGenerator from '../components/ContentGenerator';
 import ArticleIdeas from '../components/ArticleIdeas';
 import SEOStrategy from '../components/SEOStrategy';
+import GoogleAdsStrategy from '../components/GoogleAdsStrategy';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -11,7 +12,7 @@ function ProjectDetail() {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'ideas', 'generate', or 'seo-strategy'
+  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'ideas', or 'generate'
 
   useEffect(() => {
     loadProject();
@@ -179,10 +180,10 @@ function ProjectDetail() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 bg-gray-800 p-2 rounded-xl">
+      <div className="flex gap-2 bg-gray-800 p-2 rounded-xl flex-wrap">
         <button
           onClick={() => setActiveTab('seo-strategy')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'seo-strategy'
               ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -192,8 +193,19 @@ function ProjectDetail() {
           <span className="ml-2 text-sm opacity-75">Comprehensive Plan</span>
         </button>
         <button
+          onClick={() => setActiveTab('google-ads-strategy')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'google-ads-strategy'
+              ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          🔍 Google Ads
+          <span className="ml-2 text-sm opacity-75">Campaign Strategy</span>
+        </button>
+        <button
           onClick={() => setActiveTab('ideas')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'ideas'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -204,7 +216,7 @@ function ProjectDetail() {
         </button>
         <button
           onClick={() => setActiveTab('generate')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'generate'
               ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -218,6 +230,12 @@ function ProjectDetail() {
       {/* Content Area */}
       {activeTab === 'seo-strategy' ? (
         <SEOStrategy 
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
+        />
+      ) : activeTab === 'google-ads-strategy' ? (
+        <GoogleAdsStrategy 
           projectId={projectId}
           clientData={client}
           projectData={project}

@@ -212,5 +212,26 @@ export const seoStrategyAPI = {
   delete: (id) => api.delete(`/seo-strategy/${id}`),
 };
 
+/**
+ * Google Ads Strategy API
+ */
+export const googleAdsStrategyAPI = {
+  // Generate new Google Ads strategy for a project
+  generate: (projectId, clientData = {}, projectData = {}) =>
+    api.post('/google-ads-strategy/generate', { projectId, clientData, projectData }),
+  
+  // Get strategies for a project
+  getByProject: (projectId) => api.get(`/google-ads-strategy/project/${projectId}`),
+  
+  // Get specific strategy by ID
+  getById: (id) => api.get(`/google-ads-strategy/${id}`),
+  
+  // Update strategy
+  update: (id, data) => api.put(`/google-ads-strategy/${id}`, data),
+  
+  // Delete strategy
+  delete: (id) => api.delete(`/google-ads-strategy/${id}`),
+};
+
 export default api;
 

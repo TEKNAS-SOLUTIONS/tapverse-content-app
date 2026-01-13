@@ -1,10 +1,34 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config/config.js';
+import pool from '../db/index.js';
 
-// Initialize Claude client
-const client = new Anthropic({
-  apiKey: config.api.anthropicApiKey || process.env.ANTHROPIC_API_KEY,
-});
+/**
+ * Get API key from database or environment
+ */
+async function getAPIKey() {
+  try {
+    const result = await pool.query(
+      "SELECT setting_value FROM system_settings WHERE setting_key = 'anthropic_api_key' AND setting_value != ''"
+    );
+    if (result.rows.length > 0 && result.rows[0].setting_value) {
+      return result.rows[0].setting_value;
+    }
+  } catch (error) {
+    console.error('Error fetching API key from database:', error);
+  }
+  return config.api.anthropicApiKey || process.env.ANTHROPIC_API_KEY;
+}
+
+/**
+ * Get Claude client with API key from database
+ */
+async function getClaudeClient() {
+  const apiKey = await getAPIKey();
+  if (!apiKey) {
+    throw new Error('Anthropic API key not found. Please configure it in Admin Setup.');
+  }
+  return new Anthropic({ apiKey });
+}
 
 /**
  * Generate content using Claude API
@@ -17,10 +41,11 @@ const client = new Anthropic({
 export async function generateContent(prompt, options = {}) {
   try {
     const {
-      model = config.api.claudeModel || 'claude-3-5-sonnet-20241022',
+      model = config.api.claudeModel || 'claude-3-haiku-20240307',
       maxTokens = 4096,
     } = options;
 
+    const client = await getClaudeClient();
     const message = await client.messages.create({
       model,
       max_tokens: maxTokens,
@@ -55,10 +80,11 @@ export async function generateContent(prompt, options = {}) {
 export async function generateContentWithSystem(systemPrompt, userPrompt, options = {}) {
   try {
     const {
-      model = config.api.claudeModel || 'claude-3-5-sonnet-20241022',
+      model = config.api.claudeModel || 'claude-3-haiku-20240307',
       maxTokens = 4096,
     } = options;
 
+    const client = await getClaudeClient();
     const message = await client.messages.create({
       model,
       max_tokens: maxTokens,

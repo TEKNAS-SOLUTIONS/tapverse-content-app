@@ -2,20 +2,16 @@ import { generateContentWithSystem } from './claude.js';
 import pool from '../db/index.js';
 
 /**
- * SEO Strategy Generation Service
+ * Google Ads Strategy Generation Service
  * 
- * Generates comprehensive SEO strategies using Claude Sonnet
- * Includes: keyword research, content pillars, technical SEO, competitor analysis
+ * Generates comprehensive Google Ads strategies using Claude
+ * Includes: campaign structure, keywords, ad copy, landing pages, bidding, budget
  */
 
 /**
- * Generate comprehensive SEO strategy for a project
- * @param {string} projectId - Project ID
- * @param {object} clientData - Client data (industry, competitors, brand info)
- * @param {object} projectData - Project data (keywords, target audience, goals)
- * @returns {Promise<object>} Generated SEO strategy
+ * Generate comprehensive Google Ads strategy for a project
  */
-export async function generateSEOStrategy(projectId, clientData = {}, projectData = {}) {
+export async function generateGoogleAdsStrategy(projectId, clientData = {}, projectData = {}) {
   try {
     // Fetch existing project and client data from database
     const projectResult = await pool.query(
@@ -58,17 +54,17 @@ export async function generateSEOStrategy(projectId, clientData = {}, projectDat
     const strategy = await generateStrategyWithAI(mergedClientData, mergedProjectData);
     
     // Save to database
-    const savedStrategy = await saveSEOStrategy(projectId, clientId, strategy);
+    const savedStrategy = await saveGoogleAdsStrategy(projectId, clientId, strategy);
     
     return savedStrategy;
   } catch (error) {
-    console.error('Error generating SEO strategy:', error);
-    throw new Error(`Failed to generate SEO strategy: ${error.message}`);
+    console.error('Error generating Google Ads strategy:', error);
+    throw new Error(`Failed to generate Google Ads strategy: ${error.message}`);
   }
 }
 
 /**
- * Generate SEO strategy using Claude AI
+ * Generate Google Ads strategy using Claude AI
  */
 async function generateStrategyWithAI(clientData, projectData) {
   const industry = clientData.industry || 'General';
@@ -78,119 +74,117 @@ async function generateStrategyWithAI(clientData, projectData) {
   const competitors = clientData.competitors || [];
   const brandVoice = clientData.brand_voice || 'Professional';
   const brandTone = clientData.brand_tone || 'Professional';
+  const googleAdsId = clientData.google_ads_id || 'Not specified';
   
-  const systemPrompt = `You are an expert SEO strategist with 15+ years of experience. 
-You create comprehensive, data-driven SEO strategies that drive real business results.
+  const systemPrompt = `You are an expert Google Ads strategist with 15+ years of experience. 
+You create comprehensive, data-driven Google Ads strategies that drive real business results.
 
 Your strategies include:
-- Deep keyword research and gap analysis
-- Content pillar architecture
-- Technical SEO recommendations
-- Competitor content gap analysis
-- Link building opportunities
-- Content calendar recommendations
-- SEO-optimized content briefs
+- Optimal campaign structure and organization
+- Strategic keyword research with match types
+- High-converting ad copy variations
+- Landing page optimization recommendations
+- Smart bidding strategies
+- Budget allocation across campaigns
+- A/B testing frameworks
 
 Always provide actionable, specific recommendations backed by strategic thinking.`;
 
-  const userPrompt = `Create a comprehensive SEO strategy for:
+  const userPrompt = `Create a comprehensive Google Ads strategy for:
 
 COMPANY: ${companyName}
 INDUSTRY: ${industry}
 TARGET AUDIENCE: ${targetAudience}
 BRAND VOICE: ${brandVoice}
 BRAND TONE: ${brandTone}
+GOOGLE ADS ACCOUNT ID: ${googleAdsId}
 PRIMARY KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'To be researched'}
 COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
 
-Generate a complete SEO strategy including:
+Generate a complete Google Ads strategy including:
 
 1. EXECUTIVE SUMMARY
-   - Overview of SEO opportunity
+   - Overview of Google Ads opportunity
    - Key recommendations summary
-   - Expected outcomes
+   - Expected outcomes and KPIs
 
-2. KEYWORD RESEARCH
-   - Primary keywords (10-15 high-value targets)
-   - Secondary keywords (20-30 supporting keywords)
+2. CAMPAIGN STRUCTURE
+   - Recommended campaign organization (3-5 campaigns)
+   - Campaign naming conventions
+   - Ad group structure recommendations
+
+3. KEYWORD RESEARCH
+   - Primary keywords (15-20 high-value targets) with match types
+   - Long-tail keyword opportunities
+   - Negative keyword recommendations
    - Search intent analysis
-   - Keyword difficulty estimates
-   - Search volume estimates (if applicable)
 
-3. CONTENT PILLAR STRATEGY
-   - 3-5 main content pillars
-   - For each pillar: theme, target keywords, content types, goals
+4. AD COPY VARIATIONS
+   - 3-5 headline variations per campaign
+   - 3-5 description variations
+   - Call-to-action recommendations
+   - Ad extensions suggestions
 
-4. CONTENT CALENDAR RECOMMENDATIONS
-   - Monthly content themes
-   - Content types (blog posts, guides, videos, etc.)
-   - Publishing frequency recommendations
-   - Priority content pieces
+5. LANDING PAGE RECOMMENDATIONS
+   - Landing page optimization tips
+   - Conversion-focused recommendations
+   - Mobile optimization priorities
 
-5. TECHNICAL SEO RECOMMENDATIONS
-   - Site speed optimization
-   - Mobile optimization
-   - Schema markup opportunities
-   - Site structure improvements
-   - Indexing and crawling recommendations
+6. BID STRATEGY
+   - Recommended bidding strategies (Manual CPC, Target CPA, etc.)
+   - Bid adjustment recommendations
+   - Quality Score optimization tips
 
-6. LINK BUILDING OPPORTUNITIES
-   - High-authority sites in the industry
-   - Guest posting opportunities
-   - Resource page link opportunities
-   - Partnership opportunities
-   - Content-based link building ideas
+7. BUDGET ALLOCATION
+   - Budget distribution across campaigns
+   - Daily/monthly budget recommendations
+   - Budget optimization strategies
 
-7. CONTENT GAP ANALYSIS
-   - Missing content topics
-   - Underperforming content opportunities
-   - Content refresh opportunities
-
-8. COMPETITOR GAP ANALYSIS
-   - Content topics competitors rank for that we don't
-   - Content formats competitors use that we should
-   - Keyword opportunities competitors miss
+8. A/B TESTING SUGGESTIONS
+   - Ad copy tests
+   - Landing page tests
+   - Bid strategy tests
 
 9. TARGET AUDIENCE ANALYSIS
-   - Detailed audience personas
-   - Search behavior patterns
-   - Content preferences
+   - Detailed audience personas for targeting
+   - Demographic targeting recommendations
+   - Device and location targeting
 
-10. COMPETITOR ANALYSIS SUMMARY
-    - Top competitors' strengths
-    - Opportunities to outperform competitors
-    - Competitive positioning recommendations
+10. COMPETITOR ANALYSIS
+    - Competitor ad strategies
+    - Opportunities to outperform
+    - Competitive positioning
 
 CRITICAL: Keep the response concise and within 4000 tokens. Focus on the most important recommendations.
 
 Format the output as VALID JSON (no trailing commas, all strings quoted):
 {
   "executive_summary": "Brief 2-3 sentence overview",
-  "primary_keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
-  "secondary_keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5", "keyword6", "keyword7", "keyword8"],
-  "content_pillars": [
-    {"theme": "Pillar 1", "target_keywords": ["kw1", "kw2"], "goals": "Brief goal"},
-    {"theme": "Pillar 2", "target_keywords": ["kw3", "kw4"], "goals": "Brief goal"},
-    {"theme": "Pillar 3", "target_keywords": ["kw5", "kw6"], "goals": "Brief goal"}
+  "campaign_structure": [
+    {"name": "Campaign 1", "type": "Search/Display/Shopping", "ad_groups": 3, "description": "Brief description"},
+    {"name": "Campaign 2", "type": "Search", "ad_groups": 2, "description": "Brief description"}
   ],
-  "content_calendar": [
-    {"month": "Month 1", "theme": "Theme", "frequency": "2 posts/week", "priority_pieces": ["Piece 1", "Piece 2"]},
-    {"month": "Month 2", "theme": "Theme", "frequency": "2 posts/week", "priority_pieces": ["Piece 1", "Piece 2"]}
+  "primary_keywords": [
+    {"keyword": "keyword1", "match_type": "exact", "estimated_cpc": "$X.XX", "search_volume": "XK"},
+    {"keyword": "keyword2", "match_type": "phrase", "estimated_cpc": "$X.XX", "search_volume": "XK"}
   ],
-  "technical_seo_recommendations": "3-4 key technical recommendations in 2-3 sentences",
-  "link_building_opportunities": [
-    {"opportunity": "Brief description", "type": "guest_post", "priority": "high"},
-    {"opportunity": "Brief description", "type": "resource_page", "priority": "medium"}
+  "negative_keywords": ["keyword1", "keyword2", "keyword3"],
+  "ad_copy_variations": [
+    {"headlines": ["Headline 1", "Headline 2", "Headline 3"], "descriptions": ["Desc 1", "Desc 2"], "cta": "CTA text"},
+    {"headlines": ["Headline 1", "Headline 2"], "descriptions": ["Desc 1", "Desc 2"], "cta": "CTA text"}
   ],
-  "content_gap_analysis": [
-    {"topic": "Topic", "priority": "high", "content_type": "blog", "target_keyword": "keyword"},
-    {"topic": "Topic", "priority": "medium", "content_type": "guide", "target_keyword": "keyword"}
+  "landing_page_recommendations": "3-4 key recommendations in 2-3 sentences",
+  "bid_strategy_recommendations": "2-3 sentence recommendation",
+  "budget_allocation": [
+    {"campaign": "Campaign 1", "daily_budget": "$XX", "monthly_budget": "$XXX", "percentage": "XX%"},
+    {"campaign": "Campaign 2", "daily_budget": "$XX", "monthly_budget": "$XXX", "percentage": "XX%"}
   ],
-  "competitor_gaps": [
-    {"opportunity": "Brief opportunity", "competitor": "Competitor", "priority": "high", "content_type": "blog"}
+  "ab_testing_suggestions": [
+    {"test_type": "Ad Copy", "description": "Brief description"},
+    {"test_type": "Landing Page", "description": "Brief description"}
   ],
   "target_audience_analysis": "2-3 sentence audience analysis",
-  "competitor_analysis_summary": "2-3 sentence competitor summary"
+  "competitor_analysis": "2-3 sentence competitor analysis"
 }
 
 IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations. Just the JSON object.`;
@@ -214,7 +208,7 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations.
     
     const response = await generateContentWithSystem(systemPrompt, userPrompt, {
       model,
-      maxTokens, // Adjusted based on model capabilities
+      maxTokens,
     });
     
     // Parse JSON from response - try multiple strategies
@@ -276,17 +270,17 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations.
         // Last resort: try to build a minimal valid JSON from what we have
         try {
           const minimal = {
-            executive_summary: response.substring(0, 500) || "SEO strategy generated",
+            executive_summary: response.substring(0, 500) || "Google Ads strategy generated",
+            campaign_structure: [],
             primary_keywords: [],
-            secondary_keywords: [],
-            content_pillars: [],
-            content_calendar: [],
-            technical_seo_recommendations: "See full response in logs",
-            link_building_opportunities: [],
-            content_gap_analysis: [],
-            competitor_gaps: [],
+            negative_keywords: [],
+            ad_copy_variations: [],
+            landing_page_recommendations: "See full response in logs",
+            bid_strategy_recommendations: "",
+            budget_allocation: [],
+            ab_testing_suggestions: [],
             target_audience_analysis: "",
-            competitor_analysis_summary: ""
+            competitor_analysis: ""
           };
           console.warn('Returning minimal strategy due to JSON parse failure');
           return minimal;
@@ -297,118 +291,124 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations.
     }
     
     // If all parsing fails, log the response for debugging
-    console.error('Failed to parse SEO strategy JSON. Response length:', response.length);
+    console.error('Failed to parse Google Ads strategy JSON. Response length:', response.length);
     console.error('Response preview:', response.substring(0, 1000));
-    throw new Error('Failed to parse SEO strategy JSON from Claude response. Response may be too large or malformed.');
+    throw new Error('Failed to parse Google Ads strategy JSON from Claude response. Response may be too large or malformed.');
   } catch (error) {
-    console.error('Error generating SEO strategy with AI:', error);
+    console.error('Error generating Google Ads strategy with AI:', error);
     throw error;
   }
 }
 
 /**
- * Save SEO strategy to database
+ * Save Google Ads strategy to database
  */
-async function saveSEOStrategy(projectId, clientId, strategy) {
+async function saveGoogleAdsStrategy(projectId, clientId, strategy) {
   try {
     const result = await pool.query(`
-      INSERT INTO seo_strategies (
+      INSERT INTO google_ads_strategies (
         client_id,
         project_id,
+        campaign_structure,
+        recommended_campaigns,
         primary_keywords,
-        secondary_keywords,
-        content_pillars,
-        content_calendar,
-        technical_seo_recommendations,
-        link_building_opportunities,
-        content_gap_analysis,
-        competitor_gaps,
+        keyword_match_types,
+        negative_keywords,
+        ad_copy_variations,
+        headline_suggestions,
+        description_suggestions,
+        landing_page_recommendations,
+        bid_strategy_recommendations,
+        budget_allocation,
+        ab_testing_suggestions,
         executive_summary,
         target_audience_analysis,
-        competitor_analysis_summary,
-        keyword_research_summary
+        competitor_analysis
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
       ) RETURNING *
     `, [
       clientId,
       projectId,
-      strategy.primary_keywords || [],
-      strategy.secondary_keywords || [],
-      JSON.stringify(strategy.content_pillars || []),
-      JSON.stringify(strategy.content_calendar || []),
-      strategy.technical_seo_recommendations || '',
-      JSON.stringify(strategy.link_building_opportunities || []),
-      JSON.stringify(strategy.content_gap_analysis || []),
-      JSON.stringify(strategy.competitor_gaps || []),
+      JSON.stringify(strategy.campaign_structure || []),
+      JSON.stringify(strategy.campaign_structure || []), // Use same for recommended_campaigns
+      JSON.stringify(strategy.primary_keywords || []),
+      JSON.stringify((strategy.primary_keywords || []).map(kw => kw.match_type || 'broad')), // Extract match types
+      strategy.negative_keywords || [],
+      JSON.stringify(strategy.ad_copy_variations || []),
+      JSON.stringify((strategy.ad_copy_variations || []).flatMap(ad => ad.headlines || [])),
+      JSON.stringify((strategy.ad_copy_variations || []).flatMap(ad => ad.descriptions || [])),
+      strategy.landing_page_recommendations || '',
+      strategy.bid_strategy_recommendations || '',
+      JSON.stringify(strategy.budget_allocation || []),
+      JSON.stringify(strategy.ab_testing_suggestions || []),
       strategy.executive_summary || '',
       strategy.target_audience_analysis || '',
-      strategy.competitor_analysis_summary || '',
-      `Primary: ${(strategy.primary_keywords || []).join(', ')} | Secondary: ${(strategy.secondary_keywords || []).join(', ')}`
+      strategy.competitor_analysis || ''
     ]);
     
     return result.rows[0];
   } catch (error) {
-    console.error('Error saving SEO strategy:', error);
+    console.error('Error saving Google Ads strategy:', error);
     throw error;
   }
 }
 
 /**
- * Get SEO strategies for a project
+ * Get Google Ads strategies for a project
  */
-export async function getSEOStrategiesByProject(projectId) {
+export async function getGoogleAdsStrategiesByProject(projectId) {
   try {
     const result = await pool.query(
-      'SELECT * FROM seo_strategies WHERE project_id = $1 ORDER BY created_at DESC',
+      'SELECT * FROM google_ads_strategies WHERE project_id = $1 ORDER BY created_at DESC',
       [projectId]
     );
     return result.rows;
   } catch (error) {
-    console.error('Error fetching SEO strategies:', error);
+    console.error('Error fetching Google Ads strategies:', error);
     throw error;
   }
 }
 
 /**
- * Get specific SEO strategy by ID
+ * Get specific Google Ads strategy by ID
  */
-export async function getSEOStrategyById(strategyId) {
+export async function getGoogleAdsStrategyById(strategyId) {
   try {
     const result = await pool.query(
-      'SELECT * FROM seo_strategies WHERE id = $1',
+      'SELECT * FROM google_ads_strategies WHERE id = $1',
       [strategyId]
     );
     return result.rows[0] || null;
   } catch (error) {
-    console.error('Error fetching SEO strategy:', error);
+    console.error('Error fetching Google Ads strategy:', error);
     throw error;
   }
 }
 
 /**
- * Update SEO strategy
+ * Update Google Ads strategy
  */
-export async function updateSEOStrategy(strategyId, updates) {
+export async function updateGoogleAdsStrategy(strategyId, updates) {
   try {
     const fields = [];
     const values = [];
     let paramCount = 1;
     
     const allowedFields = [
-      'primary_keywords', 'secondary_keywords', 'content_pillars',
-      'content_calendar', 'technical_seo_recommendations',
-      'link_building_opportunities', 'content_gap_analysis',
-      'competitor_gaps', 'executive_summary', 'target_audience_analysis',
-      'competitor_analysis_summary'
+      'campaign_structure', 'primary_keywords', 'negative_keywords',
+      'ad_copy_variations', 'landing_page_recommendations',
+      'bid_strategy_recommendations', 'budget_allocation',
+      'ab_testing_suggestions', 'executive_summary', 'target_audience_analysis',
+      'competitor_analysis'
     ];
     
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key)) {
         fields.push(`${key} = $${paramCount}`);
         // Handle JSONB fields
-        if (['content_pillars', 'content_calendar', 'link_building_opportunities', 
-             'content_gap_analysis', 'competitor_gaps'].includes(key)) {
+        if (['campaign_structure', 'primary_keywords', 'ad_copy_variations', 
+             'budget_allocation', 'ab_testing_suggestions'].includes(key)) {
           values.push(JSON.stringify(value));
         } else {
           values.push(value);
@@ -423,7 +423,7 @@ export async function updateSEOStrategy(strategyId, updates) {
     
     values.push(strategyId);
     const query = `
-      UPDATE seo_strategies 
+      UPDATE google_ads_strategies 
       SET ${fields.join(', ')}
       WHERE id = $${paramCount}
       RETURNING *
@@ -432,23 +432,23 @@ export async function updateSEOStrategy(strategyId, updates) {
     const result = await pool.query(query, values);
     return result.rows[0];
   } catch (error) {
-    console.error('Error updating SEO strategy:', error);
+    console.error('Error updating Google Ads strategy:', error);
     throw error;
   }
 }
 
 /**
- * Delete SEO strategy
+ * Delete Google Ads strategy
  */
-export async function deleteSEOStrategy(strategyId) {
+export async function deleteGoogleAdsStrategy(strategyId) {
   try {
     const result = await pool.query(
-      'DELETE FROM seo_strategies WHERE id = $1 RETURNING id',
+      'DELETE FROM google_ads_strategies WHERE id = $1 RETURNING id',
       [strategyId]
     );
     return result.rows[0] || null;
   } catch (error) {
-    console.error('Error deleting SEO strategy:', error);
+    console.error('Error deleting Google Ads strategy:', error);
     throw error;
   }
 }

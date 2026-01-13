@@ -11,6 +11,7 @@ import articleIdeasRouter from './routes/articleIdeas.js';
 import videoRouter from './routes/video.js';
 import imagesRouter from './routes/images.js';
 import seoStrategyRouter from './routes/seoStrategy.js';
+import googleAdsStrategyRouter from './routes/googleAdsStrategy.js';
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/article-ideas', articleIdeasRouter);
 app.use('/api/video', videoRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/seo-strategy', seoStrategyRouter);
+app.use('/api/google-ads-strategy', googleAdsStrategyRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

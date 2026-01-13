@@ -21,7 +21,7 @@ export const config = {
   
   api: {
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    claudeModel: process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20241022', // Claude Sonnet for superior strategic thinking
+    claudeModel: process.env.CLAUDE_MODEL || 'claude-3-haiku-20240307', // Default to Haiku (Sonnet available with upgraded API key)
   },
   
   frontend: {
