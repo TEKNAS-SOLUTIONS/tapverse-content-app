@@ -1,0 +1,27 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Clients from './pages/Clients';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import AdminSetup from './pages/AdminSetup';
+
+function App() {
+  return (
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:projectId" element={<ProjectDetail />} />
+          <Route path="/clients/:clientId/projects" element={<Projects />} />
+          <Route path="/admin" element={<AdminSetup />} />
+        </Routes>
+      </Layout>
+    </Router>
+  );
+}
+
+export default App;
+
