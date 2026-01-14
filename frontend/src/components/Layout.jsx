@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Breadcrumb from './Breadcrumb';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -52,6 +53,7 @@ function Layout({ children }) {
       
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb />
         {children}
       </main>
       
