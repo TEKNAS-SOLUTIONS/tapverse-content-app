@@ -80,13 +80,6 @@ function ProjectDetail() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-gray-400">
-        <Link to="/projects" className="hover:text-white">Projects</Link>
-        <span className="mx-2">/</span>
-        <span className="text-white">{project.project_name}</span>
-      </nav>
-
       {/* Project Header */}
       <div className="bg-gray-800 rounded-lg p-6">
         <div className="flex justify-between items-start">
