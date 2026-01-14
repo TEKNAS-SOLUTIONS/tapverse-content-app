@@ -5,10 +5,13 @@ import ClientForm from '../components/ClientForm';
 
 function Clients() {
   const [clients, setClients] = useState([]);
+  const [filteredClients, setFilteredClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterIndustry, setFilterIndustry] = useState('');
 
   useEffect(() => {
     loadClients();
@@ -21,6 +24,7 @@ function Clients() {
       const response = await clientsAPI.getAll();
       if (response.data.success) {
         setClients(response.data.data);
+        setFilteredClients(response.data.data);
       }
     } catch (err) {
       setError(err.message || 'Failed to load clients');
@@ -28,6 +32,29 @@ function Clients() {
       setLoading(false);
     }
   };
+
+  // Filter clients based on search query and industry
+  useEffect(() => {
+    let filtered = [...clients];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(client =>
+        client.company_name?.toLowerCase().includes(query) ||
+        client.tapverse_client_id?.toLowerCase().includes(query) ||
+        client.website_url?.toLowerCase().includes(query) ||
+        client.industry?.toLowerCase().includes(query)
+      );
+    }
+
+    // Industry filter
+    if (filterIndustry) {
+      filtered = filtered.filter(client => client.industry === filterIndustry);
+    }
+
+    setFilteredClients(filtered);
+  }, [clients, searchQuery, filterIndustry]);
 
   const handleCreate = () => {
     setEditingClient(null);
@@ -91,7 +118,7 @@ function Clients() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl font-bold text-white">Clients</h1>
         <button
           onClick={handleCreate}
@@ -100,6 +127,41 @@ function Clients() {
           + Create Client
         </button>
       </div>
+
+      {/* Search and Filter Bar */}
+      {!showForm && clients.length > 0 && (
+        <div className="mb-6 bg-slate-900 rounded-xl border border-slate-800 p-4 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-2">
+              Search Clients
+            </label>
+            <input
+              type="text"
+              id="search"
+              placeholder="Search by name, ID, website, or industry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="sm:w-64">
+            <label htmlFor="industry-filter" className="block text-sm font-medium text-gray-300 mb-2">
+              Filter by Industry
+            </label>
+            <select
+              id="industry-filter"
+              value={filterIndustry}
+              onChange={(e) => setFilterIndustry(e.target.value)}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Industries</option>
+              {[...new Set(clients.map(c => c.industry).filter(Boolean))].sort().map(industry => (
+                <option key={industry} value={industry}>{industry}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 p-4 bg-red-900/50 border border-red-500 rounded-lg">
@@ -112,20 +174,41 @@ function Clients() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="text-gray-400 mt-4">Loading clients...</p>
         </div>
-      ) : clients.length === 0 ? (
+      ) : filteredClients.length === 0 ? (
         <div className="text-center py-12 bg-slate-900 rounded-xl border border-slate-800">
-          <span className="text-6xl mb-4 block">👥</span>
-          <p className="text-gray-400 text-lg">No clients found.</p>
-          <button
-            onClick={handleCreate}
-            className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Your First Client
-          </button>
+          <span className="text-6xl mb-4 block">
+            {clients.length === 0 ? '👥' : '🔍'}
+          </span>
+          <p className="text-gray-400 text-lg">
+            {clients.length === 0 ? 'No clients found.' : 'No clients match your search criteria.'}
+          </p>
+          {clients.length === 0 ? (
+            <button
+              onClick={handleCreate}
+              className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create Your First Client
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setFilterIndustry('');
+              }}
+              className="mt-4 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
-          {clients.map((client) => (
+          {filteredClients.length > 0 && clients.length > filteredClients.length && (
+            <div className="text-sm text-gray-400 mb-2">
+              Showing {filteredClients.length} of {clients.length} clients
+            </div>
+          )}
+          {filteredClients.map((client) => (
             <div key={client.id} className="bg-slate-900 rounded-xl border border-slate-800 p-6 hover:border-slate-700 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
