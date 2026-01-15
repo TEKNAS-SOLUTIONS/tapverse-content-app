@@ -9,6 +9,7 @@ import FacebookAdsStrategy from '../components/FacebookAdsStrategy';
 import ContentScheduling from '../components/ContentScheduling';
 import EmailNewsletter from '../components/EmailNewsletter';
 import ContentRoadmap from '../components/ContentRoadmap';
+import StrategyDashboard from '../components/StrategyDashboard';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -16,7 +17,7 @@ function ProjectDetail() {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('seo-strategy'); // 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', 'generate', 'scheduling', 'email'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', 'roadmap', 'generate', 'scheduling', 'email'
 
   useEffect(() => {
     loadProject();
@@ -179,6 +180,17 @@ function ProjectDetail() {
       {/* Tab Navigation */}
       <div className="flex gap-2 bg-gray-800 p-2 rounded-xl flex-wrap">
         <button
+          onClick={() => setActiveTab('dashboard')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'dashboard'
+              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          📊 Strategy Dashboard
+          <span className="ml-2 text-sm opacity-75">Overview</span>
+        </button>
+        <button
           onClick={() => setActiveTab('seo-strategy')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'seo-strategy'
@@ -269,7 +281,13 @@ function ProjectDetail() {
       </div>
 
       {/* Content Area */}
-      {activeTab === 'seo-strategy' ? (
+      {activeTab === 'dashboard' ? (
+        <StrategyDashboard 
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
+        />
+      ) : activeTab === 'seo-strategy' ? (
         <SEOStrategy 
           projectId={projectId}
           clientData={client}

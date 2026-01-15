@@ -326,5 +326,12 @@ export const contentRoadmapAPI = {
   deleteArticle: (projectId, articleId) => api.delete(`/roadmap/${projectId}/article/${articleId}`),
 };
 
+/**
+ * Dashboard API
+ */
+export const dashboardAPI = {
+  getByProject: (projectId) => api.get(`/dashboard/${projectId}`),
+};
+
 export default api;
 

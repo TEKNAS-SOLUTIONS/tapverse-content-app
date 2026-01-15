@@ -17,6 +17,7 @@ import schedulingRouter from './routes/scheduling.js';
 import emailNewslettersRouter from './routes/emailNewsletters.js';
 import analyticsRouter from './routes/analytics.js';
 import contentRoadmapRouter from './routes/contentRoadmap.js';
+import dashboardRouter from './routes/dashboard.js';
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use('/api/scheduling', schedulingRouter);
 app.use('/api/email-newsletters', emailNewslettersRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/roadmap', contentRoadmapRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
