@@ -6,71 +6,13 @@ import pool from '../db/index.js';
  * 
  * Generates comprehensive SEO strategies using Claude Sonnet
  * Includes: keyword research, content pillars, technical SEO, competitor analysis
+ * Supports business-type-specific strategies: General, Local, Shopify
  */
 
 /**
- * Generate comprehensive SEO strategy for a project
- * @param {string} projectId - Project ID
- * @param {object} clientData - Client data (industry, competitors, brand info)
- * @param {object} projectData - Project data (keywords, target audience, goals)
- * @returns {Promise<object>} Generated SEO strategy
+ * Build prompt for General Business (Blog, SaaS, Services, Agency)
  */
-export async function generateSEOStrategy(projectId, clientData = {}, projectData = {}) {
-  try {
-    // Fetch existing project and client data from database
-    const projectResult = await pool.query(
-      'SELECT * FROM projects WHERE id = $1',
-      [projectId]
-    );
-    
-    if (projectResult.rows.length === 0) {
-      throw new Error('Project not found');
-    }
-    
-    const project = projectResult.rows[0];
-    const clientId = project.client_id;
-    
-    const clientResult = await pool.query(
-      'SELECT * FROM clients WHERE id = $1',
-      [clientId]
-    );
-    
-    if (clientResult.rows.length === 0) {
-      throw new Error('Client not found');
-    }
-    
-    const client = clientResult.rows[0];
-    
-    // Merge database data with provided data
-    const mergedClientData = {
-      ...client,
-      ...clientData,
-      competitors: client.competitors || clientData.competitors || [],
-    };
-    
-    const mergedProjectData = {
-      ...project,
-      ...projectData,
-      keywords: project.keywords || projectData.keywords || [],
-    };
-    
-    // Generate strategy using Claude
-    const strategy = await generateStrategyWithAI(mergedClientData, mergedProjectData);
-    
-    // Save to database
-    const savedStrategy = await saveSEOStrategy(projectId, clientId, strategy);
-    
-    return savedStrategy;
-  } catch (error) {
-    console.error('Error generating SEO strategy:', error);
-    throw new Error(`Failed to generate SEO strategy: ${error.message}`);
-  }
-}
-
-/**
- * Generate SEO strategy using Claude AI
- */
-async function generateStrategyWithAI(clientData, projectData) {
+function buildGeneralBusinessPrompt(clientData, projectData) {
   const industry = clientData.industry || 'General';
   const companyName = clientData.company_name || 'Client';
   const targetAudience = projectData.target_audience || clientData.target_audience || 'General audience';
@@ -82,18 +24,16 @@ async function generateStrategyWithAI(clientData, projectData) {
   const systemPrompt = `You are an expert SEO strategist with 15+ years of experience. 
 You create comprehensive, data-driven SEO strategies that drive real business results.
 
-Your strategies include:
-- Deep keyword research and gap analysis
-- Content pillar architecture
-- Technical SEO recommendations
-- Competitor content gap analysis
-- Link building opportunities
-- Content calendar recommendations
-- SEO-optimized content briefs
+Your strategies focus on:
+- Thought leadership and brand authority
+- Organic traffic growth
+- Long-form content and whitepapers
+- Informational and navigational keyword intent
+- Brand awareness and industry positioning
 
 Always provide actionable, specific recommendations backed by strategic thinking.`;
 
-  const userPrompt = `Create a comprehensive SEO strategy for:
+  const userPrompt = `Create a comprehensive SEO strategy for a GENERAL BUSINESS:
 
 COMPANY: ${companyName}
 INDUSTRY: ${industry}
@@ -102,6 +42,14 @@ BRAND VOICE: ${brandVoice}
 BRAND TONE: ${brandTone}
 PRIMARY KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'To be researched'}
 COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
+
+Focus Areas:
+- Thought leadership content (long-form articles, whitepapers, case studies)
+- Brand authority building
+- Informational and navigational keyword targeting
+- Industry expertise positioning
+- Organic traffic growth
+- Brand mentions and awareness
 
 Generate a complete SEO strategy including:
 
@@ -194,6 +142,405 @@ Format the output as VALID JSON (no trailing commas, all strings quoted):
 }
 
 IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations. Just the JSON object.`;
+
+  return { systemPrompt, userPrompt };
+}
+
+/**
+ * Build prompt for Local Business (Dentist, Plumber, Salon, Lawyer, etc.)
+ */
+function buildLocalBusinessPrompt(clientData, projectData, location) {
+  const industry = clientData.industry || 'Local Business';
+  const companyName = clientData.company_name || 'Client';
+  const targetAudience = projectData.target_audience || clientData.target_audience || 'Local customers';
+  const keywords = projectData.keywords || [];
+  const competitors = clientData.competitors || [];
+  const brandVoice = clientData.brand_voice || 'Professional';
+  const brandTone = clientData.brand_tone || 'Professional';
+  
+  const systemPrompt = `You are an expert local SEO strategist with 15+ years of experience. 
+You create comprehensive, data-driven local SEO strategies that drive real business results.
+
+Your strategies focus on:
+- Local visibility and Google My Business optimization
+- Local pack rankings
+- Location-based keyword targeting
+- Local citations and directories
+- Review strategy and reputation management
+- Local link building
+- Service area targeting
+
+Always provide actionable, specific recommendations backed by strategic thinking.`;
+
+  const userPrompt = `Create a comprehensive LOCAL BUSINESS SEO strategy for:
+
+COMPANY: ${companyName}
+INDUSTRY: ${industry}
+LOCATION: ${location}
+TARGET AUDIENCE: ${targetAudience}
+BRAND VOICE: ${brandVoice}
+BRAND TONE: ${brandTone}
+PRIMARY KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'To be researched'}
+COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
+
+Focus Areas:
+- Local pack rankings (Google Maps)
+- Google My Business optimization
+- Local citations and directory listings
+- Review strategy and reputation management
+- Location-based keyword targeting (city + service)
+- Local link building
+- Service area pages
+- Local content (guides, service pages, location-specific content)
+- Phone calls and store visits
+- Local traffic growth
+
+Generate a complete local SEO strategy including:
+
+1. EXECUTIVE SUMMARY
+   - Overview of local SEO opportunity
+   - Key recommendations summary
+   - Expected outcomes (local pack position, phone calls, store visits)
+
+2. KEYWORD RESEARCH
+   - Local primary keywords (city + service, e.g., "dentist in New York")
+   - Secondary local keywords (neighborhood + service, service + near me)
+   - Search intent analysis (local intent)
+   - Keyword difficulty estimates
+   - Search volume estimates
+
+3. CONTENT PILLAR STRATEGY
+   - 3-5 main content pillars (service pages, location pages, local guides)
+   - For each pillar: theme, target keywords, content types, goals
+
+4. CONTENT CALENDAR RECOMMENDATIONS
+   - Monthly content themes
+   - Content types (service pages, location guides, local news, etc.)
+   - Publishing frequency recommendations
+   - Priority content pieces
+
+5. TECHNICAL SEO RECOMMENDATIONS
+   - Local schema markup (LocalBusiness, Service, etc.)
+   - Site speed optimization
+   - Mobile optimization (critical for local)
+   - Site structure improvements
+   - NAP (Name, Address, Phone) consistency
+
+6. GOOGLE MY BUSINESS OPTIMIZATION
+   - Profile optimization recommendations
+   - Posting strategy
+   - Photo optimization
+   - Q&A management
+   - Review response strategy
+
+7. LOCAL CITATIONS & DIRECTORIES
+   - High-priority citation sources
+   - Industry-specific directories
+   - Local business directories
+   - Citation building strategy
+
+8. REVIEW STRATEGY
+   - Review generation tactics
+   - Review response templates
+   - Review monitoring
+   - Reputation management
+
+9. LINK BUILDING OPPORTUNITIES
+   - Local business associations
+   - Chamber of commerce
+   - Local news sites
+   - Community partnerships
+   - Local sponsorships
+
+10. CONTENT GAP ANALYSIS
+    - Missing service pages
+    - Missing location pages
+    - Underperforming local content
+    - Content refresh opportunities
+
+11. COMPETITOR GAP ANALYSIS
+    - Local competitors' strengths
+    - Opportunities to outperform local competitors
+    - Competitive positioning recommendations
+
+12. TARGET AUDIENCE ANALYSIS
+    - Local customer personas
+    - Local search behavior patterns
+    - Content preferences
+
+13. COMPETITOR ANALYSIS SUMMARY
+    - Top local competitors' strengths
+    - Opportunities to outperform competitors
+    - Competitive positioning recommendations
+
+CRITICAL: Keep the response concise and within 4000 tokens. Focus on the most important recommendations.
+
+Format the output as VALID JSON (same structure as general business, but include local-specific fields):
+{
+  "executive_summary": "Brief 2-3 sentence overview with local focus",
+  "primary_keywords": ["local keyword 1", "local keyword 2", ...],
+  "secondary_keywords": ["local keyword 1", "local keyword 2", ...],
+  "content_pillars": [
+    {"theme": "Pillar 1", "target_keywords": ["kw1", "kw2"], "goals": "Brief goal"}
+  ],
+  "content_calendar": [...],
+  "technical_seo_recommendations": "Include local schema markup, NAP consistency",
+  "link_building_opportunities": [...],
+  "content_gap_analysis": [...],
+  "competitor_gaps": [...],
+  "target_audience_analysis": "Local customer focus",
+  "competitor_analysis_summary": "Local competitor focus"
+}
+
+IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations. Just the JSON object.`;
+
+  return { systemPrompt, userPrompt };
+}
+
+/**
+ * Build prompt for Shopify Store (E-commerce)
+ */
+function buildShopifyPrompt(clientData, projectData) {
+  const industry = clientData.industry || 'E-commerce';
+  const companyName = clientData.company_name || 'Client';
+  const targetAudience = projectData.target_audience || clientData.target_audience || 'Online shoppers';
+  const keywords = projectData.keywords || [];
+  const competitors = clientData.competitors || [];
+  const brandVoice = clientData.brand_voice || 'Professional';
+  const brandTone = clientData.brand_tone || 'Professional';
+  const shopifyUrl = clientData.shopify_url || '';
+  
+  const systemPrompt = `You are an expert e-commerce SEO strategist with 15+ years of experience. 
+You create comprehensive, data-driven e-commerce SEO strategies that drive real business results.
+
+Your strategies focus on:
+- Product page optimization
+- Category page strategy
+- Commercial keyword targeting
+- Conversion optimization
+- Product schema markup
+- Shopping feed optimization
+- Revenue-focused content
+- Buying guides and product comparisons
+
+Always provide actionable, specific recommendations backed by strategic thinking.`;
+
+  const userPrompt = `Create a comprehensive SHOPIFY E-COMMERCE SEO strategy for:
+
+COMPANY: ${companyName}
+INDUSTRY: ${industry}
+SHOPIFY STORE: ${shopifyUrl}
+TARGET AUDIENCE: ${targetAudience}
+BRAND VOICE: ${brandVoice}
+BRAND TONE: ${brandTone}
+PRIMARY KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'To be researched'}
+COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
+
+Focus Areas:
+- Product page optimization
+- Category page strategy
+- Commercial keyword targeting (buying intent)
+- Conversion rate optimization
+- Product schema markup
+- Shopping feed optimization
+- Revenue-focused content
+- Buying guides and product comparisons
+- Product page traffic
+- Conversion rate
+- Average order value
+- Revenue growth
+
+Generate a complete e-commerce SEO strategy including:
+
+1. EXECUTIVE SUMMARY
+   - Overview of e-commerce SEO opportunity
+   - Key recommendations summary
+   - Expected outcomes (product page traffic, conversion rate, revenue)
+
+2. KEYWORD RESEARCH
+   - Commercial primary keywords (product keywords, buying keywords)
+   - Secondary keywords (category keywords, comparison keywords)
+   - Search intent analysis (commercial intent)
+   - Keyword difficulty estimates
+   - Search volume estimates
+
+3. CONTENT PILLAR STRATEGY
+   - 3-5 main content pillars (product categories, buying guides, comparisons)
+   - For each pillar: theme, target keywords, content types, goals
+
+4. CONTENT CALENDAR RECOMMENDATIONS
+   - Monthly content themes
+   - Content types (product pages, buying guides, comparisons, blog posts)
+   - Publishing frequency recommendations
+   - Priority content pieces
+
+5. TECHNICAL SEO RECOMMENDATIONS
+   - Product schema markup (Product, Offer, AggregateRating)
+   - Category page optimization
+   - Site speed optimization (critical for e-commerce)
+   - Mobile optimization
+   - Site structure improvements
+   - Faceted navigation optimization
+
+6. PRODUCT PAGE OPTIMIZATION
+   - Product title optimization
+   - Product description optimization
+   - Image optimization
+   - Review integration
+   - Related products strategy
+
+7. CATEGORY PAGE STRATEGY
+   - Category page optimization
+   - Category descriptions
+   - Filter optimization
+   - Category content strategy
+
+8. LINK BUILDING OPPORTUNITIES
+   - Product review sites
+   - Industry blogs
+   - Influencer partnerships
+   - Resource page opportunities
+   - Content-based link building
+
+9. CONTENT GAP ANALYSIS
+   - Missing product pages
+   - Missing category pages
+   - Missing buying guides
+   - Missing product comparisons
+   - Underperforming product content
+
+10. COMPETITOR GAP ANALYSIS
+    - Product pages competitors rank for
+    - Category strategies competitors use
+    - Keyword opportunities competitors miss
+    - Content formats competitors use
+
+11. TARGET AUDIENCE ANALYSIS
+    - Customer personas
+    - Shopping behavior patterns
+    - Content preferences
+    - Buying journey
+
+12. COMPETITOR ANALYSIS SUMMARY
+    - Top competitors' strengths
+    - Opportunities to outperform competitors
+    - Competitive positioning recommendations
+
+CRITICAL: Keep the response concise and within 4000 tokens. Focus on the most important recommendations.
+
+Format the output as VALID JSON (same structure as general business, but include e-commerce-specific focus):
+{
+  "executive_summary": "Brief 2-3 sentence overview with e-commerce focus",
+  "primary_keywords": ["commercial keyword 1", "product keyword 2", ...],
+  "secondary_keywords": ["category keyword 1", "buying keyword 2", ...],
+  "content_pillars": [
+    {"theme": "Pillar 1", "target_keywords": ["kw1", "kw2"], "goals": "Brief goal"}
+  ],
+  "content_calendar": [...],
+  "technical_seo_recommendations": "Include product schema, category optimization",
+  "link_building_opportunities": [...],
+  "content_gap_analysis": [...],
+  "competitor_gaps": [...],
+  "target_audience_analysis": "E-commerce customer focus",
+  "competitor_analysis_summary": "E-commerce competitor focus"
+}
+
+IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations. Just the JSON object.`;
+
+  return { systemPrompt, userPrompt };
+}
+
+/**
+ * Generate comprehensive SEO strategy for a project
+ * @param {string} projectId - Project ID
+ * @param {object} clientData - Client data (industry, competitors, brand info)
+ * @param {object} projectData - Project data (keywords, target audience, goals)
+ * @returns {Promise<object>} Generated SEO strategy
+ */
+export async function generateSEOStrategy(projectId, clientData = {}, projectData = {}) {
+  try {
+    // Fetch existing project and client data from database
+    const projectResult = await pool.query(
+      'SELECT * FROM projects WHERE id = $1',
+      [projectId]
+    );
+    
+    if (projectResult.rows.length === 0) {
+      throw new Error('Project not found');
+    }
+    
+    const project = projectResult.rows[0];
+    const clientId = project.client_id;
+    
+    const clientResult = await pool.query(
+      'SELECT * FROM clients WHERE id = $1',
+      [clientId]
+    );
+    
+    if (clientResult.rows.length === 0) {
+      throw new Error('Client not found');
+    }
+    
+    const client = clientResult.rows[0];
+    
+    // Merge database data with provided data
+    const mergedClientData = {
+      ...client,
+      ...clientData,
+      competitors: client.competitors || clientData.competitors || [],
+    };
+    
+    const mergedProjectData = {
+      ...project,
+      ...projectData,
+      keywords: project.keywords || projectData.keywords || [],
+    };
+    
+    // Generate strategy using Claude
+    const strategy = await generateStrategyWithAI(mergedClientData, mergedProjectData);
+    
+    // Save to database
+    const savedStrategy = await saveSEOStrategy(projectId, clientId, strategy);
+    
+    return savedStrategy;
+  } catch (error) {
+    console.error('Error generating SEO strategy:', error);
+    throw new Error(`Failed to generate SEO strategy: ${error.message}`);
+  }
+}
+
+/**
+ * Generate SEO strategy using Claude AI
+ */
+async function generateStrategyWithAI(clientData, projectData) {
+  const industry = clientData.industry || 'General';
+  const companyName = clientData.company_name || 'Client';
+  const targetAudience = projectData.target_audience || clientData.target_audience || 'General audience';
+  const keywords = projectData.keywords || [];
+  const competitors = clientData.competitors || [];
+  const brandVoice = clientData.brand_voice || 'Professional';
+  const brandTone = clientData.brand_tone || 'Professional';
+  
+  // Detect business type
+  const businessTypes = clientData.business_types || ['general'];
+  const primaryBusinessType = clientData.primary_business_type || businessTypes[0] || 'general';
+  const location = clientData.location || '';
+  
+  // Select appropriate prompt builder based on business type
+  let systemPrompt, userPrompt;
+  
+  if (primaryBusinessType === 'local') {
+    ({ systemPrompt, userPrompt } = buildLocalBusinessPrompt(clientData, projectData, location));
+  } else if (primaryBusinessType === 'shopify') {
+    ({ systemPrompt, userPrompt } = buildShopifyPrompt(clientData, projectData));
+  } else {
+    ({ systemPrompt, userPrompt } = buildGeneralBusinessPrompt(clientData, projectData));
+  }
+  
+  // If multiple types, add note about multi-type strategy
+  if (businessTypes.length > 1) {
+    userPrompt += `\n\nNOTE: This client has multiple business types: ${businessTypes.join(', ')}. Focus on ${primaryBusinessType} as primary, but consider elements from other types where relevant.`;
+  }
 
   try {
     // Get model from database or use default
