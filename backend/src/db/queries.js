@@ -33,6 +33,11 @@ export async function createClient(clientData) {
     linkedin_ad_account_id,
     twitter_handle,
     tiktok_account_id,
+    // Business Types
+    business_types = ['general'],
+    primary_business_type = 'general',
+    location,
+    shopify_url,
   } = clientData;
 
   const result = await query(
@@ -42,8 +47,9 @@ export async function createClient(clientData) {
       subscribed_services, brand_voice, brand_tone, content_guidelines, sample_content,
       google_ads_customer_id, google_search_console_property, google_analytics_property_id,
       facebook_ad_account_id, facebook_page_id, instagram_account_id, 
-      linkedin_page_id, linkedin_ad_account_id, twitter_handle, tiktok_account_id
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+      linkedin_page_id, linkedin_ad_account_id, twitter_handle, tiktok_account_id,
+      business_types, primary_business_type, location, shopify_url
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)
     RETURNING *`,
     [
       id, tapverse_client_id, company_name, website_url, 
@@ -51,7 +57,8 @@ export async function createClient(clientData) {
       subscribed_services, brand_voice, brand_tone, content_guidelines, sample_content,
       google_ads_customer_id, google_search_console_property, google_analytics_property_id,
       facebook_ad_account_id, facebook_page_id, instagram_account_id,
-      linkedin_page_id, linkedin_ad_account_id, twitter_handle, tiktok_account_id
+      linkedin_page_id, linkedin_ad_account_id, twitter_handle, tiktok_account_id,
+      business_types, primary_business_type, location, shopify_url
     ]
   );
 
@@ -100,6 +107,11 @@ export async function updateClient(id, clientData) {
     linkedin_ad_account_id,
     twitter_handle,
     tiktok_account_id,
+    // Business Types
+    business_types,
+    primary_business_type,
+    location,
+    shopify_url,
   } = clientData;
 
   const result = await query(
@@ -126,8 +138,12 @@ export async function updateClient(id, clientData) {
         linkedin_ad_account_id = COALESCE($20, linkedin_ad_account_id),
         twitter_handle = COALESCE($21, twitter_handle),
         tiktok_account_id = COALESCE($22, tiktok_account_id),
+        business_types = COALESCE($23, business_types),
+        primary_business_type = COALESCE($24, primary_business_type),
+        location = COALESCE($25, location),
+        shopify_url = COALESCE($26, shopify_url),
         updated_at = CURRENT_TIMESTAMP
-    WHERE id = $23
+    WHERE id = $27
     RETURNING *`,
     [
       company_name, website_url, industry, target_audience, unique_selling_points, is_active,
@@ -135,6 +151,7 @@ export async function updateClient(id, clientData) {
       google_ads_customer_id, google_search_console_property, google_analytics_property_id,
       facebook_ad_account_id, facebook_page_id, instagram_account_id,
       linkedin_page_id, linkedin_ad_account_id, twitter_handle, tiktok_account_id,
+      business_types, primary_business_type, location, shopify_url,
       id
     ]
   );

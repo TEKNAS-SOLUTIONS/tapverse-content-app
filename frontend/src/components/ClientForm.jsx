@@ -21,6 +21,12 @@ const BRAND_TONES = [
   { value: 'playful', label: 'Playful' },
 ];
 
+const BUSINESS_TYPES = [
+  { id: 'general', label: 'General Business', description: 'Blog, SaaS, Services, Agency' },
+  { id: 'local', label: 'Local Business', description: 'Dentist, Plumber, Salon, Lawyer, etc.' },
+  { id: 'shopify', label: 'Shopify Store', description: 'E-commerce stores' },
+];
+
 function ClientForm({ onSubmit, onCancel, initialData = null }) {
   const [formData, setFormData] = useState({
     // Basic Info
@@ -54,6 +60,11 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
     twitter_handle: '',
     // Platform IDs - TikTok
     tiktok_account_id: '',
+    // Business Types
+    business_types: ['general'],
+    primary_business_type: 'general',
+    location: '',
+    shopify_url: '',
   });
   const [competitorInput, setCompetitorInput] = useState('');
 
@@ -67,6 +78,10 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
         ...initialData,
         subscribed_services: initialData.subscribed_services || [],
         competitors: initialData.competitors || [],
+        business_types: initialData.business_types || ['general'],
+        primary_business_type: initialData.primary_business_type || 'general',
+        location: initialData.location || '',
+        shopify_url: initialData.shopify_url || '',
       });
     }
   }, [initialData]);
@@ -97,6 +112,35 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
         return {
           ...prev,
           subscribed_services: [...services, serviceId],
+        };
+      }
+    });
+  };
+
+  const handleBusinessTypeToggle = (typeId) => {
+    setFormData((prev) => {
+      const types = prev.business_types || [];
+      let newTypes;
+      if (types.includes(typeId)) {
+        newTypes = types.filter((t) => t !== typeId);
+        // If removing primary type, set first remaining as primary
+        if (prev.primary_business_type === typeId) {
+          return {
+            ...prev,
+            business_types: newTypes.length > 0 ? newTypes : ['general'],
+            primary_business_type: newTypes.length > 0 ? newTypes[0] : 'general',
+          };
+        }
+        return {
+          ...prev,
+          business_types: newTypes.length > 0 ? newTypes : ['general'],
+        };
+      } else {
+        newTypes = [...types, typeId];
+        return {
+          ...prev,
+          business_types: newTypes,
+          primary_business_type: typeId, // Set newly added as primary
         };
       }
     });
@@ -138,6 +182,22 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
     }
     if (formData.subscribed_services.length === 0) {
       newErrors.subscribed_services = 'At least one service must be selected';
+    }
+    if (formData.business_types.length === 0) {
+      newErrors.business_types = 'At least one business type must be selected';
+    }
+    // Validate local business
+    if (formData.business_types.includes('local') && !formData.location.trim()) {
+      newErrors.location = 'Location is required for local businesses';
+    }
+    // Validate Shopify
+    if (formData.business_types.includes('shopify')) {
+      if (!formData.shopify_url.trim()) {
+        newErrors.shopify_url = 'Shopify Store URL is required for Shopify stores';
+      } else if (!formData.shopify_url.startsWith('https://') || 
+                 (!formData.shopify_url.includes('.myshopify.com') && !formData.shopify_url.includes('shopify'))) {
+        newErrors.shopify_url = 'Shopify URL must start with https:// and contain .myshopify.com or shopify';
+      }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -285,6 +345,99 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
               placeholder="What makes this client different from competitors?"
               className="mt-1 block w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
+          </div>
+
+          {/* Business Types Section */}
+          <div className="mt-6 pt-6 border-t border-gray-600">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              🏢 Business Type *
+            </label>
+            {errors.business_types && (
+              <p className="mb-2 text-sm text-red-400">{errors.business_types}</p>
+            )}
+            <p className="text-xs text-gray-400 mb-3">
+              Select the type(s) of business. You can select multiple types.
+            </p>
+            
+            <div className="space-y-3">
+              {BUSINESS_TYPES.map((type) => (
+                <label
+                  key={type.id}
+                  className={`flex items-start p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                    formData.business_types.includes(type.id)
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-gray-600 bg-gray-600/30 hover:border-gray-500'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.business_types.includes(type.id)}
+                    onChange={() => handleBusinessTypeToggle(type.id)}
+                    className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-white">{type.label}</div>
+                    <div className="text-xs text-gray-400">{type.description}</div>
+                    {formData.business_types.includes(type.id) && formData.primary_business_type === type.id && (
+                      <div className="mt-1 text-xs text-blue-400">⭐ Primary</div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Conditional Fields */}
+            {formData.business_types.includes('local') && (
+              <div className="mt-4 p-4 bg-gray-600/50 rounded-lg">
+                <label htmlFor="location" className="block text-sm font-medium text-gray-300 mb-2">
+                  Location * <span className="text-xs text-gray-400">(City, State or full address)</span>
+                </label>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g., New York, NY or 123 Main St, New York, NY 10001"
+                  className={`w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
+                    errors.location ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.location && (
+                  <p className="mt-1 text-sm text-red-400">{errors.location}</p>
+                )}
+              </div>
+            )}
+
+            {formData.business_types.includes('shopify') && (
+              <div className="mt-4 p-4 bg-gray-600/50 rounded-lg">
+                <label htmlFor="shopify_url" className="block text-sm font-medium text-gray-300 mb-2">
+                  Shopify Store URL * <span className="text-xs text-gray-400">(e.g., https://store.myshopify.com)</span>
+                </label>
+                <input
+                  type="url"
+                  id="shopify_url"
+                  name="shopify_url"
+                  value={formData.shopify_url}
+                  onChange={handleChange}
+                  placeholder="https://store.myshopify.com"
+                  className={`w-full rounded-md bg-gray-600 border-gray-500 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
+                    errors.shopify_url ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.shopify_url && (
+                  <p className="mt-1 text-sm text-red-400">{errors.shopify_url}</p>
+                )}
+              </div>
+            )}
+
+            {formData.business_types.includes('general') && (
+              <div className="mt-4 p-4 bg-gray-600/50 rounded-lg">
+                <p className="text-xs text-gray-400">
+                  💡 Industry field above is used for general businesses.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Competitors Section */}

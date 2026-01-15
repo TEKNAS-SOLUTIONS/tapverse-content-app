@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/clients - Create a new client
 router.post('/', async (req, res) => {
   try {
-    const { tapverse_client_id, company_name } = req.body;
+    const { tapverse_client_id, company_name, business_types, primary_business_type, location, shopify_url } = req.body;
 
     // Validation
     if (!tapverse_client_id || !company_name) {
@@ -49,6 +49,53 @@ router.post('/', async (req, res) => {
         success: false,
         error: 'tapverse_client_id and company_name are required',
       });
+    }
+
+    // Validate business types
+    const validBusinessTypes = ['general', 'local', 'shopify'];
+    if (business_types) {
+      if (!Array.isArray(business_types) || business_types.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'business_types must be a non-empty array',
+        });
+      }
+      const invalidTypes = business_types.filter(t => !validBusinessTypes.includes(t));
+      if (invalidTypes.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid business types: ${invalidTypes.join(', ')}. Valid types: ${validBusinessTypes.join(', ')}`,
+        });
+      }
+      if (primary_business_type && !business_types.includes(primary_business_type)) {
+        return res.status(400).json({
+          success: false,
+          error: 'primary_business_type must be one of the selected business_types',
+        });
+      }
+    }
+
+    // Validate conditional fields
+    if (business_types?.includes('local') && !location?.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'location is required for local businesses',
+      });
+    }
+    if (business_types?.includes('shopify')) {
+      if (!shopify_url?.trim()) {
+        return res.status(400).json({
+          success: false,
+          error: 'shopify_url is required for Shopify stores',
+        });
+      }
+      if (!shopify_url.startsWith('https://') || 
+          (!shopify_url.includes('.myshopify.com') && !shopify_url.includes('shopify'))) {
+        return res.status(400).json({
+          success: false,
+          error: 'shopify_url must start with https:// and contain .myshopify.com or shopify',
+        });
+      }
     }
 
     // Check if client already exists
@@ -75,11 +122,61 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const clientData = req.body;
+    const { business_types, primary_business_type, location, shopify_url } = clientData;
 
     // Check if client exists
     const existing = await getClientById(id);
     if (!existing) {
       return res.status(404).json({ success: false, error: 'Client not found' });
+    }
+
+    // Validate business types if provided
+    const validBusinessTypes = ['general', 'local', 'shopify'];
+    if (business_types !== undefined) {
+      if (!Array.isArray(business_types) || business_types.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'business_types must be a non-empty array',
+        });
+      }
+      const invalidTypes = business_types.filter(t => !validBusinessTypes.includes(t));
+      if (invalidTypes.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid business types: ${invalidTypes.join(', ')}. Valid types: ${validBusinessTypes.join(', ')}`,
+        });
+      }
+      if (primary_business_type && !business_types.includes(primary_business_type)) {
+        return res.status(400).json({
+          success: false,
+          error: 'primary_business_type must be one of the selected business_types',
+        });
+      }
+    }
+
+    // Validate conditional fields
+    const finalBusinessTypes = business_types || existing.business_types || ['general'];
+    if (finalBusinessTypes.includes('local') && !location?.trim() && !existing.location) {
+      return res.status(400).json({
+        success: false,
+        error: 'location is required for local businesses',
+      });
+    }
+    if (finalBusinessTypes.includes('shopify')) {
+      const finalShopifyUrl = shopify_url || existing.shopify_url;
+      if (!finalShopifyUrl?.trim()) {
+        return res.status(400).json({
+          success: false,
+          error: 'shopify_url is required for Shopify stores',
+        });
+      }
+      if (!finalShopifyUrl.startsWith('https://') || 
+          (!finalShopifyUrl.includes('.myshopify.com') && !finalShopifyUrl.includes('shopify'))) {
+        return res.status(400).json({
+          success: false,
+          error: 'shopify_url must start with https:// and contain .myshopify.com or shopify',
+        });
+      }
     }
 
     const client = await updateClient(id, clientData);
