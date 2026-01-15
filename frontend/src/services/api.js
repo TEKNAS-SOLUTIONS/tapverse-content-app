@@ -315,5 +315,16 @@ export const analyticsAPI = {
   },
 };
 
+/**
+ * Content Roadmap API
+ */
+export const contentRoadmapAPI = {
+  getByProject: (projectId) => api.get(`/roadmap/${projectId}`),
+  reorder: (projectId, articles) => api.put(`/roadmap/${projectId}/reorder`, { articles }),
+  generateArticle: (projectId, articleId) => api.post(`/roadmap/${projectId}/generate-article`, { articleId }),
+  updateArticle: (projectId, articleId, data) => api.put(`/roadmap/${projectId}/article/${articleId}`, data),
+  deleteArticle: (projectId, articleId) => api.delete(`/roadmap/${projectId}/article/${articleId}`),
+};
+
 export default api;
 

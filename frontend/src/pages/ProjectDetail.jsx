@@ -8,6 +8,7 @@ import GoogleAdsStrategy from '../components/GoogleAdsStrategy';
 import FacebookAdsStrategy from '../components/FacebookAdsStrategy';
 import ContentScheduling from '../components/ContentScheduling';
 import EmailNewsletter from '../components/EmailNewsletter';
+import ContentRoadmap from '../components/ContentRoadmap';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -244,6 +245,17 @@ function ProjectDetail() {
           <span className="ml-2 text-sm opacity-75">Publish Content</span>
         </button>
         <button
+          onClick={() => setActiveTab('roadmap')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'roadmap'
+              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          📅 Content Roadmap
+          <span className="ml-2 text-sm opacity-75">12-Month Plan</span>
+        </button>
+        <button
           onClick={() => setActiveTab('email')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'email'
@@ -289,6 +301,11 @@ function ProjectDetail() {
       ) : activeTab === 'email' ? (
         <EmailNewsletter 
           projectId={projectId}
+        />
+      ) : activeTab === 'roadmap' ? (
+        <ContentRoadmap 
+          projectId={projectId}
+          strategy={null}
         />
       ) : (
         <ContentGenerator 
