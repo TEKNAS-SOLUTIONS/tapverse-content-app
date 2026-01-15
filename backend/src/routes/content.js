@@ -8,6 +8,12 @@ import {
 } from '../services/contentGeneration.js';
 import { getProjectById, getClientById } from '../db/queries.js';
 import { query } from '../db/index.js';
+import {
+  calculateSEOScore,
+  calculateReadabilityScore,
+  getAISearchOptimizationNotes,
+  calculateStatistics,
+} from '../services/seoScoreService.js';
 
 const router = express.Router();
 
@@ -338,9 +344,25 @@ router.get('/project/:project_id', async (req, res) => {
       [project_id]
     );
 
+    // Calculate SEO scores and statistics for each content item
+    const contentWithScores = result.rows.map(article => {
+      const seoScore = calculateSEOScore(article);
+      const readabilityScore = calculateReadabilityScore(article);
+      const statistics = calculateStatistics(article);
+      const aiSearchNotes = getAISearchOptimizationNotes(article);
+
+      return {
+        ...article,
+        seo_score: seoScore,
+        readability_score: readabilityScore,
+        statistics,
+        ai_search_notes: aiSearchNotes,
+      };
+    });
+
     res.json({
       success: true,
-      data: result.rows,
+      data: contentWithScores,
     });
   } catch (error) {
     console.error('Error fetching content:', error);
