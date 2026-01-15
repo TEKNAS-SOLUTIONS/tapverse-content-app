@@ -8,6 +8,11 @@ function SEOStrategy({ projectId, clientData, projectData }) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
 
+  // Detect business type
+  const businessTypes = clientData?.business_types || ['general'];
+  const primaryBusinessType = clientData?.primary_business_type || businessTypes[0] || 'general';
+  const location = clientData?.location || '';
+
   useEffect(() => {
     if (projectId) {
       loadStrategies();
@@ -207,6 +212,79 @@ function SEOStrategy({ projectId, clientData, projectData }) {
                         {selectedStrategy.technical_seo_recommendations}
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {/* Local Business Specific Sections */}
+                {primaryBusinessType === 'local' && (
+                  <>
+                    {location && (
+                      <div className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-600/30 rounded-lg p-4">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                          📍 Location Information
+                        </h3>
+                        <p className="text-gray-300">Location: <span className="font-semibold">{location}</span></p>
+                        <p className="text-gray-400 text-sm mt-2">
+                          Focus on local pack rankings, Google My Business optimization, and local citations.
+                        </p>
+                      </div>
+                    )}
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-2">Local SEO Focus Areas</h4>
+                      <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                        <li>Google My Business optimization</li>
+                        <li>Local pack rankings</li>
+                        <li>Local citations and directories</li>
+                        <li>Review strategy and reputation management</li>
+                        <li>Location-based keyword targeting</li>
+                        <li>Service area pages</li>
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {/* Shopify Specific Sections */}
+                {primaryBusinessType === 'shopify' && (
+                  <>
+                    {clientData?.shopify_url && (
+                      <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-600/30 rounded-lg p-4">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                          🛒 Shopify Store
+                        </h3>
+                        <p className="text-gray-300">
+                          Store URL: <a href={clientData.shopify_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">{clientData.shopify_url}</a>
+                        </p>
+                        <p className="text-gray-400 text-sm mt-2">
+                          Focus on product page optimization, category strategy, and conversion optimization.
+                        </p>
+                      </div>
+                    )}
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-2">E-commerce SEO Focus Areas</h4>
+                      <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                        <li>Product page optimization</li>
+                        <li>Category page strategy</li>
+                        <li>Commercial keyword targeting</li>
+                        <li>Product schema markup</li>
+                        <li>Conversion rate optimization</li>
+                        <li>Buying guides and product comparisons</li>
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {/* General Business Specific Sections */}
+                {primaryBusinessType === 'general' && (
+                  <div className="bg-gray-700 rounded-lg p-4">
+                    <h4 className="text-white font-semibold mb-2">General Business SEO Focus Areas</h4>
+                    <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                      <li>Thought leadership content</li>
+                      <li>Brand authority building</li>
+                      <li>Informational and navigational keywords</li>
+                      <li>Long-form articles and whitepapers</li>
+                      <li>Industry expertise positioning</li>
+                      <li>Organic traffic growth</li>
+                    </ul>
                   </div>
                 )}
 
