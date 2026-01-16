@@ -333,5 +333,17 @@ export const dashboardAPI = {
   getByProject: (projectId) => api.get(`/dashboard/${projectId}`),
 };
 
+/**
+ * Content Evidence API
+ * For generating transparent, evidence-based analysis for content
+ */
+export const contentEvidenceAPI = {
+  // Generate enhanced evidence analysis (90%+ confidence without paid APIs)
+  generate: (params) => api.post('/content-evidence/generate', params),
+  
+  // Get evidence for existing content
+  getByContentId: (contentId) => api.get(`/content-evidence/${contentId}`),
+};
+
 export default api;
 

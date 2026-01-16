@@ -6,6 +6,7 @@ import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import AdminSetup from './pages/AdminSetup';
 import Analytics from './pages/Analytics';
+import KeywordAnalysis from './pages/KeywordAnalysis';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/analytics/client/:clientId" element={<Analytics />} />
           <Route path="/analytics/client/:clientId/project/:projectId" element={<Analytics />} />
+          <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
         </Routes>
       </Layout>
     </Router>

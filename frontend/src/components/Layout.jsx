@@ -9,6 +9,7 @@ function Layout({ children }) {
     { path: '/', label: 'Home', icon: '🏠' },
     { path: '/clients', label: 'Clients', icon: '👥' },
     { path: '/projects', label: 'Projects', icon: '📁' },
+    { path: '/keyword-analysis', label: 'Keywords', icon: '🔑' },
     { path: '/analytics', label: 'Analytics', icon: '📊' },
     { path: '/admin', label: 'Admin Setup', icon: '⚙️' },
   ];

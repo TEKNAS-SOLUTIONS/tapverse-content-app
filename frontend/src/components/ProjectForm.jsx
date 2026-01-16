@@ -56,6 +56,21 @@ function ProjectForm({ onSubmit, onCancel, initialData = null, clients = [] }) {
     }
   }, [initialData, clients]);
 
+  // Auto-populate competitors from client when client changes (for new projects)
+  useEffect(() => {
+    if (selectedClient && !initialData) {
+      // Only auto-populate for new projects, not when editing
+      const clientCompetitors = selectedClient.competitors || [];
+      if (clientCompetitors.length > 0 && formData.competitors.length === 0) {
+        setFormData(prev => ({
+          ...prev,
+          competitors: clientCompetitors,
+        }));
+        setCompetitorsInput(clientCompetitors.join(', '));
+      }
+    }
+  }, [selectedClient, initialData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -330,6 +345,41 @@ function ProjectForm({ onSubmit, onCancel, initialData = null, clients = [] }) {
             placeholder="https://competitor1.com, https://competitor2.com"
             className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
+          {selectedClient?.competitors?.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-1">Client competitors (auto-loaded):</p>
+              <div className="flex flex-wrap gap-1">
+                {selectedClient.competitors.map((comp, idx) => (
+                  <span key={idx} className="bg-purple-900/30 text-purple-300 text-xs px-2 py-1 rounded">
+                    {comp}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {formData.competitors.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-1">Project competitors:</p>
+              <div className="flex flex-wrap gap-1">
+                {formData.competitors.map((comp, idx) => (
+                  <span key={idx} className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded flex items-center gap-1">
+                    {comp}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newCompetitors = formData.competitors.filter((_, i) => i !== idx);
+                        setFormData(prev => ({ ...prev, competitors: newCompetitors }));
+                        setCompetitorsInput(newCompetitors.join(', '));
+                      }}
+                      className="text-gray-400 hover:text-red-400"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

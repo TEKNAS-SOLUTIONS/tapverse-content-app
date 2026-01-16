@@ -18,6 +18,8 @@ import emailNewslettersRouter from './routes/emailNewsletters.js';
 import analyticsRouter from './routes/analytics.js';
 import contentRoadmapRouter from './routes/contentRoadmap.js';
 import dashboardRouter from './routes/dashboard.js';
+import keywordAnalysisRouter from './routes/keywordAnalysis.js';
+import contentEvidenceRouter from './routes/contentEvidence.js';
 
 const app = express();
 
@@ -71,6 +73,8 @@ app.use('/api/email-newsletters', emailNewslettersRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/roadmap', contentRoadmapRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/keyword-analysis', keywordAnalysisRouter);
+app.use('/api/content-evidence', contentEvidenceRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
