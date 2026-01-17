@@ -46,7 +46,8 @@ function EmailNewsletter({ projectId }) {
   const generateNewsletter = async (sourceContentId = null) => {
     try {
       setGenerating(true);
-      const response = await emailNewslettersAPI.generate(projectId, {
+      const response = await emailNewslettersAPI.generate({
+        projectId,
         sourceContentId,
       });
       if (response.data.success) {
