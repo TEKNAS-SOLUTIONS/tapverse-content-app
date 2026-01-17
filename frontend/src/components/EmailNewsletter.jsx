@@ -102,23 +102,32 @@ function EmailNewsletter({ projectId }) {
         </div>
       </div>
 
+      {generating && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <p className="ml-4 text-gray-600 font-medium">Generating your newsletter...</p>
+          </div>
+        </div>
+      )}
+
       {newsletters.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-              <h3 className="text-white font-semibold mb-3">Newsletters</h3>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-2">
+              <h3 className="text-gray-900 font-semibold mb-3">Newsletters</h3>
               {newsletters.map((newsletter) => (
                 <button
                   key={newsletter.id}
                   onClick={() => setSelectedNewsletter(newsletter)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  className={`w-full text-left p-3 rounded-lg transition-colors border ${
                     selectedNewsletter?.id === newsletter.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      ? 'bg-orange-600 text-white border-orange-600'
+                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
                   }`}
                 >
                   <div className="text-sm font-medium truncate">{newsletter.subject_line}</div>
-                  <div className="text-xs mt-1 opacity-75">
+                  <div className={`text-xs mt-1 ${selectedNewsletter?.id === newsletter.id ? 'text-orange-100' : 'text-gray-500'}`}>
                     {new Date(newsletter.created_at).toLocaleDateString()}
                   </div>
                 </button>
@@ -128,35 +137,35 @@ function EmailNewsletter({ projectId }) {
 
           <div className="lg:col-span-2">
             {selectedNewsletter && (
-              <div className="bg-gray-800 rounded-lg p-6 space-y-4">
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Subject Line</h3>
-                  <p className="text-gray-300">{selectedNewsletter.subject_line}</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Subject Line</h3>
+                  <p className="text-gray-700">{selectedNewsletter.subject_line}</p>
                 </div>
 
                 {selectedNewsletter.preview_text && (
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Preview Text</h3>
-                    <p className="text-gray-300">{selectedNewsletter.preview_text}</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Preview Text</h3>
+                    <p className="text-gray-700">{selectedNewsletter.preview_text}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Email Body</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Email Body</h3>
                   <div
-                    className="bg-white rounded-lg p-4 text-gray-800"
+                    className="bg-gray-50 rounded-lg p-4 text-gray-900 border border-gray-200"
                     dangerouslySetInnerHTML={{ __html: selectedNewsletter.email_body }}
                   />
                 </div>
 
                 {selectedNewsletter.cta_text && (
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Call to Action</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Call to Action</h3>
                     <a
                       href={selectedNewsletter.cta_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="inline-block px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                     >
                       {selectedNewsletter.cta_text}
                     </a>
