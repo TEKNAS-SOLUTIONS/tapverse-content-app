@@ -15,6 +15,8 @@ function Clients() {
   const [editingClient, setEditingClient] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterIndustry, setFilterIndustry] = useState('');
+  const [contentIdeas, setContentIdeas] = useState(null);
+  const [loadingIdeas, setLoadingIdeas] = useState(false);
 
   useEffect(() => {
     loadClients();
@@ -300,18 +302,69 @@ function Clients() {
               <button
                 onClick={async () => {
                   try {
-                    await contentIdeasAPI.generate(selectedClientId);
-                    alert('Content ideas generated!');
+                    setLoadingIdeas(true);
+                    setError(null);
+                    const response = await contentIdeasAPI.generate(selectedClientId);
+                    if (response.data.success) {
+                      setContentIdeas(response.data.data);
+                    } else {
+                      setError('Failed to generate content ideas');
+                    }
                   } catch (err) {
-                    alert('Error generating content ideas');
+                    setError(err.response?.data?.error || err.message || 'Error generating content ideas');
+                  } finally {
+                    setLoadingIdeas(false);
                   }
                 }}
-                className="px-4 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                disabled={loadingIdeas}
+                className="px-4 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Generate Ideas
+                {loadingIdeas ? 'Generating...' : 'Generate Ideas'}
               </button>
             </div>
-            <p className="text-gray-600">AI-driven content ideas and upsell opportunities coming soon...</p>
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+                {error}
+              </div>
+            )}
+            {loadingIdeas ? (
+              <p className="text-gray-600">Generating content ideas...</p>
+            ) : contentIdeas ? (
+              <div className="space-y-4">
+                {contentIdeas.contentIdeas && contentIdeas.contentIdeas.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Content Ideas</h3>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                      {contentIdeas.contentIdeas.slice(0, 5).map((idea, idx) => (
+                        <li key={idx}>{idea}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {contentIdeas.keywordOpportunities && contentIdeas.keywordOpportunities.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Keyword Opportunities</h3>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                      {contentIdeas.keywordOpportunities.slice(0, 5).map((opp, idx) => (
+                        <li key={idx}>{opp}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {contentIdeas.upsellOpportunities && contentIdeas.upsellOpportunities.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Upsell Opportunities</h3>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                      {contentIdeas.upsellOpportunities.slice(0, 5).map((opp, idx) => (
+                        <li key={idx}>{opp}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-gray-600">Click "Generate Ideas" to get AI-driven content ideas and upsell opportunities.</p>
+            )}
           </div>
 
           {/* Connections Section */}

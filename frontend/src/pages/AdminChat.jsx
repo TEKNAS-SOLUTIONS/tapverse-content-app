@@ -13,6 +13,7 @@ export default function AdminChat() {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
   const [insights, setInsights] = useState([]);
   const messagesEndRef = useRef(null);
 
@@ -38,10 +39,16 @@ export default function AdminChat() {
   const loadConversations = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await chatAPI.getConversations('admin');
-      setConversations(response.data.data);
+      if (response.data.success) {
+        setConversations(response.data.data || []);
+      } else {
+        setError('Failed to load conversations');
+      }
     } catch (error) {
       console.error('Error loading conversations:', error);
+      setError(error.response?.data?.error || error.message || 'Failed to load conversations. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -107,17 +114,24 @@ export default function AdminChat() {
       setMessages(prev => [...prev, userMessage]);
 
       const response = await adminChatAPI.sendMessage(convId, messageText);
-
-      const aiMessage = {
-        role: 'assistant',
-        content: response.data.data.message,
-        created_at: new Date().toISOString(),
-        toolUsed: response.data.data.toolUsed,
-      };
-      setMessages(prev => [...prev, aiMessage]);
+      
+      if (response.data.success) {
+        const aiMessage = {
+          role: 'assistant',
+          content: response.data.data.message || response.data.data.content || 'No response received',
+          created_at: new Date().toISOString(),
+          toolUsed: response.data.data.toolUsed,
+        };
+        setMessages(prev => [...prev, aiMessage]);
+        setError(null);
+      } else {
+        setError('Failed to send message');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Error sending message. Please try again.');
+      setError(error.response?.data?.error || error.message || 'Failed to send message. Please try again.');
+      // Remove user message if send failed
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setSending(false);
     }
@@ -198,6 +212,11 @@ export default function AdminChat() {
               + New
             </button>
           </div>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+              {error}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">

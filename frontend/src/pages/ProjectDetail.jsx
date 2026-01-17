@@ -62,8 +62,8 @@ function ProjectDetail() {
   if (loading) {
     return (
       <div className="text-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading project...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading project...</p>
       </div>
     );
   }
@@ -71,9 +71,9 @@ function ProjectDetail() {
   if (error) {
     return (
       <div className="text-center py-16">
-        <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-md mx-auto">
-          <p className="text-red-300">Error: {error}</p>
-          <Link to="/projects" className="mt-4 inline-block text-blue-400 hover:text-blue-300">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+          <p className="text-red-700">Error: {error}</p>
+          <Link to="/projects" className="mt-4 inline-block text-orange-600 hover:text-orange-700">
             ← Back to Projects
           </Link>
         </div>
@@ -84,8 +84,8 @@ function ProjectDetail() {
   if (!project) {
     return (
       <div className="text-center py-16">
-        <p className="text-gray-400">Project not found</p>
-        <Link to="/projects" className="mt-4 inline-block text-blue-400 hover:text-blue-300">
+        <p className="text-gray-600">Project not found</p>
+        <Link to="/projects" className="mt-4 inline-block text-orange-600 hover:text-orange-700">
           ← Back to Projects
         </Link>
       </div>
@@ -97,20 +97,20 @@ function ProjectDetail() {
   return (
     <div className="space-y-6">
       {/* Project Header */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-white">{project.project_name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{project.project_name}</h1>
             {client && (
-              <p className="mt-1 text-gray-400">
-                Client: <span className="text-blue-400">{client.company_name}</span>
+              <p className="mt-1 text-gray-600">
+                Client: <span className="text-orange-600">{client.company_name}</span>
               </p>
             )}
           </div>
           <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-            project.status === 'completed' ? 'bg-green-900 text-green-200' :
-            project.status === 'processing' ? 'bg-yellow-900 text-yellow-200' :
-            'bg-gray-700 text-gray-300'
+            project.status === 'completed' ? 'bg-green-100 text-green-700' :
+            project.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
+            'bg-gray-100 text-gray-700'
           }`}>
             {project.status}
           </span>
@@ -119,11 +119,11 @@ function ProjectDetail() {
         {/* Project Details Grid */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Content Types */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Content Types</h3>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Content Types</h3>
             <div className="flex flex-wrap gap-1">
               {projectTypes.map((type) => (
-                <span key={type} className="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded">
+                <span key={type} className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded">
                   {type}
                 </span>
               ))}
@@ -131,12 +131,12 @@ function ProjectDetail() {
           </div>
 
           {/* Keywords */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Keywords</h3>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Keywords</h3>
             <div className="flex flex-wrap gap-1">
               {project.keywords && project.keywords.length > 0 ? (
                 project.keywords.map((kw, idx) => (
-                  <span key={idx} className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded">
+                  <span key={idx} className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">
                     {kw}
                   </span>
                 ))
@@ -147,15 +147,15 @@ function ProjectDetail() {
           </div>
 
           {/* Content Preferences */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Content Style</h3>
-            <span className="text-white capitalize">{project.content_preferences || 'Professional'}</span>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Content Style</h3>
+            <span className="text-gray-900 capitalize">{project.content_preferences || 'Professional'}</span>
           </div>
 
           {/* Target Audience */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Target Audience</h3>
-            <p className="text-white text-sm line-clamp-2">
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Target Audience</h3>
+            <p className="text-gray-900 text-sm line-clamp-2">
               {project.target_audience || client?.target_audience || 'Not specified'}
             </p>
           </div>
@@ -163,28 +163,28 @@ function ProjectDetail() {
 
         {/* Unique Angle */}
         {project.unique_angle && (
-          <div className="mt-4 bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Unique Angle</h3>
-            <p className="text-white">{project.unique_angle}</p>
+          <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Unique Angle</h3>
+            <p className="text-gray-900">{project.unique_angle}</p>
           </div>
         )}
       </div>
 
       {/* Client Brand Info (if available) */}
       {client && (client.brand_voice || client.brand_tone) && (
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">🎨 Brand Guidelines</h2>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Brand Guidelines</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {client.brand_tone && (
               <div>
-                <span className="text-sm text-gray-400">Brand Tone:</span>
-                <span className="ml-2 text-white capitalize">{client.brand_tone}</span>
+                <span className="text-sm text-gray-600">Brand Tone:</span>
+                <span className="ml-2 text-gray-900 capitalize">{client.brand_tone}</span>
               </div>
             )}
             {client.brand_voice && (
               <div className="md:col-span-2">
-                <span className="text-sm text-gray-400 block mb-1">Brand Voice:</span>
-                <p className="text-white text-sm bg-gray-700/50 p-3 rounded">{client.brand_voice}</p>
+                <span className="text-sm text-gray-600 block mb-1">Brand Voice:</span>
+                <p className="text-gray-900 text-sm bg-gray-50 p-3 rounded border border-gray-200">{client.brand_voice}</p>
               </div>
             )}
           </div>
@@ -192,13 +192,13 @@ function ProjectDetail() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 bg-gray-800 p-2 rounded-xl flex-wrap">
+      <div className="flex gap-2 bg-white border border-gray-200 p-2 rounded-xl flex-wrap">
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'dashboard'
               ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           📊 Strategy Dashboard
@@ -209,7 +209,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'seo-strategy'
               ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           🎯 SEO Strategy
@@ -220,7 +220,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'google-ads-strategy'
               ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           🔍 Google Ads
@@ -231,7 +231,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'facebook-ads-strategy'
               ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           📘 Facebook Ads
@@ -242,7 +242,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'ideas'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           💡 Article Ideas
@@ -253,7 +253,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'generate'
               ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           ✨ Direct Generate
@@ -264,7 +264,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'scheduling'
               ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           📅 Schedule
@@ -275,7 +275,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'roadmap'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           📅 Content Roadmap
@@ -286,7 +286,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'email'
               ? 'bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           ✉️ Email
@@ -298,7 +298,7 @@ function ProjectDetail() {
             className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
               activeTab === 'shopify-analysis'
                 ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             🛒 Shopify Store
@@ -311,7 +311,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'local-seo'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           📍 Local SEO
@@ -323,7 +323,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'programmatic-seo'
               ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           🔄 Programmatic SEO
@@ -334,7 +334,7 @@ function ProjectDetail() {
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'client-chat'
               ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           💬 Chat
