@@ -64,8 +64,8 @@ function EmailNewsletter({ projectId }) {
   if (loading && newsletters.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading newsletters...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading newsletters...</p>
       </div>
     );
   }
@@ -74,14 +74,14 @@ function EmailNewsletter({ projectId }) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Email Newsletters</h2>
-          <p className="text-gray-400 text-sm mt-1">Generate email newsletters from blog content</p>
+          <h2 className="text-2xl font-bold text-gray-900">Email Newsletters</h2>
+          <p className="text-gray-600 text-sm mt-1">Generate email newsletters from blog content</p>
         </div>
         <div className="flex gap-2">
           {content.length > 0 && (
             <select
               onChange={(e) => e.target.value && generateNewsletter(e.target.value)}
-              className="bg-gray-700 text-white rounded-lg p-2 text-sm"
+              className="bg-white border border-gray-300 text-gray-900 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
               disabled={generating}
             >
               <option value="">Generate from blog...</option>
@@ -95,7 +95,7 @@ function EmailNewsletter({ projectId }) {
           <button
             onClick={() => generateNewsletter()}
             disabled={generating}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors"
           >
             {generating ? 'Generating...' : '+ Generate Newsletter'}
           </button>
@@ -167,11 +167,12 @@ function EmailNewsletter({ projectId }) {
           </div>
         </div>
       ) : (
-        <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400 mb-4">No newsletters generated yet</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <p className="text-gray-600 mb-4">No newsletters generated yet</p>
+          <p className="text-gray-500 text-sm mb-6">Generate email newsletters from blog content</p>
           <button
             onClick={() => generateNewsletter()}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
           >
             Generate Your First Newsletter
           </button>

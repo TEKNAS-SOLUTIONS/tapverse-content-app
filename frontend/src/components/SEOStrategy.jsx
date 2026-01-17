@@ -58,8 +58,8 @@ function SEOStrategy({ projectId, clientData, projectData }) {
   if (loading && strategies.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading SEO strategies...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading SEO strategies...</p>
       </div>
     );
   }
@@ -69,15 +69,15 @@ function SEOStrategy({ projectId, clientData, projectData }) {
       {/* Header with Generate Button */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">SEO Strategy</h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-gray-900">SEO Strategy</h2>
+          <p className="text-gray-600 text-sm mt-1">
             Comprehensive SEO strategies powered by Claude Sonnet
           </p>
         </div>
         <button
           onClick={generateStrategy}
           disabled={generating}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
           {generating ? (
             <>
@@ -86,7 +86,6 @@ function SEOStrategy({ projectId, clientData, projectData }) {
             </>
           ) : (
             <>
-              <span>✨</span>
               Generate SEO Strategy
             </>
           )}
@@ -94,8 +93,8 @@ function SEOStrategy({ projectId, clientData, projectData }) {
       </div>
 
       {error && (
-        <div className="bg-red-900/50 border border-red-700 rounded-lg p-4">
-          <p className="text-red-300">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">{error}</p>
         </div>
       )}
 
@@ -104,22 +103,22 @@ function SEOStrategy({ projectId, clientData, projectData }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Strategy Selector */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-              <h3 className="text-white font-semibold mb-3">Strategies</h3>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-2">
+              <h3 className="text-gray-900 font-semibold mb-3">Strategies</h3>
               {strategies.map((strategy) => (
                 <button
                   key={strategy.id}
                   onClick={() => setSelectedStrategy(strategy)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  className={`w-full text-left p-3 rounded-lg transition-colors border ${
                     selectedStrategy?.id === strategy.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      ? 'bg-orange-600 text-white border-orange-600'
+                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
                   }`}
                 >
                   <div className="text-sm font-medium">
                     {new Date(strategy.created_at).toLocaleDateString()}
                   </div>
-                  <div className="text-xs mt-1 opacity-75">
+                  <div className={`text-xs mt-1 ${selectedStrategy?.id === strategy.id ? 'text-orange-100' : 'text-gray-500'}`}>
                     {strategy.primary_keywords?.length || 0} primary keywords
                   </div>
                 </button>
@@ -415,11 +414,12 @@ function SEOStrategy({ projectId, clientData, projectData }) {
 
       {/* Empty State */}
       {strategies.length === 0 && !generating && (
-        <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400 mb-4">No SEO strategies generated yet</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <p className="text-gray-600 mb-4">No SEO strategies generated yet</p>
+          <p className="text-gray-500 text-sm mb-6">Comprehensive SEO strategies powered by Claude Sonnet</p>
           <button
             onClick={generateStrategy}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
           >
             Generate Your First SEO Strategy
           </button>

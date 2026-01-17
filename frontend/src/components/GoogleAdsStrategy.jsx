@@ -53,8 +53,8 @@ function GoogleAdsStrategy({ projectId, clientData, projectData }) {
   if (loading && strategies.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading Google Ads strategies...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading Google Ads strategies...</p>
       </div>
     );
   }
@@ -64,15 +64,15 @@ function GoogleAdsStrategy({ projectId, clientData, projectData }) {
       {/* Header with Generate Button */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Google Ads Strategy</h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-gray-900">Google Ads Strategy</h2>
+          <p className="text-gray-600 text-sm mt-1">
             Comprehensive Google Ads strategies powered by Claude
           </p>
         </div>
         <button
           onClick={generateStrategy}
           disabled={generating}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
           {generating ? (
             <>
@@ -81,7 +81,6 @@ function GoogleAdsStrategy({ projectId, clientData, projectData }) {
             </>
           ) : (
             <>
-              <span>✨</span>
               Generate Google Ads Strategy
             </>
           )}
@@ -89,8 +88,8 @@ function GoogleAdsStrategy({ projectId, clientData, projectData }) {
       </div>
 
       {error && (
-        <div className="bg-red-900/50 border border-red-700 rounded-lg p-4">
-          <p className="text-red-300">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">{error}</p>
         </div>
       )}
 
@@ -334,11 +333,12 @@ function GoogleAdsStrategy({ projectId, clientData, projectData }) {
 
       {/* Empty State */}
       {strategies.length === 0 && !generating && (
-        <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400 mb-4">No Google Ads strategies generated yet</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <p className="text-gray-600 mb-4">No Google Ads strategies generated yet</p>
+          <p className="text-gray-500 text-sm mb-6">Comprehensive Google Ads strategies powered by Claude</p>
           <button
             onClick={generateStrategy}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
           >
             Generate Your First Google Ads Strategy
           </button>
