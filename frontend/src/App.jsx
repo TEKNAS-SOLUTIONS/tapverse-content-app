@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastProvider } from './context/ToastContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -16,7 +17,8 @@ import AdminChat from './pages/AdminChat';
 
 function App() {
   return (
-    <Router>
+    <ToastProvider>
+      <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
@@ -46,6 +48,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </ToastProvider>
   );
 }
 

@@ -78,23 +78,26 @@
 
 ---
 
-### Issue #4: Login Credentials Visible ✅ FIXING
+### Issue #4: Login Credentials Visible ✅ FIXED
 **Page/Feature:** Login Page  
 **Severity:** Medium (Security)  
-**Status:** 🔧 Fixing
+**Status:** ✅ Fixed
 
 **Problem:** Default credentials shown on login page (line 94: "Default admin: admin@tapverse.ai / admin123")
 
-**Fix:** Remove visible credentials from login page
+**Fix Applied:** Removed visible credentials from login page (`frontend/src/pages/Login.jsx`)
+
+**Files Modified:**
+- `frontend/src/pages/Login.jsx` - Removed credentials display line
 
 ---
 
 ## 🟢 Medium Priority Issues
 
-### Issue #5: Admin Chat Breadcrumb Wrong ✅ FIXING
+### Issue #5: Admin Chat Breadcrumb Wrong ✅ FIXED
 **Page/Feature:** Admin Chat  
 **Severity:** Low  
-**Status:** 🔧 Fixing
+**Status:** ✅ Fixed
 
 **Problem:** Shows "Home / Settings" instead of "Home / Admin Chat"
 
@@ -102,21 +105,30 @@
 - `Breadcrumb.jsx` line 88: All `/admin` paths show "Settings"
 - Need to differentiate `/admin` (Settings) from `/admin-chat` (Admin Chat)
 
-**Fix:** Update breadcrumb logic to check for `/admin-chat` path
+**Fix Applied:** Updated breadcrumb logic to check for `/admin-chat` path before `/admin`
+
+**Files Modified:**
+- `frontend/src/components/Breadcrumb.jsx` - Added `/admin-chat` check before `/admin` check
 
 ---
 
-### Issue #11: Connections Page - Blank/Not Loading 🔍 INVESTIGATING
+### Issue #11: Connections Page - Blank/Not Loading ✅ FIXING
 **Page/Feature:** Connections Management  
 **Severity:** Medium  
-**Status:** 🔍 Investigating
+**Status:** 🔧 Fixing
 
 **Problem:** Connections page (/connections) loads blank with no content.
 
-**Next Steps:**
-- Check if `Connections.jsx` component exists and renders
-- Verify route is configured correctly
-- Check for API endpoints for connections
+**Root Cause:**
+- `Connections.jsx` uses `useToast` from `ToastContext`
+- `ToastProvider` was not wrapping the app in `App.jsx`
+- This causes error: "useToast must be used within a ToastProvider"
+- Error causes page to crash and show blank screen
+
+**Fix Applied:** Add `ToastProvider` wrapper to `App.jsx` to wrap all routes
+
+**Files Modified:**
+- `frontend/src/App.jsx` - Added `ToastProvider` import and wrapper
 
 ---
 
