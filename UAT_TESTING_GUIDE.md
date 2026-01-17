@@ -1,9 +1,10 @@
 # User Acceptance Testing (UAT) Guide
 
 **Application:** Tapverse Content Automation System  
-**Version:** 2.0  
+**Version:** 2.1  
 **Date:** January 2025  
-**Test Environment:** app.tapverse.ai
+**Test Environment:** app.tapverse.ai  
+**Update:** Added Priority Summary Features (Dashboard Graphs, Task Management, Connections/OAuth, Video Generation)
 
 ---
 
