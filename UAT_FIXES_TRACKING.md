@@ -190,11 +190,37 @@ _______________
 
 ---
 
-## Next Steps:
-1. Test Issue #2 (Settings page) - Check console errors and API responses
-2. Test Issue #3 (Chat blank page) - Check for uncaught errors in console
-3. Deploy fixes to server
-4. Re-run UAT for remaining issues
+## Next Steps for Deployment:
+1. ✅ **Run Database Migration:** Execute `001_system_settings_table.sql` on server
+   ```bash
+   # On server
+   cd /root/tapverse-content-creation/backend
+   psql -U postgres -d tapverse_content -f src/db/migrations/001_system_settings_table.sql
+   ```
+   
+2. ✅ **Deploy Frontend/Backend Changes:** 
+   - All code fixes committed and pushed to GitHub
+   - Need to pull latest on server and restart services
+
+3. ✅ **Test All Fixed Issues:**
+   - Issue #1: Project Detail Dashboard - API error fixed
+   - Issue #2: Settings Page - Migration created, error handling improved
+   - Issue #3: Chat Blank Page - Navigation timing fixed
+   - Issue #4: Login Credentials - Removed
+   - Issue #5: Admin Chat Breadcrumb - Fixed
+   - Issue #11: Connections Page - ToastProvider added
+
+4. ✅ **Ready for Phase 2 UAT:** All critical issues from Phase 1 UAT have been resolved
+
+---
+
+## Deployment Checklist:
+- [ ] Run `001_system_settings_table.sql` migration on server
+- [ ] Pull latest code from GitHub on server
+- [ ] Restart backend server (PM2 or screen)
+- [ ] Restart frontend server (PM2 or screen)
+- [ ] Verify all fixes in browser
+- [ ] Ready for Phase 2 UAT testing
 
 ---
 
