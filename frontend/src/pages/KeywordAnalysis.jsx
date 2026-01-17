@@ -160,7 +160,7 @@ function KeywordAnalysis() {
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
               disabled={!selectedClientId}
-              className="block w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="block w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
             >
               <option value="">-- All Projects --</option>
               {projects.map((p) => (
@@ -198,7 +198,7 @@ function KeywordAnalysis() {
                 <span className="bg-gray-100 px-2 py-1 rounded text-gray-700">{selectedClient.industry}</span>
               )}
               {selectedClient.competitors?.length > 0 && (
-                <span className="bg-purple-900/30 text-purple-300 px-2 py-1 rounded">
+                <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
                   {selectedClient.competitors.length} competitors
                 </span>
               )}
@@ -340,7 +340,7 @@ function KeywordAnalysis() {
               {/* Competitor Gaps */}
               {activeTab === 'competitors' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Competitor Keyword Gaps</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Competitor Keyword Gaps</h3>
                   {analysis.competitor_gaps?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.competitor_gaps.map((gap, idx) => (
@@ -377,7 +377,7 @@ function KeywordAnalysis() {
               {/* Industry Trends */}
               {activeTab === 'trends' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Industry Trends</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Industry Trends</h3>
                   {analysis.industry_trends?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.industry_trends.map((trend, idx) => (
@@ -412,7 +412,7 @@ function KeywordAnalysis() {
               {/* Long-Tail */}
               {activeTab === 'longtail' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Long-Tail Opportunities</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Long-Tail Opportunities</h3>
                   {analysis.long_tail_opportunities?.length > 0 ? (
                     <div className="grid gap-3">
                       {analysis.long_tail_opportunities.map((lt, idx) => (
@@ -441,7 +441,7 @@ function KeywordAnalysis() {
               {/* Clusters */}
               {activeTab === 'clusters' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Keyword Clusters</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Keyword Clusters</h3>
                   {analysis.keyword_clusters?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.keyword_clusters.map((cluster, idx) => (
@@ -455,7 +455,7 @@ function KeywordAnalysis() {
                           </div>
                           <div className="flex flex-wrap gap-2 mb-3">
                             {cluster.supporting_keywords?.map((kw, i) => (
-                              <span key={i} className="bg-slate-700 text-gray-300 px-2 py-1 rounded text-sm">
+                              <span key={i} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm">
                                 {kw}
                               </span>
                             ))}
@@ -477,7 +477,7 @@ function KeywordAnalysis() {
               {/* Quick Wins */}
               {activeTab === 'quickwins' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Quick Wins</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Wins</h3>
                   <p className="text-gray-600 text-sm mb-4">Low-difficulty keywords with high potential for fast rankings</p>
                   {analysis.quick_wins?.length > 0 ? (
                     <div className="grid gap-3">
