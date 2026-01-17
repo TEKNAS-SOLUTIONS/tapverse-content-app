@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { seoStrategyAPI } from '../services/api';
-import { downloadCSV, downloadJSON, downloadPDF } from '../utils/export';
+import exportUtils from '../utils/export';
 
 function SEOStrategy({ projectId, clientData, projectData }) {
   const [strategies, setStrategies] = useState([]);
@@ -149,7 +149,7 @@ function SEOStrategy({ projectId, clientData, projectData }) {
                         ...(selectedStrategy.primary_keywords || []),
                         ...(selectedStrategy.secondary_keywords || [])
                       ];
-                      downloadCSV([{ keywords: keywords.join(', ') }], 'seo-strategy-keywords');
+                      exportUtils.downloadCSV([{ keywords: keywords.join(', ') }], 'seo-strategy-keywords');
                     }}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                   >
@@ -166,7 +166,7 @@ function SEOStrategy({ projectId, clientData, projectData }) {
                         <h2>Secondary Keywords</h2>
                         <p>${(selectedStrategy.secondary_keywords || []).join(', ')}</p>
                       `;
-                      downloadPDF(htmlContent, 'SEO Strategy');
+                      exportUtils.downloadPDF(htmlContent, 'SEO Strategy');
                     }}
                     className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >

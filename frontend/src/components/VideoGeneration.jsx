@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { videoAPI } from '../services/api';
-import { downloadJSON, downloadPDF } from '../utils/export';
+import exportUtils from '../utils/export';
 
 function VideoGeneration({ projectId }) {
   const [script, setScript] = useState(null);
@@ -170,7 +170,7 @@ function VideoGeneration({ projectId }) {
                 <button
                   onClick={() => {
                     const scriptData = script ? { ...script, script: scriptText } : { script: scriptText };
-                    downloadJSON(scriptData, 'video-script');
+                    exportUtils.downloadJSON(scriptData, 'video-script');
                   }}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                 >
