@@ -10,6 +10,8 @@ import ContentScheduling from '../components/ContentScheduling';
 import EmailNewsletter from '../components/EmailNewsletter';
 import ContentRoadmap from '../components/ContentRoadmap';
 import StrategyDashboard from '../components/StrategyDashboard';
+import ShopifyStoreAnalysis from '../components/ShopifyStoreAnalysis';
+import LocalSeoAnalysis from '../components/LocalSeoAnalysis';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -278,6 +280,32 @@ function ProjectDetail() {
           ✉️ Email
           <span className="ml-2 text-sm opacity-75">Newsletters</span>
         </button>
+        {client?.primary_business_type === 'shopify' && (
+          <button
+            onClick={() => setActiveTab('shopify-analysis')}
+            className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+              activeTab === 'shopify-analysis'
+                ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            🛒 Shopify Store
+            <span className="ml-2 text-sm opacity-75">SEO Analysis</span>
+          </button>
+        )}
+        {client?.primary_business_type === 'local' && (
+          <button
+            onClick={() => setActiveTab('local-seo')}
+            className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+              activeTab === 'local-seo'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            📍 Local SEO
+            <span className="ml-2 text-sm opacity-75">Analysis</span>
+          </button>
+        )}
       </div>
 
       {/* Content Area */}
@@ -324,6 +352,18 @@ function ProjectDetail() {
         <ContentRoadmap 
           projectId={projectId}
           strategy={null}
+        />
+      ) : activeTab === 'shopify-analysis' ? (
+        <ShopifyStoreAnalysis 
+          clientId={client?.id}
+          clientData={client}
+        />
+      ) : activeTab === 'local-seo' ? (
+        <LocalSeoAnalysis 
+          clientId={client?.id}
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
         />
       ) : (
         <ContentGenerator 

@@ -1,5 +1,7 @@
 import { generateContentWithSystem } from './claude.js';
 import pool from '../db/index.js';
+import { getKeywordData, getRelatedKeywords, getKeywordDifficulty, batchGetKeywordData } from './dataForSeoService.js';
+import { config } from '../config/config.js';
 
 /**
  * Keyword Analysis Service
@@ -58,7 +60,29 @@ export async function analyzeKeywords(params) {
     const finalBusinessType = businessType || clientData.primary_business_type || 'general';
     const finalLocation = location || clientData.location || '';
 
-    // Generate analysis
+    // Get real keyword data from DataForSEO if enabled
+    let realKeywordData = null;
+    let dataSource = 'ai'; // Track data source for user visibility
+    if (config.dataForSeo?.enabled && finalKeywords.length > 0) {
+      try {
+        console.log('Fetching real keyword data from DataForSEO...');
+        realKeywordData = await batchGetKeywordData(
+          finalKeywords.slice(0, 50), // Limit to 50 keywords per analysis
+          {
+            locationCode: config.dataForSeo.defaultLocation,
+            languageCode: config.dataForSeo.defaultLanguage,
+          }
+        );
+        console.log(`Retrieved data for ${realKeywordData.length} keywords`);
+        dataSource = 'dataforseo';
+      } catch (error) {
+        console.error('DataForSEO error (falling back to AI):', error.message);
+        dataSource = 'ai_fallback'; // Indicate fallback occurred
+        // Continue with AI-only analysis if DataForSEO fails
+      }
+    }
+
+    // Generate analysis (enhanced with real data if available)
     const analysis = await generateKeywordAnalysis({
       companyName: clientData.company_name || '',
       keywords: finalKeywords,
@@ -67,7 +91,22 @@ export async function analyzeKeywords(params) {
       targetAudience: finalTargetAudience,
       businessType: finalBusinessType,
       location: finalLocation,
+      realKeywordData, // Pass real data to enhance AI analysis
     });
+
+    // Add data source metadata to response
+    analysis.metadata = {
+      data_source: dataSource,
+      dataforseo_enabled: config.dataForSeo?.enabled || false,
+      keywords_analyzed: finalKeywords.length,
+      real_data_count: realKeywordData?.length || 0,
+      fallback_used: dataSource === 'ai_fallback',
+      message: dataSource === 'dataforseo' 
+        ? 'Real keyword data from DataForSEO API' 
+        : dataSource === 'ai_fallback'
+        ? '⚠️ DataForSEO unavailable - using AI estimates (fallback)'
+        : 'AI-powered keyword analysis (DataForSEO not enabled)',
+    };
 
     // Save analysis if we have project ID
     if (projectId) {
@@ -93,6 +132,7 @@ async function generateKeywordAnalysis(params) {
     targetAudience,
     businessType,
     location,
+    realKeywordData = null, // Real data from DataForSEO
   } = params;
 
   const systemPrompt = `You are an expert SEO analyst and keyword researcher with 15+ years of experience.
@@ -106,6 +146,16 @@ You specialize in:
 
 Provide data-driven, actionable keyword insights. Rate keyword strength on a scale of 1-100.`;
 
+  // Build real data context if available
+  let realDataContext = '';
+  if (realKeywordData && realKeywordData.length > 0) {
+    realDataContext = `\n\nREAL KEYWORD DATA FROM DATAFORSEO (use this instead of estimates):\n`;
+    realKeywordData.forEach(kw => {
+      realDataContext += `- "${kw.keyword}": ${kw.search_volume} monthly searches, CPC: $${kw.cpc}, Competition: ${kw.competition}\n`;
+    });
+    realDataContext += `\nIMPORTANT: Use the REAL search volumes and CPC data above. Only estimate for keywords not in this list.\n`;
+  }
+
   const userPrompt = `Perform a comprehensive KEYWORD ANALYSIS for:
 
 COMPANY: ${companyName || 'Client'}
@@ -114,14 +164,16 @@ BUSINESS TYPE: ${businessType}${businessType === 'local' ? ` (Location: ${locati
 TARGET AUDIENCE: ${targetAudience || 'Not specified'}
 CURRENT KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'None provided - research from scratch'}
 COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
+${realDataContext}
 
 Analyze and provide:
 
 1. KEYWORD OPPORTUNITIES (10-15 keywords)
    - For each keyword, provide:
      * keyword: the keyword phrase
-     * search_volume: estimated monthly searches (high/medium/low)
-     * difficulty: ranking difficulty (1-100)
+     * search_volume: ${realKeywordData ? 'REAL monthly search volume from DataForSEO (use exact numbers)' : 'estimated monthly searches (high/medium/low)'}
+     * difficulty: ranking difficulty (1-100) ${realKeywordData ? '(use real competition_index if available)' : ''}
+     * cpc: ${realKeywordData ? 'REAL cost-per-click from DataForSEO' : 'estimated CPC'}
      * strength_score: overall opportunity score (1-100)
      * intent: search intent (informational/navigational/commercial/transactional)
      * priority: high/medium/low
@@ -152,17 +204,17 @@ Analyze and provide:
    - Top 3 priority keywords to target first
    - Expected results timeline
 
-Format as VALID JSON:
+Format as VALID JSON${realKeywordData ? ' (use REAL numbers from DataForSEO when available)' : ''}:
 {
   "keyword_opportunities": [
     {
       "keyword": "example keyword",
-      "search_volume": "medium",
+      "search_volume": ${realKeywordData ? '1500' : '"medium"'},
       "difficulty": 45,
-      "strength_score": 78,
+      ${realKeywordData ? '"cpc": 1.25,\n      ' : ''}"strength_score": 78,
       "intent": "commercial",
       "priority": "high",
-      "rationale": "Why this keyword matters"
+      "rationale": "Why this keyword matters"${realKeywordData ? ',\n      "data_source": "DataForSEO"' : ''}
     }
   ],
   "competitor_gaps": [

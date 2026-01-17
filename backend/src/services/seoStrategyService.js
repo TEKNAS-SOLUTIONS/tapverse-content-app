@@ -1,5 +1,7 @@
 import { generateContentWithSystem } from './claude.js';
 import pool from '../db/index.js';
+import { batchGetKeywordData, getRelatedKeywords } from './dataForSeoService.js';
+import { config } from '../config/config.js';
 
 /**
  * SEO Strategy Generation Service
@@ -300,7 +302,7 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no code blocks, no explanations.
 /**
  * Build prompt for Shopify Store (E-commerce)
  */
-function buildShopifyPrompt(clientData, projectData) {
+function buildShopifyPrompt(clientData, projectData, realKeywordData = null) {
   const industry = clientData.industry || 'E-commerce';
   const companyName = clientData.company_name || 'Client';
   const targetAudience = projectData.target_audience || clientData.target_audience || 'Online shoppers';
@@ -325,6 +327,16 @@ Your strategies focus on:
 
 Always provide actionable, specific recommendations backed by strategic thinking.`;
 
+  // Build real keyword data context for Shopify (commercial/product keywords)
+  let realDataContext = '';
+  if (realKeywordData && realKeywordData.length > 0) {
+    realDataContext = `\n\nREAL PRODUCT/COMMERCIAL KEYWORD DATA FROM DATAFORSEO (use this for product pages):\n`;
+    realKeywordData.forEach(kw => {
+      realDataContext += `- "${kw.keyword}": ${kw.search_volume} monthly searches, CPC: $${kw.cpc}, Competition: ${kw.competition}\n`;
+    });
+    realDataContext += `\nIMPORTANT: Use REAL search volumes and CPC data above for product page optimization. Focus on high-volume commercial keywords for product pages.\n`;
+  }
+
   const userPrompt = `Create a comprehensive SHOPIFY E-COMMERCE SEO strategy for:
 
 COMPANY: ${companyName}
@@ -335,6 +347,7 @@ BRAND VOICE: ${brandVoice}
 BRAND TONE: ${brandTone}
 PRIMARY KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'To be researched'}
 COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
+${realDataContext}
 
 Focus Areas:
 - Product page optimization
@@ -361,8 +374,9 @@ Generate a complete e-commerce SEO strategy including:
    - Commercial primary keywords (product keywords, buying keywords)
    - Secondary keywords (category keywords, comparison keywords)
    - Search intent analysis (commercial intent)
-   - Keyword difficulty estimates
-   - Search volume estimates
+   - ${realKeywordData ? 'REAL keyword difficulty and search volume from DataForSEO (use exact numbers)' : 'Keyword difficulty estimates and search volume estimates'}
+   - Focus on high-CPC keywords (indicates commercial value)
+   - Product page keyword opportunities
 
 3. CONTENT PILLAR STRATEGY
    - 3-5 main content pillars (product categories, buying guides, comparisons)
@@ -496,8 +510,46 @@ export async function generateSEOStrategy(projectId, clientData = {}, projectDat
       keywords: project.keywords || projectData.keywords || [],
     };
     
-    // Generate strategy using Claude
-    const strategy = await generateStrategyWithAI(mergedClientData, mergedProjectData);
+    // Get real keyword data from DataForSEO if enabled (especially important for Shopify)
+    let realKeywordData = null;
+    let dataSource = 'ai';
+    const keywords = mergedProjectData.keywords || [];
+    
+    if (config.dataForSeo?.enabled && keywords.length > 0 && mergedClientData.primary_business_type === 'shopify') {
+      try {
+        console.log('Fetching real product/commercial keyword data from DataForSEO for Shopify...');
+        realKeywordData = await batchGetKeywordData(
+          keywords.slice(0, 50),
+          {
+            locationCode: config.dataForSeo.defaultLocation,
+            languageCode: config.dataForSeo.defaultLanguage,
+          }
+        );
+        dataSource = 'dataforseo';
+        console.log(`Retrieved real keyword data for ${realKeywordData.length} Shopify keywords`);
+      } catch (error) {
+        console.error('DataForSEO error for Shopify (falling back to AI):', error.message);
+        dataSource = 'ai_fallback';
+      }
+    }
+    
+    // Generate strategy using Claude (enhanced with real data for Shopify)
+    const strategy = await generateStrategyWithAI(mergedClientData, mergedProjectData, realKeywordData);
+    
+    // Add metadata about data source
+    strategy.metadata = {
+      data_source: dataSource,
+      dataforseo_enabled: config.dataForSeo?.enabled || false,
+      business_type: mergedClientData.primary_business_type || 'general',
+      keywords_analyzed: keywords.length,
+      real_data_count: realKeywordData?.length || 0,
+      fallback_used: dataSource === 'ai_fallback',
+      message: dataSource === 'dataforseo' 
+        ? 'Real product/commercial keyword data from DataForSEO API' 
+        : dataSource === 'ai_fallback'
+        ? '⚠️ DataForSEO unavailable - using AI estimates for product keywords (fallback)'
+        : 'AI-powered SEO strategy (DataForSEO not enabled)',
+    };
     
     // Save to database
     const savedStrategy = await saveSEOStrategy(projectId, clientId, strategy);
@@ -512,7 +564,7 @@ export async function generateSEOStrategy(projectId, clientData = {}, projectDat
 /**
  * Generate SEO strategy using Claude AI
  */
-async function generateStrategyWithAI(clientData, projectData) {
+async function generateStrategyWithAI(clientData, projectData, realKeywordData = null) {
   const industry = clientData.industry || 'General';
   const companyName = clientData.company_name || 'Client';
   const targetAudience = projectData.target_audience || clientData.target_audience || 'General audience';
@@ -532,7 +584,7 @@ async function generateStrategyWithAI(clientData, projectData) {
   if (primaryBusinessType === 'local') {
     ({ systemPrompt, userPrompt } = buildLocalBusinessPrompt(clientData, projectData, location));
   } else if (primaryBusinessType === 'shopify') {
-    ({ systemPrompt, userPrompt } = buildShopifyPrompt(clientData, projectData));
+    ({ systemPrompt, userPrompt } = buildShopifyPrompt(clientData, projectData, realKeywordData));
   } else {
     ({ systemPrompt, userPrompt } = buildGeneralBusinessPrompt(clientData, projectData));
   }

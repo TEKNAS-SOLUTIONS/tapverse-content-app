@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connectionsAPI } from '../services/api';
 
 // Available services that can be subscribed
 const AVAILABLE_SERVICES = [
@@ -65,8 +66,13 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
     primary_business_type: 'general',
     location: '',
     shopify_url: '',
+    // API Connections
+    connectionIds: [],
+    defaultConnectionId: null,
   });
   const [competitorInput, setCompetitorInput] = useState('');
+  const [availableConnections, setAvailableConnections] = useState([]);
+  const [loadingConnections, setLoadingConnections] = useState(false);
 
   const [errors, setErrors] = useState({});
   const [activeSection, setActiveSection] = useState('basic');
@@ -82,9 +88,30 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
         primary_business_type: initialData.primary_business_type || 'general',
         location: initialData.location || '',
         shopify_url: initialData.shopify_url || '',
+        connectionIds: initialData.assigned_connections?.map(c => c.connection_id) || [],
+        defaultConnectionId: initialData.assigned_connections?.find(c => c.is_default)?.connection_id || null,
       });
     }
   }, [initialData]);
+
+  // Load available connections
+  useEffect(() => {
+    loadConnections();
+  }, []);
+
+  const loadConnections = async () => {
+    try {
+      setLoadingConnections(true);
+      const response = await connectionsAPI.getAllAvailable();
+      if (response.data.success) {
+        setAvailableConnections(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error loading connections:', err);
+    } finally {
+      setLoadingConnections(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -214,11 +241,56 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
     onSubmit(formData);
   };
 
+  const handleConnectionToggle = (connectionId) => {
+    setFormData((prev) => {
+      const connectionIds = prev.connectionIds || [];
+      if (connectionIds.includes(connectionId)) {
+        const newIds = connectionIds.filter(id => id !== connectionId);
+        return {
+          ...prev,
+          connectionIds: newIds,
+          defaultConnectionId: prev.defaultConnectionId === connectionId ? null : prev.defaultConnectionId,
+        };
+      } else {
+        return {
+          ...prev,
+          connectionIds: [...connectionIds, connectionId],
+        };
+      }
+    });
+  };
+
+  const handleSetDefaultConnection = (connectionId) => {
+    setFormData((prev) => ({
+      ...prev,
+      defaultConnectionId: prev.defaultConnectionId === connectionId ? null : connectionId,
+    }));
+  };
+
+  const getConnectionTypeLabel = (type) => {
+    const labels = {
+      'google_ads': 'Google Ads',
+      'google_search_console': 'Search Console',
+      'google_analytics': 'Google Analytics',
+      'google_my_business': 'Google My Business',
+      'google_all': 'Google (All Services)',
+      'facebook_ads': 'Facebook Ads',
+    };
+    return labels[type] || type;
+  };
+
+  const getProviderIcon = (provider) => {
+    if (provider === 'google') return '🔵';
+    if (provider === 'facebook') return '📘';
+    return '🔌';
+  };
+
   const sections = [
     { id: 'basic', label: '📋 Basic Info' },
     { id: 'services', label: '⚡ Services' },
+    { id: 'connections', label: '🔗 API Connections' },
     { id: 'brand', label: '🎨 Brand & Content' },
-    { id: 'platforms', label: '🔗 Platform IDs' },
+    { id: 'platforms', label: '🔧 Platform IDs' },
   ];
 
   return (
@@ -487,6 +559,126 @@ function ClientForm({ onSubmit, onCancel, initialData = null }) {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Connections Section */}
+      {activeSection === 'connections' && (
+        <div className="bg-gray-700 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-white mb-2">API Connections</h3>
+          <p className="text-gray-400 text-sm mb-4">
+            Select which Tapverse API connections this client can access. These connections are managed centrally by Tapverse.
+          </p>
+          
+          {loadingConnections ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-2 text-gray-400 text-sm">Loading connections...</p>
+            </div>
+          ) : availableConnections.length === 0 ? (
+            <div className="text-center py-8 bg-gray-600/50 rounded-lg">
+              <p className="text-gray-400 mb-2">No connections available</p>
+              <p className="text-gray-500 text-sm">
+                Go to <a href="/connections" className="text-blue-400 hover:text-blue-300">Connections</a> to set up API connections first.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {availableConnections.map((conn) => {
+                const isSelected = formData.connectionIds?.includes(conn.id);
+                const isDefault = formData.defaultConnectionId === conn.id;
+                const connectionData = typeof conn.connection_data === 'string' 
+                  ? JSON.parse(conn.connection_data || '{}')
+                  : conn.connection_data || {};
+
+                return (
+                  <div
+                    key={conn.id}
+                    className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-900/30'
+                        : 'border-gray-600 hover:border-gray-500 bg-gray-600/30'
+                    }`}
+                    onClick={() => handleConnectionToggle(conn.id)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleConnectionToggle(conn.id)}
+                          className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded bg-gray-600"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl">{getProviderIcon(conn.provider)}</span>
+                            <span className="font-semibold text-white">{conn.connection_name}</span>
+                            {isDefault && (
+                              <span className="px-2 py-0.5 bg-yellow-900 text-yellow-200 text-xs rounded">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-400 mb-1">
+                            {getConnectionTypeLabel(conn.connection_type)}
+                          </p>
+                          {conn.account_email && (
+                            <p className="text-xs text-gray-500">📧 {conn.account_email}</p>
+                          )}
+                          
+                          {/* Show discovered resources */}
+                          <div className="mt-2 space-y-1">
+                            {connectionData.googleAdsAccounts && connectionData.googleAdsAccounts.length > 0 && (
+                              <p className="text-xs text-gray-400">
+                                Google Ads: {connectionData.googleAdsAccounts.length} account(s)
+                              </p>
+                            )}
+                            {connectionData.searchConsoleProperties && connectionData.searchConsoleProperties.length > 0 && (
+                              <p className="text-xs text-gray-400">
+                                Search Console: {connectionData.searchConsoleProperties.length} property(ies)
+                              </p>
+                            )}
+                            {connectionData.analyticsAccounts && connectionData.analyticsAccounts.length > 0 && (
+                              <p className="text-xs text-gray-400">
+                                Analytics: {connectionData.analyticsAccounts.length} account(s)
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {isSelected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSetDefaultConnection(conn.id);
+                          }}
+                          className={`px-3 py-1 text-xs rounded ${
+                            isDefault
+                              ? 'bg-yellow-600 text-white'
+                              : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          }`}
+                        >
+                          {isDefault ? '⭐ Default' : 'Set Default'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          
+          {formData.connectionIds && formData.connectionIds.length > 0 && (
+            <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
+              <p className="text-sm text-blue-300">
+                {formData.connectionIds.length} connection(s) selected
+                {formData.defaultConnectionId && ' • 1 default connection set'}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

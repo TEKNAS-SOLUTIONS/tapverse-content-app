@@ -24,6 +24,20 @@ export const config = {
     claudeModel: process.env.CLAUDE_MODEL || 'claude-3-haiku-20240307', // Default to Haiku (Sonnet available with upgraded API key)
   },
   
+  dataForSeo: {
+    login: process.env.DATAFORSEO_LOGIN || 'sanket@teknas.com.au',
+    password: process.env.DATAFORSEO_PASSWORD || '97e322c50317d801',
+    enabled: process.env.DATAFORSEO_ENABLED !== 'false', // Enabled by default
+    defaultLocation: process.env.DATAFORSEO_LOCATION || '2840', // US
+    defaultLanguage: process.env.DATAFORSEO_LANGUAGE || 'en', // English
+  },
+  
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri: process.env.GOOGLE_REDIRECT_URI || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/connections/google/callback`,
+  },
+  
   frontend: {
     url: process.env.FRONTEND_URL || 'http://localhost:3000',
   },

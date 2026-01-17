@@ -11,6 +11,7 @@ function Layout({ children }) {
     { path: '/projects', label: 'Projects', icon: '📁' },
     { path: '/keyword-analysis', label: 'Keywords', icon: '🔑' },
     { path: '/analytics', label: 'Analytics', icon: '📊' },
+    { path: '/connections', label: 'Connections', icon: '🔌' },
     { path: '/admin', label: 'Admin Setup', icon: '⚙️' },
   ];
   

@@ -2,6 +2,8 @@ import { generateContentWithSystem } from './claude.js';
 import pool from '../db/index.js';
 import https from 'https';
 import http from 'http';
+import { getSerpData } from './dataForSeoService.js';
+import { config } from '../config/config.js';
 
 /**
  * Enhanced Evidence Service
@@ -35,6 +37,28 @@ export async function generateEnhancedEvidence(params) {
     // Step 1: Gather real data from free sources
     const realData = await gatherFreeData(topic, keywords, competitors);
     
+    // Step 1.5: Get SERP data from DataForSEO if enabled and keywords available
+    let serpDataSource = 'none';
+    if (config.dataForSeo?.enabled && keywords.length > 0) {
+      try {
+        console.log('Fetching SERP data from DataForSEO...');
+        const primaryKeyword = keywords[0]; // Use first keyword for SERP analysis
+        const serpData = await getSerpData(
+          primaryKeyword,
+          config.dataForSeo.defaultLocation,
+          config.dataForSeo.defaultLanguage
+        );
+        realData.serpData = serpData;
+        realData.sources.push('DataForSEO SERP Analysis');
+        serpDataSource = 'dataforseo';
+        console.log(`Retrieved SERP data for "${primaryKeyword}"`);
+      } catch (error) {
+        console.error('DataForSEO SERP error (continuing without):', error.message);
+        serpDataSource = 'ai_fallback';
+        // Continue without SERP data
+      }
+    }
+    
     // Step 2: Run multi-pass AI analysis
     const analyses = await runMultiPassAnalysis({
       contentType,
@@ -62,6 +86,17 @@ export async function generateEnhancedEvidence(params) {
         real_data_sources: realData.sources,
         validation_method: 'Multi-pass synthesis with cross-validation',
       },
+      metadata: {
+        dataforseo_enabled: config.dataForSeo?.enabled || false,
+        serp_data_source: serpDataSource,
+        keyword_data_source: realData.serpData ? 'dataforseo' : 'ai',
+        fallback_used: serpDataSource === 'ai_fallback',
+        message: serpDataSource === 'dataforseo'
+          ? 'Real SERP data from DataForSEO API'
+          : serpDataSource === 'ai_fallback'
+          ? '⚠️ DataForSEO SERP unavailable - using AI analysis (fallback)'
+          : 'AI-powered analysis (DataForSEO not enabled)',
+      },
     };
   } catch (error) {
     console.error('Error in enhanced evidence generation:', error);
@@ -78,6 +113,7 @@ async function gatherFreeData(topic, keywords, competitors) {
     googleAutocomplete: [],
     competitorData: [],
     relatedSearches: [],
+    serpData: null, // DataForSEO SERP data
   };
 
   // 1. Google Autocomplete (free keyword ideas)
@@ -420,6 +456,25 @@ Competitor ${i + 1}: ${comp.domain}
     });
   }
 
+  // Add SERP data if available
+  let serpInfo = '';
+  if (realData.serpData) {
+    serpInfo = `\n\nREAL SERP DATA FROM DATAFORSEO (Top 10 Results):\n`;
+    serpInfo += `Keyword: "${realData.serpData.keyword}"\n`;
+    serpInfo += `Total Results: ${realData.serpData.serp_info?.total_results || 0}\n`;
+    serpInfo += `Featured Snippet: ${realData.serpData.featured_snippet ? 'Yes' : 'No'}\n\n`;
+    serpInfo += `Top Ranking Pages:\n`;
+    realData.serpData.organic_results.slice(0, 10).forEach((result, i) => {
+      serpInfo += `${i + 1}. ${result.title}\n`;
+      serpInfo += `   Domain: ${result.domain}\n`;
+      serpInfo += `   URL: ${result.url}\n`;
+      if (result.description) {
+        serpInfo += `   Description: ${result.description.substring(0, 100)}...\n`;
+      }
+      serpInfo += `\n`;
+    });
+  }
+
   const userPrompt = `Analyze the competitive landscape for:
 
 TOPIC: ${topic}
@@ -427,6 +482,7 @@ INDUSTRY: ${industry || 'General'}
 OUR COMPANY: ${clientData.company_name || 'Client'}
 COMPETITOR URLs: ${competitors.length > 0 ? competitors.join(', ') : 'No specific competitors provided'}
 ${competitorInfo}
+${serpInfo}
 
 Provide comprehensive competitive analysis as JSON:
 {
@@ -599,6 +655,16 @@ async function synthesizeAnalyses(analyses, realData) {
       dominant_content_type: strategy.content_recommendations?.optimal_format || 'guide',
       recommended_word_count: strategy.content_recommendations?.recommended_length || '1500-2500',
       strategy: strategy.content_recommendations?.differentiation_hook || '',
+      // Real SERP data if available
+      top_competitors: realData.serpData?.organic_results?.slice(0, 10).map(r => ({
+        rank: r.rank,
+        title: r.title,
+        domain: r.domain,
+        url: r.url,
+      })) || [],
+      total_results: realData.serpData?.serp_info?.total_results || null,
+      has_featured_snippet: realData.serpData?.featured_snippet ? true : false,
+      serp_data_source: realData.serpData ? 'DataForSEO' : null,
     },
 
     content_recommendations: strategy.content_recommendations || {},
@@ -666,6 +732,7 @@ function calculateEnhancedConfidence(evidence, realData) {
   if (realData.competitorData.length > 0) score += 10;
   if (realData.competitorData.length >= 2) score += 5;
   if (realData.relatedSearches.length > 0) score += 5;
+  if (realData.serpData) score += 15; // SERP data is very valuable
 
   // Analysis quality bonuses
   if (evidence.keyword_analysis?.primary_keywords?.length >= 5) score += 5;
@@ -673,7 +740,7 @@ function calculateEnhancedConfidence(evidence, realData) {
   if (evidence.competitor_analysis?.gaps_to_exploit?.length >= 2) score += 5;
   if (evidence.ai_reasoning?.steps?.length >= 4) score += 5;
 
-  return Math.min(score, 95); // Cap at 95% without paid APIs
+  return Math.min(score, 98); // Cap at 98% with DataForSEO
 }
 
 /**

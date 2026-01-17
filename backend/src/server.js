@@ -20,6 +20,9 @@ import contentRoadmapRouter from './routes/contentRoadmap.js';
 import dashboardRouter from './routes/dashboard.js';
 import keywordAnalysisRouter from './routes/keywordAnalysis.js';
 import contentEvidenceRouter from './routes/contentEvidence.js';
+import shopifyRouter from './routes/shopify.js';
+import localSeoRouter from './routes/localSeo.js';
+import connectionsRouter from './routes/connections.js';
 
 const app = express();
 
@@ -75,6 +78,9 @@ app.use('/api/roadmap', contentRoadmapRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/keyword-analysis', keywordAnalysisRouter);
 app.use('/api/content-evidence', contentEvidenceRouter);
+app.use('/api/shopify', shopifyRouter);
+app.use('/api/local-seo', localSeoRouter);
+app.use('/api/connections', connectionsRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

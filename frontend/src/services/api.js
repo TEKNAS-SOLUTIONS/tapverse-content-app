@@ -345,5 +345,81 @@ export const contentEvidenceAPI = {
   getByContentId: (contentId) => api.get(`/content-evidence/${contentId}`),
 };
 
+/**
+ * Shopify Store API
+ * For connecting and analyzing Shopify stores
+ */
+export const shopifyAPI = {
+  // Connect Shopify store
+  connect: (clientId, storeUrl, accessToken) =>
+    api.post('/shopify/connect', { client_id: clientId, store_url: storeUrl, access_token: accessToken }),
+  
+  // Get store connection for client
+  getStore: (clientId) => api.get(`/shopify/stores/${clientId}`),
+  
+  // Run store analysis
+  analyze: (clientId, options = {}) =>
+    api.post(`/shopify/analyze/${clientId}`, { options }),
+  
+  // Get analysis history
+  getAnalyses: (clientId, limit = 10) =>
+    api.get(`/shopify/analyses/${clientId}?limit=${limit}`),
+  
+  // Get specific analysis
+  getAnalysis: (analysisId) => api.get(`/shopify/analysis/${analysisId}`),
+};
+
+/**
+ * Local SEO API
+ * For local businesses (dentists, plumbers, salons, etc.)
+ */
+export const localSeoAPI = {
+  // Generate local SEO analysis
+  analyze: (clientId, projectId, location, websiteUrl) =>
+    api.post('/local-seo/analyze', { clientId, projectId, location, websiteUrl }),
+  
+  // Generate local schema markup
+  generateSchema: (schemaData) =>
+    api.post('/local-seo/schema', schemaData),
+};
+
+/**
+ * API Connections API
+ * For managing Google, Facebook, and other API connections
+ */
+export const connectionsAPI = {
+  // Get all connections
+  getAll: () => api.get('/connections'),
+  
+  // Get specific connection
+  getById: (id) => api.get(`/connections/${id}`),
+  
+  // Get all active connections (for assignment to clients)
+  getAllAvailable: () => api.get('/connections/all-available'),
+  
+  // Get available connections for a client
+  getAvailableForClient: (clientId) => api.get(`/connections/available/${clientId}`),
+  
+  // Assign connections to a client
+  assignToClient: (clientId, connectionIds, defaultConnectionId) =>
+    api.post('/connections/assign', { clientId, connectionIds, defaultConnectionId }),
+  
+  // Check Google OAuth status
+  getGoogleOAuthStatus: () => api.get('/connections/google/status'),
+  
+  // Generate Google OAuth URL
+  getGoogleAuthUrl: (connectionType) => api.post('/connections/google/auth-url', { connectionType }),
+  
+  // Handle Google OAuth callback
+  handleGoogleCallback: (code, state, connectionType, connectionName) =>
+    api.post('/connections/google/callback', { code, state, connectionType, connectionName }),
+  
+  // Re-discover resources for a connection
+  discoverResources: (connectionId) => api.post(`/connections/${connectionId}/discover`),
+  
+  // Delete connection
+  delete: (id) => api.delete(`/connections/${id}`),
+};
+
 export default api;
 

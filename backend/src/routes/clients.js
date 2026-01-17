@@ -1,4 +1,5 @@
 import express from 'express';
+import pool from '../db/index.js';
 import {
   createClient,
   getClientById,
@@ -30,6 +31,28 @@ router.get('/:id', async (req, res) => {
     if (!client) {
       return res.status(404).json({ success: false, error: 'Client not found' });
     }
+
+    // Get assigned connections
+    const connectionsResult = await pool.query(`
+      SELECT 
+        cc.connection_id,
+        cc.is_default,
+        ac.connection_name,
+        ac.connection_type,
+        ac.provider
+      FROM client_connections cc
+      JOIN api_connections ac ON cc.connection_id = ac.id
+      WHERE cc.client_id = $1
+      ORDER BY cc.is_default DESC
+    `, [id]);
+
+    client.assigned_connections = connectionsResult.rows.map(row => ({
+      connection_id: row.connection_id,
+      is_default: row.is_default,
+      connection_name: row.connection_name,
+      connection_type: row.connection_type,
+      provider: row.provider,
+    }));
     
     res.json({ success: true, data: client });
   } catch (error) {
@@ -107,8 +130,30 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Pass all fields from request body
-    const client = await createClient(req.body);
+    // Pass all fields from request body (excluding connectionIds)
+    const { connectionIds, defaultConnectionId, ...clientData } = req.body;
+    const client = await createClient(clientData);
+
+    // Assign connections if provided
+    if (connectionIds && Array.isArray(connectionIds) && connectionIds.length > 0) {
+      try {
+        // Remove existing assignments
+        await pool.query('DELETE FROM client_connections WHERE client_id = $1', [client.id]);
+
+        // Add new assignments
+        for (const connectionId of connectionIds) {
+          const isDefault = defaultConnectionId === connectionId;
+          await pool.query(
+            `INSERT INTO client_connections (client_id, connection_id, is_default)
+             VALUES ($1, $2, $3)`,
+            [client.id, connectionId, isDefault]
+          );
+        }
+      } catch (connError) {
+        console.error('Error assigning connections:', connError);
+        // Don't fail client creation if connection assignment fails
+      }
+    }
 
     res.status(201).json({ success: true, data: client });
   } catch (error) {
@@ -179,7 +224,33 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    const client = await updateClient(id, clientData);
+    // Handle connection assignments separately
+    const { connectionIds, defaultConnectionId, ...clientUpdateData } = clientData;
+    const client = await updateClient(id, clientUpdateData);
+
+    // Update connections if provided
+    if (connectionIds !== undefined) {
+      try {
+        // Remove existing assignments
+        await pool.query('DELETE FROM client_connections WHERE client_id = $1', [id]);
+
+        // Add new assignments
+        if (Array.isArray(connectionIds) && connectionIds.length > 0) {
+          for (const connectionId of connectionIds) {
+            const isDefault = defaultConnectionId === connectionId;
+            await pool.query(
+              `INSERT INTO client_connections (client_id, connection_id, is_default)
+               VALUES ($1, $2, $3)`,
+              [id, connectionId, isDefault]
+            );
+          }
+        }
+      } catch (connError) {
+        console.error('Error updating connections:', connError);
+        // Don't fail client update if connection assignment fails
+      }
+    }
+
     res.json({ success: true, data: client });
   } catch (error) {
     console.error('Error updating client:', error);

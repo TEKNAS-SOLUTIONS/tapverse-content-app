@@ -7,6 +7,8 @@ import ProjectDetail from './pages/ProjectDetail';
 import AdminSetup from './pages/AdminSetup';
 import Analytics from './pages/Analytics';
 import KeywordAnalysis from './pages/KeywordAnalysis';
+import Connections from './pages/Connections';
+import GoogleOAuthCallback from './pages/GoogleOAuthCallback';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path="/analytics/client/:clientId" element={<Analytics />} />
           <Route path="/analytics/client/:clientId/project/:projectId" element={<Analytics />} />
           <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
+          <Route path="/connections" element={<Connections />} />
+          <Route path="/connections/google/callback" element={<GoogleOAuthCallback />} />
         </Routes>
       </Layout>
     </Router>
