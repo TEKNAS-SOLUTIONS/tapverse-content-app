@@ -252,6 +252,84 @@
 
 ---
 
+### Test Case 3.7: Dashboard Graphs (NEW)
+**Steps:**
+1. Select a client from dropdown
+2. Scroll to "Month-on-Month Graphs" section (after metrics cards)
+3. Verify two graphs displayed:
+   - Rankings Trend (6 months)
+   - Content Generated Trend (6 months)
+
+**Expected:**
+- ✅ Rankings Trend chart displays (AreaChart)
+  - Shows average keyword positions over 6 months
+  - X-axis shows months (Jan, Feb, Mar, Apr, May, Jun)
+  - Y-axis shows position (1-100, reversed)
+  - Export button visible
+- ✅ Content Generated Trend chart displays (LineChart)
+  - Shows content count over 6 months
+  - X-axis shows months
+  - Y-axis shows content count
+  - Export button visible
+- ✅ Graphs only visible when client selected
+- ✅ Light theme styling throughout
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
+### Test Case 3.8: Task Management (NEW)
+**Steps:**
+1. Select a client from dropdown
+2. Scroll to "Tasks" section
+3. Click "+ New Task"
+4. Fill in task form:
+   - Title: "SEO Audit"
+   - Description: "Monthly SEO audit for client"
+   - Task Type: "Monthly Recurring" or "Ad-hoc"
+   - Assign To: Select a user (if available)
+   - Priority: "High"
+   - Due Date: Select a date
+5. Click "Create Task"
+6. Verify task appears in list
+
+**Expected:**
+- ✅ Task form displays (light theme)
+- ✅ All fields editable
+- ✅ Monthly Recurring option available with recurrence pattern
+- ✅ Ad-hoc option available
+- ✅ User dropdown populated (if users exist)
+- ✅ Task created successfully
+- ✅ Task appears in task list with status badge
+- ✅ Task list shows: Status, Priority, Assigned To, Due Date
+- ✅ Can filter by Status and Task Type
+- ✅ Can edit/delete tasks
+- ✅ Can update task status from dropdown
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
+### Test Case 3.9: Task Management - Status Updates
+**Steps:**
+1. Select a client with existing tasks
+2. Go to Tasks section
+3. Change task status using dropdown (e.g., Pending → In Progress)
+4. Verify status updates
+
+**Expected:**
+- ✅ Status dropdown available on each task
+- ✅ Status updates immediately
+- ✅ Status badge color changes (pending=yellow, in_progress=blue, completed=green, cancelled=red)
+- ✅ Status persists after page refresh
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
 ## 4. Projects Management
 
 ### Test Case 4.1: Create Project from Clients Dashboard
@@ -301,6 +379,7 @@
    - Article Ideas
    - Local SEO
    - Programmatic SEO
+   - Video Generation (NEW)
    - Chat
 
 **Expected:**
@@ -308,6 +387,7 @@
 - ✅ Active tab highlighted in orange
 - ✅ Content displays in light theme
 - ✅ No blank screens or errors
+- ✅ "Video Generation" tab visible
 
 **Actual Result:** _______________  
 **Pass/Fail:** _______________
@@ -469,6 +549,88 @@
 
 ---
 
+### Test Case 6.5: Connections Management (NEW)
+**Steps:**
+1. Navigate to `/connections` or click "Manage" in Clients Dashboard
+2. Verify Connections page loads
+3. Check page uses light theme (white/gray backgrounds)
+4. Review available connection options:
+   - Google Ads
+   - Google Search Console
+   - Google Analytics
+   - Google (All Services)
+
+**Expected:**
+- ✅ Connections page uses light theme (not dark theme)
+- ✅ Header displays "API Connections" with description
+- ✅ Connection cards show: Google Ads, Search Console, Analytics, Google (All)
+- ✅ Each card has description text
+- ✅ "Connect" buttons available (disabled if OAuth not configured)
+- ✅ Light theme styling throughout
+- ✅ Error messages clear if OAuth not configured
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
+### Test Case 6.6: Google OAuth Connection (NEW)
+**Steps:**
+1. Go to Connections page (`/connections`)
+2. Verify OAuth configuration status displayed
+3. If OAuth configured, click "Google Ads" or "Google (All)" connection button
+4. Verify redirect to Google OAuth authorization page
+5. Complete OAuth authorization
+6. Verify redirect back to app (`/connections/google/callback`)
+7. Verify callback page shows "Connection Successful" (light theme)
+8. Verify redirect to Connections page
+9. Verify new connection appears in "Connected Services" section
+
+**Expected:**
+- ✅ OAuth status checked and displayed
+- ✅ Authorization URL generated correctly
+- ✅ Redirect to Google works
+- ✅ OAuth callback page uses light theme
+- ✅ Connection successful message displayed
+- ✅ New connection saved to database
+- ✅ Connection appears in "Connected Services" with:
+  - Connection name
+  - Connection type
+  - Account email
+  - Account name
+  - Discovered resources (Google Ads accounts, Search Console properties, etc.)
+- ✅ "Refresh" and "Delete" buttons work
+- ✅ Connection status shows "Active"
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
+### Test Case 6.7: Google OAuth Callback Page (NEW)
+**Steps:**
+1. Initiate Google OAuth connection
+2. Complete Google authorization
+3. Verify redirect to `/connections/google/callback`
+4. Check callback page styling and messages
+
+**Expected:**
+- ✅ Callback page uses light theme (not dark theme)
+- ✅ Background: Light gray (bg-gray-50)
+- ✅ Card: White with border and shadow
+- ✅ Status messages displayed:
+  - "Processing Authorization" (with spinner)
+  - "Connecting" (with spinner)
+  - "Connection Successful!" (with checkmark)
+  - "Connection Failed" (with X) if error
+- ✅ Auto-redirect after 2-3 seconds
+- ✅ Error messages clear if OAuth fails
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
 ## 7. Content Generation
 
 ### Test Case 7.1: Keyword Analysis
@@ -503,6 +665,38 @@
 - ✅ Progress indicator shown
 - ✅ Generated content displayed
 - ✅ Content includes evidence/reasoning (if available)
+
+**Actual Result:** _______________  
+**Pass/Fail:** _______________
+
+---
+
+### Test Case 7.3: Video Generation (NEW)
+**Steps:**
+1. Open Project Detail page
+2. Click "Video Generation" tab
+3. Click "Generate Script" button
+4. Wait for script generation (may take 10-30 seconds)
+5. Review generated script (editable text area)
+6. Select an Avatar from available avatars
+7. Select a Voice from available voices
+8. Click "Create Video" button
+9. Wait for video generation (may take 2-5 minutes)
+10. Monitor video status updates
+11. Once completed, verify video playback
+
+**Expected:**
+- ✅ Video Generation tab displays (light theme)
+- ✅ Script generation works (generates script from project data)
+- ✅ Script text editable
+- ✅ Avatar selection shows available avatars with thumbnails
+- ✅ Voice selection shows available voices with details (gender, language)
+- ✅ Video creation starts successfully
+- ✅ Status polling works (shows progress)
+- ✅ Video status updates: processing → completed
+- ✅ Video playback works once completed
+- ✅ Download button available
+- ✅ Error messages clear if API keys missing or generation fails
 
 **Actual Result:** _______________  
 **Pass/Fail:** _______________
@@ -565,14 +759,18 @@
 
 ### Current Limitations
 1. **Logo & Favicon:** User must add `logo.png` and `favicon.png` to `frontend/public/` manually
-2. **Graphs/Charts:** Month-on-month graphs in Clients Dashboard are placeholders (sections ready, needs chart library)
-3. **Full Task Management:** Tasks section in Clients Dashboard is placeholder (backend ready, UI pending)
-4. **Content Ideas Storage:** Content ideas are displayed immediately but not stored in database yet
+2. **Content Ideas Storage:** Content ideas are displayed immediately but not stored in database yet
+3. **Video Generation:** Requires HeyGen and ElevenLabs API keys configured in Settings
+4. **Google OAuth:** Requires OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) configured in `.env`
 
 ### Known Bugs (Fixed)
 - ✅ Chat error handling - Fixed
 - ✅ ProjectDetail dark theme - Fixed (all converted to light)
 - ✅ Content ideas display - Fixed
+- ✅ Dashboard graphs - Implemented with Recharts ✅
+- ✅ Task Management UI - Fully implemented ✅
+- ✅ Connections Management light theme - Converted ✅
+- ✅ Google OAuth light theme - Converted ✅
 
 ---
 
@@ -585,11 +783,18 @@
 **Environment:** app.tapverse.ai
 
 ### Results Summary
-- **Total Test Cases:** 30+
+- **Total Test Cases:** 40+ (including new features)
 - **Passed:** ___
 - **Failed:** ___
 - **Blocked:** ___
 - **Not Tested:** ___
+
+### New Features Tested (Priority Summary)
+- ✅ Dashboard Graphs (Recharts) - Test Case 3.7
+- ✅ Task Management UI - Test Case 3.8, 3.9
+- ✅ Connections Management - Test Case 6.5
+- ✅ Google OAuth Integration - Test Case 6.6, 6.7
+- ✅ Video Generation - Test Case 7.3
 
 ### Critical Issues Found
 1. _______________
