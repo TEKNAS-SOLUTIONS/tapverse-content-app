@@ -82,22 +82,22 @@ function KeywordAnalysis() {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 70) return 'text-green-400 bg-green-900/30';
-    if (score >= 40) return 'text-yellow-400 bg-yellow-900/30';
-    return 'text-red-400 bg-red-900/30';
+    if (score >= 70) return 'text-green-700 bg-green-100';
+    if (score >= 40) return 'text-yellow-700 bg-yellow-100';
+    return 'text-red-700 bg-red-100';
   };
 
   const getDifficultyColor = (difficulty) => {
-    if (difficulty <= 30) return 'text-green-400';
-    if (difficulty <= 60) return 'text-yellow-400';
-    return 'text-red-400';
+    if (difficulty <= 30) return 'text-green-600';
+    if (difficulty <= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getPriorityBadge = (priority) => {
     const colors = {
-      high: 'bg-red-900/50 text-red-300 border-red-600/30',
-      medium: 'bg-yellow-900/50 text-yellow-300 border-yellow-600/30',
-      low: 'bg-slate-700 text-slate-300 border-slate-600/30',
+      high: 'bg-red-100 text-red-700 border-red-300',
+      medium: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+      low: 'bg-gray-200 text-gray-700 border-gray-300',
     };
     return colors[priority] || colors.medium;
   };
@@ -123,15 +123,15 @@ function KeywordAnalysis() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Keyword Analysis</h1>
-        <p className="text-gray-400 mt-1">Analyze keywords, competitors, and industry trends</p>
+        <h1 className="text-3xl font-bold text-gray-900">Keyword Analysis</h1>
+        <p className="text-gray-600 mt-1">Analyze keywords, competitors, and industry trends</p>
       </div>
 
       {/* Client & Project Selector */}
-      <div className="bg-slate-900 rounded-xl border border-slate-800 p-4">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Select Client *
             </label>
             <select
@@ -141,7 +141,7 @@ function KeywordAnalysis() {
                 setSelectedProjectId('');
                 setAnalysis(null);
               }}
-              className="block w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
               <option value="">-- Select a Client --</option>
               {clients.map((c) => (
@@ -153,7 +153,7 @@ function KeywordAnalysis() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Select Project (Optional)
             </label>
             <select
@@ -175,7 +175,7 @@ function KeywordAnalysis() {
             <button
               onClick={runAnalysis}
               disabled={!selectedClientId || loading}
-              className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="w-full px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -191,11 +191,11 @@ function KeywordAnalysis() {
 
         {/* Client Info */}
         {selectedClient && (
-          <div className="mt-4 pt-4 border-t border-slate-700">
+          <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="font-medium text-white">{selectedClient.company_name}</span>
+              <span className="font-medium text-gray-900">{selectedClient.company_name}</span>
               {selectedClient.industry && (
-                <span className="bg-slate-800 px-2 py-1 rounded text-gray-400">{selectedClient.industry}</span>
+                <span className="bg-gray-100 px-2 py-1 rounded text-gray-700">{selectedClient.industry}</span>
               )}
               {selectedClient.competitors?.length > 0 && (
                 <span className="bg-purple-900/30 text-purple-300 px-2 py-1 rounded">
@@ -209,17 +209,17 @@ function KeywordAnalysis() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-900/30 border border-red-600/30 rounded-lg p-4">
-          <p className="text-red-300">❌ {error}</p>
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-700">❌ {error}</p>
         </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="text-center py-16 bg-slate-900 rounded-xl border border-slate-800">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-400">Analyzing keywords and competitors...</p>
-          <p className="text-gray-500 text-sm mt-2">This may take 30-60 seconds</p>
+        <div className="text-center py-16 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-700">Analyzing keywords and competitors...</p>
+          <p className="text-gray-600 text-sm mt-2">This may take 30-60 seconds</p>
         </div>
       )}
 
@@ -228,24 +228,24 @@ function KeywordAnalysis() {
         <div className="space-y-6">
           {/* Summary Card */}
           {analysis.summary && (
-            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">📊 Analysis Summary</h2>
-              <p className="text-gray-300 mb-4">{analysis.summary.overall_strategy}</p>
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200 shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📊 Analysis Summary</h2>
+              <p className="text-gray-700 mb-4">{analysis.summary.overall_strategy}</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Top Priority Keywords</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Top Priority Keywords</h3>
                   <div className="flex flex-wrap gap-2">
                     {analysis.summary.top_priorities?.map((kw, idx) => (
-                      <span key={idx} className="bg-blue-600/30 text-blue-300 px-3 py-1 rounded-full text-sm">
+                      <span key={idx} className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm">
                         {kw}
                       </span>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Expected Timeline</h3>
-                  <p className="text-white">{analysis.summary.timeline}</p>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Expected Timeline</h3>
+                  <p className="text-gray-900">{analysis.summary.timeline}</p>
                 </div>
               </div>
             </div>
@@ -260,21 +260,21 @@ function KeywordAnalysis() {
           )}
 
           {/* Tabs */}
-          <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-            <div className="flex overflow-x-auto border-b border-slate-800">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex overflow-x-auto border-b border-gray-200">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-slate-800 text-blue-400 border-b-2 border-blue-400'
-                      : 'text-gray-400 hover:text-white hover:bg-slate-800/50'
-                  }`}
+                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-orange-600 text-white border-b-2 border-orange-600'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
                 >
                   {tab.label}
                   {tab.count > 0 && (
-                    <span className="ml-2 bg-slate-700 text-gray-300 px-2 py-0.5 rounded-full text-xs">
+                    <span className="ml-2 bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs">
                       {tab.count}
                     </span>
                   )}
@@ -286,12 +286,12 @@ function KeywordAnalysis() {
               {/* Keyword Opportunities */}
               {activeTab === 'opportunities' && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-white mb-4">Keyword Opportunities</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Keyword Opportunities</h3>
                   {analysis.keyword_opportunities?.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="text-left text-gray-400 text-sm border-b border-slate-700">
+                          <tr className="text-left text-gray-700 text-sm border-b border-gray-200">
                             <th className="pb-3 pr-4">Keyword</th>
                             <th className="pb-3 pr-4">Volume</th>
                             <th className="pb-3 pr-4">Difficulty</th>
@@ -302,16 +302,16 @@ function KeywordAnalysis() {
                         </thead>
                         <tbody>
                           {analysis.keyword_opportunities.map((kw, idx) => (
-                            <tr key={idx} className="border-b border-slate-800 hover:bg-slate-800/50">
+                            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
                               <td className="py-3 pr-4">
                                 <div>
-                                  <span className="text-white font-medium">{kw.keyword}</span>
+                                  <span className="text-gray-900 font-medium">{kw.keyword}</span>
                                   {kw.rationale && (
-                                    <p className="text-gray-500 text-xs mt-1 max-w-xs">{kw.rationale}</p>
+                                    <p className="text-gray-600 text-xs mt-1 max-w-xs">{kw.rationale}</p>
                                   )}
                                 </div>
                               </td>
-                              <td className="py-3 pr-4 text-gray-300 capitalize">{kw.search_volume}</td>
+                              <td className="py-3 pr-4 text-gray-700 capitalize">{kw.search_volume}</td>
                               <td className="py-3 pr-4">
                                 <span className={getDifficultyColor(kw.difficulty)}>{kw.difficulty}/100</span>
                               </td>
@@ -320,7 +320,7 @@ function KeywordAnalysis() {
                                   {kw.strength_score}
                                 </span>
                               </td>
-                              <td className="py-3 pr-4 text-gray-300 capitalize">{kw.intent}</td>
+                              <td className="py-3 pr-4 text-gray-700 capitalize">{kw.intent}</td>
                               <td className="py-3 pr-4">
                                 <span className={`px-2 py-1 rounded text-xs border ${getPriorityBadge(kw.priority)}`}>
                                   {kw.priority}
@@ -332,7 +332,7 @@ function KeywordAnalysis() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-gray-400">No keyword opportunities found</p>
+                    <p className="text-gray-600">No keyword opportunities found</p>
                   )}
                 </div>
               )}
@@ -344,17 +344,17 @@ function KeywordAnalysis() {
                   {analysis.competitor_gaps?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.competitor_gaps.map((gap, idx) => (
-                        <div key={idx} className="bg-slate-800 rounded-lg p-4">
+                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                           <div className="flex items-start justify-between">
                             <div>
-                              <span className="text-white font-medium">{gap.keyword}</span>
-                              <p className="text-gray-400 text-sm mt-1">
+                              <span className="text-gray-900 font-medium">{gap.keyword}</span>
+                              <p className="text-gray-600 text-sm mt-1">
                                 Competitor: <span className="text-purple-400">{gap.competitor}</span>
                               </p>
                             </div>
                             <div className="flex gap-3 text-sm">
                               <div className="text-center">
-                                <p className="text-gray-500">Difficulty</p>
+                                <p className="text-gray-600">Difficulty</p>
                                 <p className={getDifficultyColor(gap.difficulty)}>{gap.difficulty}</p>
                               </div>
                               <div className="text-center">
@@ -381,11 +381,11 @@ function KeywordAnalysis() {
                   {analysis.industry_trends?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.industry_trends.map((trend, idx) => (
-                        <div key={idx} className="bg-slate-800 rounded-lg p-4">
+                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <span className="text-2xl">{getTrendIcon(trend.trend_direction)}</span>
-                              <span className="text-white font-medium">{trend.topic}</span>
+                              <span className="text-gray-900 font-medium">{trend.topic}</span>
                             </div>
                             <span className={`px-2 py-1 rounded ${getScoreColor(trend.relevance_score)}`}>
                               {trend.relevance_score}% relevant
@@ -394,7 +394,7 @@ function KeywordAnalysis() {
                           {trend.keywords?.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {trend.keywords.map((kw, i) => (
-                                <span key={i} className="bg-slate-700 text-gray-300 px-2 py-1 rounded text-sm">
+                                <span key={i} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm">
                                   {kw}
                                 </span>
                               ))}
@@ -416,15 +416,15 @@ function KeywordAnalysis() {
                   {analysis.long_tail_opportunities?.length > 0 ? (
                     <div className="grid gap-3">
                       {analysis.long_tail_opportunities.map((lt, idx) => (
-                        <div key={idx} className="bg-slate-800 rounded-lg p-4 flex items-center justify-between">
-                          <span className="text-white">{lt.keyword}</span>
+                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                          <span className="text-gray-900">{lt.keyword}</span>
                           <div className="flex items-center gap-4 text-sm">
-                            <span className="text-gray-400">Vol: {lt.search_volume}</span>
+                            <span className="text-gray-600">Vol: {lt.search_volume}</span>
                             <span className={getDifficultyColor(lt.difficulty)}>Diff: {lt.difficulty}</span>
                             <span className={`px-2 py-1 rounded ${
-                              lt.conversion_potential === 'high' ? 'bg-green-900/30 text-green-300' :
-                              lt.conversion_potential === 'medium' ? 'bg-yellow-900/30 text-yellow-300' :
-                              'bg-slate-700 text-gray-300'
+                              lt.conversion_potential === 'high' ? 'bg-green-100 text-green-700' :
+                              lt.conversion_potential === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-gray-200 text-gray-700'
                             }`}>
                               {lt.conversion_potential} conversion
                             </span>
@@ -445,11 +445,11 @@ function KeywordAnalysis() {
                   {analysis.keyword_clusters?.length > 0 ? (
                     <div className="grid gap-4">
                       {analysis.keyword_clusters.map((cluster, idx) => (
-                        <div key={idx} className="bg-slate-800 rounded-lg p-4">
-                          <h4 className="text-white font-medium mb-2">{cluster.cluster_name}</h4>
+                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h4 className="text-gray-900 font-medium mb-2">{cluster.cluster_name}</h4>
                           <div className="mb-3">
-                            <span className="text-gray-400 text-sm">Primary: </span>
-                            <span className="bg-blue-600/30 text-blue-300 px-2 py-1 rounded text-sm">
+                            <span className="text-gray-600 text-sm">Primary: </span>
+                            <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm">
                               {cluster.primary_keyword}
                             </span>
                           </div>
@@ -461,7 +461,7 @@ function KeywordAnalysis() {
                             ))}
                           </div>
                           {cluster.content_recommendation && (
-                            <p className="text-gray-400 text-sm">
+                            <p className="text-gray-700 text-sm">
                               💡 {cluster.content_recommendation}
                             </p>
                           )}
@@ -478,34 +478,34 @@ function KeywordAnalysis() {
               {activeTab === 'quickwins' && (
                 <div className="space-y-3">
                   <h3 className="text-lg font-medium text-white mb-4">Quick Wins</h3>
-                  <p className="text-gray-400 text-sm mb-4">Low-difficulty keywords with high potential for fast rankings</p>
+                  <p className="text-gray-600 text-sm mb-4">Low-difficulty keywords with high potential for fast rankings</p>
                   {analysis.quick_wins?.length > 0 ? (
                     <div className="grid gap-3">
                       {analysis.quick_wins.map((qw, idx) => (
-                        <div key={idx} className="bg-gradient-to-r from-green-900/20 to-slate-800 rounded-lg p-4 flex items-center justify-between border border-green-600/20">
+                        <div key={idx} className="bg-gradient-to-r from-green-50 to-gray-50 rounded-lg p-4 flex items-center justify-between border border-green-200 shadow-sm">
                           <div className="flex items-center gap-3">
                             <span className="text-2xl">⚡</span>
-                            <span className="text-white font-medium">{qw.keyword}</span>
+                            <span className="text-gray-900 font-medium">{qw.keyword}</span>
                           </div>
                           <div className="flex items-center gap-4 text-sm">
                             <div className="text-center">
-                              <p className="text-gray-500 text-xs">Difficulty</p>
-                              <p className="text-green-400 font-medium">{qw.difficulty}</p>
+                              <p className="text-gray-600 text-xs">Difficulty</p>
+                              <p className="text-green-600 font-medium">{qw.difficulty}</p>
                             </div>
                             <div className="text-center">
-                              <p className="text-gray-500 text-xs">Traffic</p>
-                              <p className="text-gray-300">{qw.potential_traffic}</p>
+                              <p className="text-gray-600 text-xs">Traffic</p>
+                              <p className="text-gray-700">{qw.potential_traffic}</p>
                             </div>
                             <div className="text-center">
-                              <p className="text-gray-500 text-xs">Time to Rank</p>
-                              <p className="text-blue-300">{qw.time_to_rank}</p>
+                              <p className="text-gray-600 text-xs">Time to Rank</p>
+                              <p className="text-orange-600">{qw.time_to_rank}</p>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-400">No quick wins identified</p>
+                    <p className="text-gray-600">No quick wins identified</p>
                   )}
                 </div>
               )}
@@ -516,10 +516,10 @@ function KeywordAnalysis() {
 
       {/* Empty State */}
       {!analysis && !loading && !error && (
-        <div className="text-center py-16 bg-slate-900 rounded-xl border border-slate-800">
+        <div className="text-center py-16 bg-white rounded-xl border border-gray-200 shadow-sm">
           <span className="text-6xl mb-4 block">🔍</span>
-          <p className="text-gray-400 text-lg">Select a client and run analysis</p>
-          <p className="text-gray-500 text-sm mt-2">
+          <p className="text-gray-700 text-lg">Select a client and run analysis</p>
+          <p className="text-gray-600 text-sm mt-2">
             Get AI-powered keyword research, competitor gaps, and industry trends
           </p>
         </div>
