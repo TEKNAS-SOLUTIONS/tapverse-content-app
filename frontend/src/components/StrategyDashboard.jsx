@@ -32,24 +32,24 @@ function StrategyDashboard({ projectId, clientData, projectData }) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading strategy dashboard...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading strategy dashboard...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-900/50 border border-red-700 rounded-lg p-4">
-        <p className="text-red-300">{error}</p>
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-700">{error}</p>
       </div>
     );
   }
 
   if (!dashboard) {
     return (
-      <div className="text-center py-12 bg-gray-800 rounded-lg">
-        <p className="text-gray-400">No dashboard data available. Generate strategies first.</p>
+      <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+        <p className="text-gray-600">No dashboard data available. Generate strategies first.</p>
       </div>
     );
   }

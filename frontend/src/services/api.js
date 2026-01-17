@@ -254,6 +254,7 @@ export const contentRoadmapAPI = {
  */
 export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
+  getByProject: (projectId) => api.get(`/dashboard/${projectId}`),
 };
 
 /**
