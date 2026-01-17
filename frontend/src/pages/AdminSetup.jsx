@@ -69,14 +69,21 @@ export default function AdminSetup() {
       setLoading(true);
       setError(null);
       const response = await settingsAPI.getAll();
-      if (response.data.success) {
-        setSettings(response.data.data || []);
+      console.log('Settings API Response:', response); // Debug log
+      
+      if (response?.data?.success) {
+        const settingsData = response.data.data || [];
+        console.log('Settings loaded:', settingsData.length, 'items'); // Debug log
+        setSettings(Array.isArray(settingsData) ? settingsData : []);
       } else {
-        setError(response.data.error || 'Failed to load settings');
+        const errorMsg = response?.data?.error || 'Failed to load settings';
+        setError(errorMsg);
+        setSettings([]); // Ensure settings is always an array
       }
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'Failed to load settings';
       setError(errorMsg);
+      setSettings([]); // Ensure settings is always an array
       console.error('Error loading settings:', err);
       // If it's a table not found error, suggest migration
       if (errorMsg.includes('system_settings') || errorMsg.includes('does not exist')) {
@@ -239,7 +246,7 @@ export default function AdminSetup() {
   const renderSettingInput = (key) => {
     const setting = getSetting(key);
     const value = getValue(key);
-    const isSecret = setting?.is_secret;
+    const isSecret = setting?.is_secret || false; // Default to false if setting not found
     const isEdited = editedValues[key] !== undefined;
     const testResult = testResults[key];
     const isTesting = testing[key];
@@ -251,6 +258,7 @@ export default function AdminSetup() {
       .replace('Api', 'API')
       .replace('Id', 'ID');
 
+    // Always render the input, even if setting doesn't exist yet
     return (
       <div key={key} className="mb-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -258,11 +266,14 @@ export default function AdminSetup() {
           {setting?.description && (
             <span className="text-xs text-gray-500 ml-2">({setting.description})</span>
           )}
+          {!setting && (
+            <span className="text-xs text-gray-400 ml-2">(Setting not yet configured)</span>
+          )}
         </label>
         <div className="flex gap-2">
           <input
             type={isSecret ? 'password' : 'text'}
-            value={value}
+            value={value || ''}
             onChange={(e) => handleChange(key, e.target.value)}
             placeholder={isSecret ? '••••••••' : 'Enter value...'}
             className={`flex-1 px-4 py-2 bg-white border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
@@ -272,7 +283,7 @@ export default function AdminSetup() {
           {(key === 'anthropic_api_key' || key === 'heygen_api_key' || key === 'elevenlabs_api_key' || key === 'openai_api_key' || key === 'leonardo_api_key') && (
             <button
               onClick={() => handleTestConnection(key)}
-              disabled={isTesting}
+              disabled={isTesting || !value}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {isTesting ? 'Testing...' : 'Test'}
@@ -410,6 +421,18 @@ export default function AdminSetup() {
             <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-center">
               <span className="mr-2">⚠</span>
               You have unsaved changes. Click "Save All Changes" to apply them.
+            </div>
+          )}
+
+          {settings.length === 0 && !loading && (
+            <div className="mb-6 p-6 bg-gray-50 border border-gray-200 rounded-lg text-center">
+              <p className="text-gray-600">No settings found. Settings will appear here once loaded.</p>
+              <button
+                onClick={loadSettings}
+                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              >
+                Reload Settings
+              </button>
             </div>
           )}
 

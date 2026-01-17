@@ -109,15 +109,20 @@ export default function Chat() {
     if (!inputMessage.trim() || sending) return;
 
     const messageText = inputMessage.trim();
-    setInputMessage('');
     setSending(true);
+    setError(null); // Clear previous errors
+
+    // Store conversation ID before any async operations
+    let convId = currentConversation?.id;
+    let userMessageAdded = false;
 
     try {
-      let convId = currentConversation?.id;
-
       // Create conversation if needed
       if (!convId) {
         const createResp = await chatAPI.createConversation({ chatType: 'general' });
+        if (!createResp?.data?.success || !createResp?.data?.data?.id) {
+          throw new Error('Failed to create conversation');
+        }
         convId = createResp.data.data.id;
         setCurrentConversation(createResp.data.data);
         await loadConversations();
@@ -126,33 +131,46 @@ export default function Chat() {
       // Add user message to UI immediately
       const userMessage = { role: 'user', content: messageText, created_at: new Date().toISOString() };
       setMessages(prev => [...prev, userMessage]);
+      userMessageAdded = true;
+      setInputMessage(''); // Clear input after adding to UI
 
       // Send to API
       const response = await chatAPI.sendMessage(convId, messageText);
       
-      if (response.data.success) {
-        // Add AI response
-        const aiMessage = {
-          role: 'assistant',
-          content: response.data.data.message || response.data.data.content || 'No response received',
-          created_at: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setError(null);
+      if (response?.data?.success && response?.data?.data) {
+        // Add AI response - handle both message and content fields
+        const aiContent = response.data.data.message || response.data.data.content;
+        if (aiContent) {
+          const aiMessage = {
+            role: 'assistant',
+            content: aiContent,
+            created_at: new Date().toISOString(),
+          };
+          setMessages(prev => [...prev, aiMessage]);
+          setError(null);
+        } else {
+          setError('Received empty response from AI');
+        }
       } else {
-        setError('Failed to send message');
+        throw new Error(response?.data?.error || 'Invalid response from server');
       }
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = error.response?.data?.error || error.message || 'Failed to send message. Please try again.';
       setError(errorMessage);
+      
       // Remove user message if send failed
-      setMessages(prev => prev.slice(0, -1));
-      // Only redirect to login if it's truly a 401 and not a temporary issue
-      if (error.response?.status === 401 && !error.response?.data?.retry) {
+      if (userMessageAdded) {
+        setMessages(prev => prev.slice(0, -1));
+        // Restore input message if send failed
+        setInputMessage(messageText);
+      }
+      
+      // Only redirect to login on 401, not on other errors
+      if (error.response?.status === 401) {
         setTimeout(() => {
           navigate('/login');
-        }, 2000); // Delay to show error message first
+        }, 2000);
       }
     } finally {
       setSending(false);
