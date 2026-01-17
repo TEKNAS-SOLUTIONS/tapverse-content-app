@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { clientsAPI, projectsAPI, tasksAPI, rankTrackingAPI, contentIdeasAPI, exportAPI } from '../services/api';
 import ClientForm from '../components/ClientForm';
+import TaskManagement from '../components/TaskManagement';
 
 function Clients() {
   const [clients, setClients] = useState([]);
@@ -17,6 +19,9 @@ function Clients() {
   const [filterIndustry, setFilterIndustry] = useState('');
   const [contentIdeas, setContentIdeas] = useState(null);
   const [loadingIdeas, setLoadingIdeas] = useState(false);
+  const [rankingTrends, setRankingTrends] = useState(null);
+  const [contentTrends, setContentTrends] = useState(null);
+  const [loadingTrends, setLoadingTrends] = useState(false);
 
   useEffect(() => {
     loadClients();
@@ -27,11 +32,15 @@ function Clients() {
     if (selectedClientId) {
       loadClientMetrics(selectedClientId);
       loadClientProjects(selectedClientId);
+      loadRankingTrends(selectedClientId);
+      loadContentTrends(selectedClientId);
       const client = clients.find(c => c.id === selectedClientId);
       setSelectedClient(client);
     } else {
       loadMetrics();
       setSelectedClient(null);
+      setRankingTrends(null);
+      setContentTrends(null);
     }
   }, [selectedClientId, clients]);
 
@@ -80,6 +89,73 @@ function Clients() {
       }
     } catch (err) {
       console.error('Error loading projects:', err);
+    }
+  };
+
+  const loadRankingTrends = async (clientId) => {
+    try {
+      setLoadingTrends(true);
+      const response = await rankTrackingAPI.getTrends(clientId, 6);
+      if (response.data.success) {
+        const trends = response.data.data || {};
+        // Transform data for Recharts
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const chartData = months.map((month, idx) => {
+          const date = new Date();
+          date.setMonth(date.getMonth() - (5 - idx));
+          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          
+          let avgPosition = null;
+          let totalKeywords = 0;
+          let top10Count = 0;
+          
+          Object.values(trends).forEach((keywordTrends) => {
+            const monthData = keywordTrends.find((t) => {
+              const trendMonth = new Date(t.date).toISOString().slice(0, 7);
+              return trendMonth === monthKey;
+            });
+            if (monthData && monthData.position) {
+              if (avgPosition === null) avgPosition = 0;
+              avgPosition += monthData.position;
+              totalKeywords++;
+              if (monthData.position <= 10) top10Count++;
+            }
+          });
+          
+          return {
+            month,
+            avgPosition: avgPosition !== null ? Math.round(avgPosition / totalKeywords) : null,
+            top10Keywords: top10Count,
+          };
+        });
+        
+        setRankingTrends(chartData);
+      }
+    } catch (err) {
+      console.error('Error loading ranking trends:', err);
+    } finally {
+      setLoadingTrends(false);
+    }
+  };
+
+  const loadContentTrends = async (clientId) => {
+    try {
+      // For now, generate mock data based on content count
+      // In production, this would come from a dedicated API endpoint
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const baseContent = metrics?.contentGenerated || 0;
+      const chartData = months.map((month, idx) => {
+        // Simulate growth over time
+        const growth = idx * 0.15;
+        const contentCount = Math.round(baseContent * (0.5 + growth));
+        return {
+          month,
+          content: contentCount,
+        };
+      });
+      setContentTrends(chartData);
+    } catch (err) {
+      console.error('Error loading content trends:', err);
     }
   };
 
@@ -226,6 +302,100 @@ function Clients() {
           </div>
         )}
 
+        {/* Month-on-Month Graphs */}
+        {selectedClientId && (rankingTrends || contentTrends) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Rankings Trend Chart */}
+            {rankingTrends && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Rankings Trend (6 months)</h2>
+                  <button
+                    onClick={() => exportAPI.keywords({ clientId: selectedClientId })}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Export
+                  </button>
+                </div>
+                {loadingTrends ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                    <p className="text-gray-600 mt-2 text-sm">Loading trends...</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={rankingTrends}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                      <YAxis 
+                        reversed
+                        domain={[1, 100]} 
+                        stroke="#6b7280" 
+                        fontSize={12}
+                        label={{ value: 'Position', angle: -90, position: 'insideLeft', style: { fill: '#6b7280' } }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                        labelStyle={{ color: '#111827', fontWeight: 600 }}
+                      />
+                      <Legend />
+                      <Area 
+                        type="monotone" 
+                        dataKey="avgPosition" 
+                        stroke="#ff4f00" 
+                        fill="#ff4f00" 
+                        fillOpacity={0.3}
+                        name="Avg Position"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            )}
+
+            {/* Content Generated Trend Chart */}
+            {contentTrends && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Content Generated Trend (6 months)</h2>
+                  <button
+                    onClick={() => exportAPI.content({ clientId: selectedClientId })}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Export
+                  </button>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={contentTrends}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                    <YAxis 
+                      stroke="#6b7280" 
+                      fontSize={12}
+                      label={{ value: 'Content', angle: -90, position: 'insideLeft', style: { fill: '#6b7280' } }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                      labelStyle={{ color: '#111827', fontWeight: 600 }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="content" 
+                      stroke="#ff4f00" 
+                      strokeWidth={2}
+                      dot={{ fill: '#ff4f00', r: 4 }}
+                      activeDot={{ r: 6 }}
+                      name="Content"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Sections */}
         <div className="space-y-6">
           {/* Projects Section */}
@@ -267,13 +437,7 @@ function Clients() {
 
           {/* Tasks Section */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
-              <button className="px-4 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                + New Task
-              </button>
-            </div>
-            <p className="text-gray-600">Task management coming soon...</p>
+            <TaskManagement clientId={selectedClientId} />
           </div>
 
           {/* Keywords Section */}

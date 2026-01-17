@@ -129,8 +129,8 @@ function Connections() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading connections...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading connections...</p>
       </div>
     );
   }
@@ -138,29 +138,29 @@ function Connections() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h1 className="text-3xl font-bold text-white mb-2">API Connections</h1>
-        <p className="text-gray-400">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">API Connections</h1>
+        <p className="text-gray-600">
           Manage API connections for Google, Facebook, and other services. These connections are available for assignment to clients.
         </p>
       </div>
 
       {/* Connect New Services */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Connect New Service</h2>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Connect New Service</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Google Ads */}
           <button
             onClick={() => handleConnectGoogle('google_ads')}
             disabled={connecting}
-            className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left disabled:opacity-50"
+            className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-left disabled:opacity-50"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">🔵</span>
-              <span className="font-semibold text-white">Google Ads</span>
+              <span className="font-semibold text-gray-900">Google Ads</span>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Connect to manage Google Ads accounts
             </p>
           </button>
@@ -169,13 +169,13 @@ function Connections() {
           <button
             onClick={() => handleConnectGoogle('google_search_console')}
             disabled={connecting}
-            className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left disabled:opacity-50"
+            className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-left disabled:opacity-50"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">🔵</span>
-              <span className="font-semibold text-white">Search Console</span>
+              <span className="font-semibold text-gray-900">Search Console</span>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Connect to access website properties
             </p>
           </button>
@@ -184,13 +184,13 @@ function Connections() {
           <button
             onClick={() => handleConnectGoogle('google_analytics')}
             disabled={connecting}
-            className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left disabled:opacity-50"
+            className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-left disabled:opacity-50"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">🔵</span>
-              <span className="font-semibold text-white">Google Analytics</span>
+              <span className="font-semibold text-gray-900">Google Analytics</span>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Connect to access analytics data
             </p>
           </button>
@@ -199,60 +199,60 @@ function Connections() {
           <button
             onClick={() => handleConnectGoogle('google_all')}
             disabled={connecting}
-            className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left disabled:opacity-50"
+            className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-left disabled:opacity-50"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">🔵</span>
-              <span className="font-semibold text-white">Google (All)</span>
+              <span className="font-semibold text-gray-900">Google (All)</span>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Connect to all Google services at once
             </p>
           </button>
         </div>
 
         {connecting && (
-          <div className="mt-4 p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
-            <p className="text-blue-300 text-sm">
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-700 text-sm">
               Redirecting to Google authorization... Please complete the authorization.
             </p>
           </div>
         )}
 
         {oauthError && (
-          <div className="mt-4 p-4 bg-red-900/30 border border-red-700 rounded-lg">
-            <p className="text-red-300 font-semibold mb-2">⚠️ OAuth Configuration Error</p>
-            <p className="text-red-200 text-sm mb-2">{oauthError}</p>
-            <p className="text-red-300 text-xs">
-              See <code className="bg-red-900/50 px-2 py-1 rounded">GOOGLE_OAUTH_SETUP.md</code> for setup instructions.
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 font-semibold mb-2">⚠️ OAuth Configuration Error</p>
+            <p className="text-red-600 text-sm mb-2">{oauthError}</p>
+            <p className="text-red-700 text-xs">
+              See <code className="bg-red-100 px-2 py-1 rounded">GOOGLE_OAUTH_SETUP.md</code> for setup instructions.
             </p>
           </div>
         )}
 
         {/* Setup Instructions */}
-        <div className="mt-6 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
-          <h3 className="text-sm font-semibold text-white mb-2">📋 Setup Required</h3>
-          <p className="text-xs text-gray-400 mb-2">
+        <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">📋 Setup Required</h3>
+          <p className="text-xs text-gray-600 mb-2">
             Before connecting Google services, you need to configure OAuth credentials:
           </p>
-          <ol className="text-xs text-gray-300 space-y-1 list-decimal list-inside ml-2">
+          <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside ml-2">
             <li>Create OAuth credentials in Google Cloud Console</li>
             <li>Enable required APIs (Google Ads, Search Console, Analytics)</li>
-            <li>Add credentials to your <code className="bg-gray-800 px-1 rounded">.env</code> file</li>
-            <li>See <code className="bg-gray-800 px-1 rounded">GOOGLE_OAUTH_SETUP.md</code> for detailed instructions</li>
+            <li>Add credentials to your <code className="bg-gray-100 px-1 rounded">.env</code> file</li>
+            <li>See <code className="bg-gray-100 px-1 rounded">GOOGLE_OAUTH_SETUP.md</code> for detailed instructions</li>
           </ol>
         </div>
       </div>
 
       {/* Existing Connections */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-white mb-4">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
           Connected Services ({connections.length})
         </h2>
 
         {connections.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400">No connections yet. Connect a service above to get started.</p>
+            <p className="text-gray-600">No connections yet. Connect a service above to get started.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -262,27 +262,27 @@ function Connections() {
                 : conn.connection_data || {};
 
               return (
-                <div key={conn.id} className="bg-gray-700/50 rounded-lg p-4">
+                <div key={conn.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-2xl">{getProviderIcon(conn.provider)}</span>
                         <div>
-                          <h3 className="font-semibold text-white">{conn.connection_name}</h3>
-                          <p className="text-sm text-gray-400">
+                          <h3 className="font-semibold text-gray-900">{conn.connection_name}</h3>
+                          <p className="text-sm text-gray-600">
                             {getConnectionTypeLabel(conn.connection_type)}
                           </p>
                         </div>
                       </div>
                       
                       {conn.account_email && (
-                        <p className="text-sm text-gray-400 mb-1">
+                        <p className="text-sm text-gray-600 mb-1">
                           📧 {conn.account_email}
                         </p>
                       )}
                       
                       {conn.account_name && (
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-gray-600">
                           Account: {conn.account_name}
                         </p>
                       )}
@@ -291,13 +291,13 @@ function Connections() {
                       <div className="mt-3 space-y-2">
                         {connectionData.googleAdsAccounts && connectionData.googleAdsAccounts.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-gray-400">Google Ads Accounts: </span>
-                            <span className="text-white">
+                            <span className="text-gray-600">Google Ads Accounts: </span>
+                            <span className="text-gray-900">
                               {connectionData.googleAdsAccounts.length} account(s)
                             </span>
                             <div className="ml-4 mt-1 space-y-1">
                               {connectionData.googleAdsAccounts.slice(0, 3).map((acc, idx) => (
-                                <div key={idx} className="text-xs text-gray-300">
+                                <div key={idx} className="text-xs text-gray-700">
                                   • {acc.customerName} ({acc.customerId})
                                 </div>
                               ))}
@@ -307,13 +307,13 @@ function Connections() {
 
                         {connectionData.searchConsoleProperties && connectionData.searchConsoleProperties.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-gray-400">Search Console Properties: </span>
-                            <span className="text-white">
+                            <span className="text-gray-600">Search Console Properties: </span>
+                            <span className="text-gray-900">
                               {connectionData.searchConsoleProperties.length} property(ies)
                             </span>
                             <div className="ml-4 mt-1 space-y-1">
                               {connectionData.searchConsoleProperties.slice(0, 3).map((prop, idx) => (
-                                <div key={idx} className="text-xs text-gray-300">
+                                <div key={idx} className="text-xs text-gray-700">
                                   • {prop.propertyUrl}
                                 </div>
                               ))}
@@ -323,8 +323,8 @@ function Connections() {
 
                         {connectionData.analyticsAccounts && connectionData.analyticsAccounts.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-gray-400">Analytics Accounts: </span>
-                            <span className="text-white">
+                            <span className="text-gray-600">Analytics Accounts: </span>
+                            <span className="text-gray-900">
                               {connectionData.analyticsAccounts.length} account(s)
                             </span>
                           </div>
@@ -335,20 +335,20 @@ function Connections() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleDiscoverResources(conn.id)}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="px-3 py-1 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600"
                       >
                         🔄 Refresh
                       </button>
                       <button
                         onClick={() => handleDelete(conn.id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600"
                       >
                         Delete
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
+                  <div className="flex items-center gap-4 text-xs text-gray-600 mt-2">
                     <span>Status: {conn.is_active ? '✅ Active' : '❌ Inactive'}</span>
                     {conn.last_synced_at && (
                       <span>Last synced: {new Date(conn.last_synced_at).toLocaleString()}</span>

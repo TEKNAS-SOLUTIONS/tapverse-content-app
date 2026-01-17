@@ -152,15 +152,15 @@ export const imagesAPI = {
  */
 export const videoAPI = {
   // Generate video script
-  generateScript: (content, options = {}) => 
-    api.post('/video/generate-script', { content, ...options }),
+  generateScript: (projectId) => 
+    api.post('/video/generate-script', { project_id: projectId }),
   
-  // Generate video with HeyGen
-  generateVideo: (script, options = {}) => 
-    api.post('/video/generate', { script, ...options }),
+  // Create video with HeyGen
+  create: (scriptId, scriptText, avatarId, voiceId) => 
+    api.post('/video/create', { script_id: scriptId, script_text: scriptText, avatar_id: avatarId, voice_id: voiceId }),
   
   // Check video generation status
-  checkStatus: (jobId) => api.get(`/video/status/${jobId}`),
+  checkStatus: (videoId) => api.get(`/video/status/${videoId}`),
   
   // Get videos for a project
   getByProject: (projectId) => api.get(`/video/project/${projectId}`),

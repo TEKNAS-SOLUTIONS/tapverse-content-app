@@ -71,37 +71,37 @@ function GoogleOAuthCallback() {
   }, [searchParams, navigate, showToast]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="bg-gray-800 rounded-lg p-8 text-center max-w-md">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 text-center max-w-md">
         {status === 'processing' && (
           <>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <h2 className="text-xl font-bold text-white mb-2">Processing Authorization</h2>
-            <p className="text-gray-400">Completing Google OAuth connection...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Authorization</h2>
+            <p className="text-gray-600">Completing Google OAuth connection...</p>
           </>
         )}
         
         {status === 'connecting' && (
           <>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <h2 className="text-xl font-bold text-white mb-2">Connecting</h2>
-            <p className="text-gray-400">Setting up your connection...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Connecting</h2>
+            <p className="text-gray-600">Setting up your connection...</p>
           </>
         )}
         
         {status === 'success' && (
           <>
             <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-xl font-bold text-white mb-2">Connection Successful!</h2>
-            <p className="text-gray-400">Redirecting to connections page...</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Connection Successful!</h2>
+            <p className="text-gray-600">Redirecting to connections page...</p>
           </>
         )}
         
         {status === 'error' && (
           <>
             <div className="text-6xl mb-4">❌</div>
-            <h2 className="text-xl font-bold text-white mb-2">Connection Failed</h2>
-            <p className="text-gray-400">Redirecting back...</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Connection Failed</h2>
+            <p className="text-gray-600">Redirecting back...</p>
           </>
         )}
       </div>

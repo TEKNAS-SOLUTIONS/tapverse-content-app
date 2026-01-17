@@ -14,6 +14,7 @@ import ShopifyStoreAnalysis from '../components/ShopifyStoreAnalysis';
 import LocalSeoAnalysis from '../components/LocalSeoAnalysis';
 import ProgrammaticSeo from '../components/ProgrammaticSeo';
 import ClientChat from '../components/ClientChat';
+import VideoGeneration from '../components/VideoGeneration';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -330,6 +331,17 @@ function ProjectDetail() {
           <span className="ml-2 text-sm opacity-75">Service+Location</span>
         </button>
         <button
+          onClick={() => setActiveTab('video-generation')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'video-generation'
+              ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          🎬 Video Generation
+          <span className="ml-2 text-sm opacity-75">AI Avatar</span>
+        </button>
+        <button
           onClick={() => setActiveTab('client-chat')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'client-chat'
@@ -406,8 +418,10 @@ function ProjectDetail() {
           clientData={client}
           projectData={project}
         />
+      ) : activeTab === 'video-generation' ? (
+        <VideoGeneration projectId={projectId} />
       ) : activeTab === 'client-chat' ? (
-        <ClientChat clientId={client?.id} />
+        <ClientChat clientId={client?.id} projectId={projectId} />
       ) : (
         <ContentGenerator 
           project={project} 
