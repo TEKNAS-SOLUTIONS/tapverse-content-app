@@ -8,7 +8,31 @@
 
 ## 🔴 Critical Issues
 
-_Add issues here as they are reported_
+### Issue #1: Project Detail - API Error ✅ FIXED
+**Page/Feature:** Project Detail Dashboard  
+**Error Message:** `dashboardAPI.getByProject is not a function`  
+**Severity:** Critical  
+**Status:** ✅ Fixed
+
+**Root Cause:**
+- `StrategyDashboard.jsx` was calling `dashboardAPI.getByProject(projectId)`
+- `dashboardAPI` in `api.js` only had `getStats()` method
+- Missing `getByProject()` method
+
+**Fix Applied:**
+- Added `getByProject: (projectId) => api.get(`/dashboard/${projectId}`)` to `dashboardAPI` in `frontend/src/services/api.js`
+- Backend route exists at `/api/dashboard/:projectId`
+- Updated error/loading displays to use light theme
+
+**Files Modified:**
+- `frontend/src/services/api.js` - Added `getByProject` method
+- `frontend/src/components/StrategyDashboard.jsx` - Fixed loading/error states to light theme
+
+**Deployed:** ✅ Yes  
+**Test:**
+1. Open Project Detail page
+2. Click "Strategy Dashboard" tab
+3. Verify dashboard loads without error
 
 ---
 
