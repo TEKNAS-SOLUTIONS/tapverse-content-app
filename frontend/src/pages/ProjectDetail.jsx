@@ -198,7 +198,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('dashboard')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'dashboard'
-              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -209,7 +209,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('seo-strategy')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'seo-strategy'
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -220,7 +220,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('google-ads-strategy')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'google-ads-strategy'
-              ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -231,7 +231,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('facebook-ads-strategy')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'facebook-ads-strategy'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -242,7 +242,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('ideas')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'ideas'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -253,7 +253,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('generate')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'generate'
-              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -264,7 +264,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('scheduling')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'scheduling'
-              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -275,7 +275,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('roadmap')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'roadmap'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -286,7 +286,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('email')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'email'
-              ? 'bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -298,7 +298,7 @@ function ProjectDetail() {
             onClick={() => setActiveTab('shopify-analysis')}
             className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
               activeTab === 'shopify-analysis'
-                ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg'
+                ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -311,7 +311,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('local-seo')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'local-seo'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -323,7 +323,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('programmatic-seo')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'programmatic-seo'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -334,7 +334,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('video-generation')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'video-generation'
-              ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -345,7 +345,7 @@ function ProjectDetail() {
           onClick={() => setActiveTab('client-chat')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
             activeTab === 'client-chat'
-              ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+              ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
