@@ -14,6 +14,7 @@ export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
@@ -41,10 +42,20 @@ export default function Chat() {
   const loadConversations = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await chatAPI.getConversations('general');
-      setConversations(response.data.data);
+      if (response.data.success) {
+        setConversations(response.data.data || []);
+      } else {
+        setError('Failed to load conversations');
+      }
     } catch (error) {
       console.error('Error loading conversations:', error);
+      setError(error.response?.data?.error || error.message || 'Failed to load conversations. Please try again.');
+      // If unauthorized, redirect to login
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -52,22 +63,40 @@ export default function Chat() {
 
   const loadMessages = async (conversationId) => {
     try {
+      setError(null);
       const response = await chatAPI.getMessages(conversationId);
-      setMessages(response.data.data.messages || []);
+      if (response.data.success) {
+        setMessages(response.data.data.messages || []);
+      } else {
+        setError('Failed to load messages');
+      }
     } catch (error) {
       console.error('Error loading messages:', error);
+      setError(error.response?.data?.error || error.message || 'Failed to load messages. Please try again.');
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     }
   };
 
   const createNewConversation = async () => {
     try {
+      setError(null);
       const response = await chatAPI.createConversation({ chatType: 'general' });
-      const newConv = response.data.data;
-      setConversations([newConv, ...conversations]);
-      setCurrentConversation(newConv);
-      setMessages([]);
+      if (response.data.success) {
+        const newConv = response.data.data;
+        setConversations([newConv, ...conversations]);
+        setCurrentConversation(newConv);
+        setMessages([]);
+      } else {
+        setError('Failed to create conversation');
+      }
     } catch (error) {
       console.error('Error creating conversation:', error);
+      setError(error.response?.data?.error || error.message || 'Failed to create conversation. Please try again.');
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     }
   };
 
@@ -101,16 +130,26 @@ export default function Chat() {
       // Send to API
       const response = await chatAPI.sendMessage(convId, messageText);
       
-      // Add AI response
-      const aiMessage = {
-        role: 'assistant',
-        content: response.data.data.message,
-        created_at: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, aiMessage]);
+      if (response.data.success) {
+        // Add AI response
+        const aiMessage = {
+          role: 'assistant',
+          content: response.data.data.message || response.data.data.content || 'No response received',
+          created_at: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, aiMessage]);
+        setError(null);
+      } else {
+        setError('Failed to send message');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Error sending message. Please try again.');
+      setError(error.response?.data?.error || error.message || 'Failed to send message. Please try again.');
+      // Remove user message if send failed
+      setMessages(prev => prev.slice(0, -1));
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setSending(false);
     }
@@ -146,6 +185,11 @@ export default function Chat() {
               + New
             </button>
           </div>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+              {error}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">

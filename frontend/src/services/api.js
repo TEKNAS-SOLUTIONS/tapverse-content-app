@@ -52,6 +52,8 @@ export const clientsAPI = {
   create: (data) => api.post('/clients', data),
   update: (id, data) => api.put(`/clients/${id}`, data),
   delete: (id) => api.delete(`/clients/${id}`),
+  getDashboardMetrics: (clientId = null) => 
+    api.get('/clients/dashboard/metrics', { params: clientId ? { clientId } : {} }),
 };
 
 /**

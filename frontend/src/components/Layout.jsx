@@ -70,11 +70,7 @@ function Layout({ children }) {
   const navItems = [
     { path: '/', label: 'Home', icon: HomeIcon },
     { path: '/clients', label: 'Clients', icon: UsersIcon },
-    { path: '/projects', label: 'Projects', icon: FolderIcon },
-    { path: '/keyword-analysis', label: 'Keywords', icon: KeyIcon },
     { path: '/chat', label: 'Chat', icon: ChatIcon },
-    { path: '/analytics', label: 'Analytics', icon: ChartIcon },
-    { path: '/connections', label: 'Connections', icon: PlugIcon },
     ...(isAdmin ? [{ path: '/admin-chat', label: 'Admin Chat', icon: AdminChatIcon }] : []),
     { path: '/admin', label: 'Settings', icon: GearIcon },
   ];
