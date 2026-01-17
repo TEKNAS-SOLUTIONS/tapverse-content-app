@@ -62,56 +62,15 @@ function KeywordAnalysis() {
     setAnalysis(null);
 
     try {
-      // Use enhanced evidence API for 90%+ confidence analysis
-      const response = await api.post('/content-evidence/generate', {
-        contentType: 'seo_content',
-        topic: selectedClient?.company_name + ' - SEO Strategy',
+      // Use keyword-analysis API endpoint
+      const response = await api.post('/keyword-analysis/analyze', {
         clientId: selectedClientId,
         projectId: selectedProjectId || null,
       });
 
       if (response.data.success) {
-        // Transform evidence data to match expected format
-        const evidence = response.data.data;
-        setAnalysis({
-          ...evidence,
-          keyword_opportunities: evidence.keyword_analysis?.primary_keywords?.map(kw => ({
-            keyword: kw.keyword,
-            search_volume: kw.monthly_volume_estimate || kw.volume || 'medium',
-            difficulty: kw.difficulty || 50,
-            strength_score: kw.opportunity_score || 70,
-            intent: kw.intent || 'informational',
-            priority: kw.opportunity_score >= 70 ? 'high' : kw.opportunity_score >= 40 ? 'medium' : 'low',
-            rationale: kw.why_valuable || kw.difficulty_reasoning || '',
-          })) || [],
-          competitor_gaps: evidence.competitor_analysis?.gaps_to_exploit?.map((gap, i) => ({
-            keyword: gap,
-            competitor: evidence.competitor_analysis?.competitors?.[0]?.name || 'Competitors',
-            difficulty: 50,
-            opportunity_score: 75,
-          })) || [],
-          industry_trends: [{
-            topic: evidence.trend_analysis?.direction || 'Industry Trends',
-            trend_direction: evidence.trend_analysis?.direction || 'stable',
-            relevance_score: evidence.seo_potential || 70,
-            keywords: evidence.keyword_analysis?.keyword_clusters?.[0]?.keywords || [],
-          }],
-          long_tail_opportunities: evidence.keyword_analysis?.long_tail_opportunities || [],
-          keyword_clusters: evidence.keyword_analysis?.keyword_clusters || [],
-          quick_wins: evidence.keyword_analysis?.primary_keywords?.filter(kw => kw.difficulty < 40).map(kw => ({
-            keyword: kw.keyword,
-            difficulty: kw.difficulty,
-            potential_traffic: kw.monthly_volume_estimate || 'medium',
-            time_to_rank: '1-2 months',
-          })) || [],
-          summary: {
-            overall_strategy: evidence.ai_reasoning?.steps?.map(s => s.description).join(' ') || '',
-            top_priorities: evidence.keyword_analysis?.primary_keywords?.slice(0, 3).map(k => k.keyword) || [],
-            timeline: evidence.serp_analysis?.time_to_rank || '3-6 months',
-          },
-          // Include full evidence for display
-          evidence: evidence,
-        });
+        const analysisData = response.data.data;
+        setAnalysis(analysisData);
       } else {
         setError(response.data.error || 'Failed to generate analysis');
       }

@@ -12,6 +12,8 @@ import ContentRoadmap from '../components/ContentRoadmap';
 import StrategyDashboard from '../components/StrategyDashboard';
 import ShopifyStoreAnalysis from '../components/ShopifyStoreAnalysis';
 import LocalSeoAnalysis from '../components/LocalSeoAnalysis';
+import ProgrammaticSeo from '../components/ProgrammaticSeo';
+import ClientChat from '../components/ClientChat';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -31,17 +33,27 @@ function ProjectDetail() {
       setError(null);
       
       const projectRes = await projectsAPI.getById(projectId);
-      if (projectRes.data.success) {
+      if (projectRes.data.success && projectRes.data.data) {
         setProject(projectRes.data.data);
         
-        // Load client info
-        const clientRes = await clientsAPI.getById(projectRes.data.data.client_id);
-        if (clientRes.data.success) {
-          setClient(clientRes.data.data);
+        // Load client info if client_id exists
+        if (projectRes.data.data.client_id) {
+          try {
+            const clientRes = await clientsAPI.getById(projectRes.data.data.client_id);
+            if (clientRes.data.success && clientRes.data.data) {
+              setClient(clientRes.data.data);
+            }
+          } catch (clientErr) {
+            console.error('Error loading client:', clientErr);
+            // Continue without client data - don't fail the whole page
+          }
         }
+      } else {
+        setError(projectRes.data.error || 'Project not found');
       }
     } catch (err) {
-      setError(err.message || 'Failed to load project');
+      console.error('Error loading project:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to load project');
     } finally {
       setLoading(false);
     }
@@ -293,19 +305,41 @@ function ProjectDetail() {
             <span className="ml-2 text-sm opacity-75">SEO Analysis</span>
           </button>
         )}
-        {client?.primary_business_type === 'local' && (
-          <button
-            onClick={() => setActiveTab('local-seo')}
-            className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-              activeTab === 'local-seo'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            📍 Local SEO
-            <span className="ml-2 text-sm opacity-75">Analysis</span>
-          </button>
-        )}
+        {/* Local SEO available for all clients */}
+        <button
+          onClick={() => setActiveTab('local-seo')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'local-seo'
+              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          📍 Local SEO
+          <span className="ml-2 text-sm opacity-75">Analysis</span>
+        </button>
+        {/* Programmatic SEO */}
+        <button
+          onClick={() => setActiveTab('programmatic-seo')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'programmatic-seo'
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          🔄 Programmatic SEO
+          <span className="ml-2 text-sm opacity-75">Service+Location</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('client-chat')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
+            activeTab === 'client-chat'
+              ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          💬 Chat
+          <span className="ml-2 text-sm opacity-75">Client Chat</span>
+        </button>
       </div>
 
       {/* Content Area */}
@@ -365,6 +399,15 @@ function ProjectDetail() {
           clientData={client}
           projectData={project}
         />
+      ) : activeTab === 'programmatic-seo' ? (
+        <ProgrammaticSeo 
+          clientId={client?.id}
+          projectId={projectId}
+          clientData={client}
+          projectData={project}
+        />
+      ) : activeTab === 'client-chat' ? (
+        <ClientChat clientId={client?.id} />
       ) : (
         <ContentGenerator 
           project={project} 

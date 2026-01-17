@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 // Available project types (content to generate)
 const PROJECT_TYPES = [
   { id: 'seo', label: 'SEO Content', icon: '📝', description: 'Blog posts, articles, landing pages' },
+  { id: 'local_seo', label: 'Local SEO', icon: '📍', description: 'Local search optimization, Google My Business, local citations' },
   { id: 'social', label: 'Social Media', icon: '📱', description: 'Posts for LinkedIn, Twitter, Instagram, TikTok' },
   { id: 'google_ads', label: 'Google Ads', icon: '🔍', description: 'Search & Display ad copy' },
   { id: 'facebook_ads', label: 'Facebook/Instagram Ads', icon: '📘', description: 'Social media ad campaigns' },

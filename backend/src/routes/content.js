@@ -14,6 +14,7 @@ import {
   getAISearchOptimizationNotes,
   calculateStatistics,
 } from '../services/seoScoreService.js';
+import { authenticate, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 

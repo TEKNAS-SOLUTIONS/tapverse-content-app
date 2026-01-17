@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { settingsAPI } from '../services/api';
+import { settingsAPI, authAPI } from '../services/api';
 
 const API_CATEGORIES = {
   content_generation: {
@@ -40,6 +40,7 @@ const API_CATEGORIES = {
 };
 
 export default function AdminSetup() {
+  const [activeTab, setActiveTab] = useState('api-keys');
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,10 +49,25 @@ export default function AdminSetup() {
   const [editedValues, setEditedValues] = useState({});
   const [testResults, setTestResults] = useState({});
   const [testing, setTesting] = useState({});
+  
+  // User management state
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userFormData, setUserFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    role: 'user',
+  });
 
   useEffect(() => {
     loadSettings();
-  }, []);
+    if (activeTab === 'users') {
+      loadUsers();
+    }
+  }, [activeTab]);
 
   const loadSettings = async () => {
     try {
@@ -112,6 +128,77 @@ export default function AdminSetup() {
       console.error('Error saving settings:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const response = await authAPI.getAllUsers();
+      if (response.data.success) {
+        setUsers(response.data.data);
+      }
+    } catch (err) {
+      setError('Failed to load users');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleCreateUser = () => {
+    setEditingUser(null);
+    setUserFormData({ email: '', password: '', fullName: '', role: 'user' });
+    setShowUserForm(true);
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUser(user);
+    setUserFormData({
+      email: user.email,
+      password: '',
+      fullName: user.fullName || '',
+      role: user.role,
+    });
+    setShowUserForm(true);
+  };
+
+  const handleSaveUser = async () => {
+    try {
+      if (editingUser) {
+        await authAPI.updateUser(editingUser.id, {
+          full_name: userFormData.fullName,
+          role: userFormData.role,
+          is_active: true,
+        });
+        setSuccess('User updated successfully');
+      } else {
+        await authAPI.register({
+          email: userFormData.email,
+          password: userFormData.password,
+          fullName: userFormData.fullName,
+          role: userFormData.role,
+        });
+        setSuccess('User created successfully');
+      }
+      setShowUserForm(false);
+      await loadUsers();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to save user');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+    try {
+      await authAPI.deleteUser(userId);
+      setSuccess('User deleted successfully');
+      await loadUsers();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to delete user');
     }
   };
 
@@ -237,11 +324,11 @@ export default function AdminSetup() {
   const hasChanges = Object.keys(editedValues).length > 0;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Admin Setup</h1>
-          <p className="text-gray-400 mt-1">Configure API keys and integrations</p>
+          <h1 className="text-3xl font-bold text-white">Admin Settings</h1>
+          <p className="text-gray-400 mt-1">Configure API keys, integrations, and user management</p>
         </div>
         <button
           onClick={handleSave}
@@ -268,18 +355,195 @@ export default function AdminSetup() {
         </div>
       )}
 
-      {hasChanges && (
-        <div className="mb-6 p-4 bg-yellow-900/50 border border-yellow-500 text-yellow-300 rounded-lg flex items-center">
-          <span className="mr-2">⚠️</span>
-          You have unsaved changes. Click "Save All Changes" to apply them.
+      {/* Tabs */}
+      <div className="mb-6 border-b border-gray-700">
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setActiveTab('api-keys')}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'api-keys'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            API Keys
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'users'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            User Management
+          </button>
         </div>
+      </div>
+
+      {activeTab === 'api-keys' && (
+        <>
+          {hasChanges && (
+            <div className="mb-6 p-4 bg-yellow-900/50 border border-yellow-500 text-yellow-300 rounded-lg flex items-center">
+              <span className="mr-2">⚠️</span>
+              You have unsaved changes. Click "Save All Changes" to apply them.
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {Object.entries(API_CATEGORIES).map(([key, category]) => 
+              renderCategory(key, category)
+            )}
+          </div>
+        </>
       )}
 
-      <div className="space-y-6">
-        {Object.entries(API_CATEGORIES).map(([key, category]) => 
-          renderCategory(key, category)
-        )}
-      </div>
+      {activeTab === 'users' && (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-white">User Management</h2>
+            <button
+              onClick={handleCreateUser}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              + Add User
+            </button>
+          </div>
+
+          {showUserForm && (
+            <div className="mb-6 p-6 bg-gray-800 rounded-lg">
+              <h3 className="text-lg font-semibold text-white mb-4">
+                {editingUser ? 'Edit User' : 'Create New User'}
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={userFormData.email}
+                    onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                    disabled={!!editingUser}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+                {!editingUser && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input
+                      type="password"
+                      value={userFormData.password}
+                      onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={userFormData.fullName}
+                    onChange={(e) => setUserFormData({ ...userFormData, fullName: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Role</label>
+                  <select
+                    value={userFormData.role}
+                    onChange={(e) => setUserFormData({ ...userFormData, role: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  >
+                    <option value="user">User</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveUser}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    {editingUser ? 'Update User' : 'Create User'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowUserForm(false);
+                      setEditingUser(null);
+                    }}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {loadingUsers ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+          ) : (
+            <div className="bg-gray-800 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-900">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Email</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Name</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Role</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Last Login</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {users.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-700">
+                      <td className="px-4 py-3 text-sm text-gray-300">{user.email}</td>
+                      <td className="px-4 py-3 text-sm text-gray-300">{user.fullName || '-'}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          user.role === 'admin' ? 'bg-red-900/50 text-red-300' :
+                          user.role === 'manager' ? 'bg-blue-900/50 text-blue-300' :
+                          'bg-gray-700 text-gray-300'
+                        }`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          user.isActive ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'
+                        }`}>
+                          {user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-400">
+                        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditUser(user)}
+                            className="text-blue-400 hover:text-blue-300"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 p-4 bg-gray-800 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-2">📋 API Documentation Links</h3>
