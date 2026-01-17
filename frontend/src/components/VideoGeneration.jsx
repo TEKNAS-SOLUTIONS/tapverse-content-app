@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { videoAPI } from '../services/api';
+import { videoAPI, avatarsAPI } from '../services/api';
 import exportUtils from '../utils/export';
 
 function VideoGeneration({ projectId }) {
   const [script, setScript] = useState(null);
   const [scriptText, setScriptText] = useState('');
   const [avatars, setAvatars] = useState([]);
+  const [customAvatars, setCustomAvatars] = useState([]);
   const [voices, setVoices] = useState([]);
   const [selectedAvatarId, setSelectedAvatarId] = useState('');
   const [selectedVoiceId, setSelectedVoiceId] = useState('');
@@ -17,6 +18,7 @@ function VideoGeneration({ projectId }) {
 
   useEffect(() => {
     loadAvatars();
+    loadCustomAvatars();
     loadVoices();
   }, []);
 
@@ -33,14 +35,43 @@ function VideoGeneration({ projectId }) {
     try {
       const response = await videoAPI.getAvatars();
       if (response.data.success) {
-        setAvatars(response.data.data || []);
-        if (response.data.data?.length > 0) {
-          setSelectedAvatarId(response.data.data[0].avatar_id || response.data.data[0].id);
+        const defaultAvatars = response.data.data || [];
+        setAvatars(defaultAvatars);
+        // Only set default if no custom avatar is selected yet
+        if (defaultAvatars.length > 0 && !selectedAvatarId) {
+          setSelectedAvatarId(defaultAvatars[0].avatar_id || defaultAvatars[0].id);
         }
       }
     } catch (err) {
       console.error('Error loading avatars:', err);
       setError(err.response?.data?.error || 'Failed to load avatars');
+    }
+  };
+
+  const loadCustomAvatars = async () => {
+    try {
+      const response = await avatarsAPI.getAll();
+      if (response.data.success) {
+        // Only include completed custom avatars
+        const completedCustomAvatars = (response.data.data || [])
+          .filter(avatar => avatar.status === 'completed' && avatar.heygen_avatar_id)
+          .map(avatar => ({
+            ...avatar,
+            avatar_id: avatar.heygen_avatar_id,
+            id: avatar.heygen_avatar_id,
+            name: avatar.name,
+            type: 'custom',
+            thumbnail_url: avatar.thumbnail_url,
+          }));
+        setCustomAvatars(completedCustomAvatars);
+        // Select first custom avatar if available and no default is selected
+        if (completedCustomAvatars.length > 0 && !selectedAvatarId && avatars.length === 0) {
+          setSelectedAvatarId(completedCustomAvatars[0].avatar_id);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading custom avatars:', err);
+      // Don't show error for custom avatars - just log it
     }
   };
 
@@ -212,37 +243,81 @@ function VideoGeneration({ projectId }) {
         {/* Avatar Selection */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Avatar</h3>
-          {avatars.length === 0 ? (
+          {avatars.length === 0 && customAvatars.length === 0 ? (
             <p className="text-gray-600 text-sm">Loading avatars...</p>
           ) : (
-            <div className="space-y-2">
-              {avatars.map((avatar) => (
-                <button
-                  key={avatar.avatar_id || avatar.id}
-                  onClick={() => setSelectedAvatarId(avatar.avatar_id || avatar.id)}
-                  className={`w-full p-3 rounded-lg border-2 text-left transition-colors ${
-                    selectedAvatarId === (avatar.avatar_id || avatar.id)
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {avatar.cover_url && (
-                      <img
-                        src={avatar.cover_url}
-                        alt={avatar.name}
-                        className="w-16 h-16 rounded object-cover"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{avatar.name || avatar.avatar_name}</div>
-                      {avatar.description && (
-                        <div className="text-sm text-gray-600">{avatar.description}</div>
-                      )}
-                    </div>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {/* Custom Avatars Section */}
+              {customAvatars.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">My Avatars</h4>
+                  <div className="space-y-2">
+                    {customAvatars.map((avatar) => (
+                      <button
+                        key={avatar.avatar_id || avatar.id}
+                        onClick={() => setSelectedAvatarId(avatar.avatar_id || avatar.id)}
+                        className={`w-full p-3 rounded-lg border-2 text-left transition-colors ${
+                          selectedAvatarId === (avatar.avatar_id || avatar.id)
+                            ? 'border-orange-500 bg-orange-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {avatar.thumbnail_url && (
+                            <img
+                              src={avatar.thumbnail_url}
+                              alt={avatar.name}
+                              className="w-16 h-16 rounded object-cover"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{avatar.name}</div>
+                            <div className="text-xs text-orange-600 mt-1">Custom Avatar</div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                </button>
-              ))}
+                </div>
+              )}
+
+              {/* Default Avatars Section */}
+              {avatars.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    {customAvatars.length > 0 ? 'Default Avatars' : ''}
+                  </h4>
+                  <div className="space-y-2">
+                    {avatars.map((avatar) => (
+                      <button
+                        key={avatar.avatar_id || avatar.id}
+                        onClick={() => setSelectedAvatarId(avatar.avatar_id || avatar.id)}
+                        className={`w-full p-3 rounded-lg border-2 text-left transition-colors ${
+                          selectedAvatarId === (avatar.avatar_id || avatar.id)
+                            ? 'border-orange-500 bg-orange-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {avatar.cover_url && (
+                            <img
+                              src={avatar.cover_url}
+                              alt={avatar.name}
+                              className="w-16 h-16 rounded object-cover"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{avatar.name || avatar.avatar_name}</div>
+                            {avatar.description && (
+                              <div className="text-sm text-gray-600">{avatar.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

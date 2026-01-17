@@ -148,6 +148,24 @@ export const imagesAPI = {
 };
 
 /**
+ * Custom Avatars API
+ */
+export const avatarsAPI = {
+  // Create Instant Avatar
+  createInstantAvatar: (formData) => api.post('/avatars/create-instant-avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  // Get all custom avatars for current user
+  getAll: () => api.get('/avatars'),
+  // Get avatar by ID
+  getById: (id) => api.get(`/avatars/${id}`),
+  // Check avatar status
+  checkStatus: (id) => api.post(`/avatars/${id}/check-status`),
+  // Delete avatar
+  delete: (id) => api.delete(`/avatars/${id}`),
+};
+
+/**
  * Video Generation API
  */
 export const videoAPI = {

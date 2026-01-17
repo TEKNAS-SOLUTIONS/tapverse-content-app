@@ -33,6 +33,8 @@ import reportsRouter from './routes/reports.js';
 import contentIdeasRouter from './routes/contentIdeas.js';
 import chatRouter from './routes/chat.js';
 import adminChatRouter from './routes/adminChat.js';
+import avatarsRouter from './routes/avatars.js';
+import webhooksRouter from './routes/webhooks.js';
 
 const app = express();
 
@@ -101,6 +103,8 @@ app.use('/api/reports', reportsRouter);
 app.use('/api/content-ideas', contentIdeasRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/admin-chat', adminChatRouter);
+app.use('/api/avatars', avatarsRouter);
+app.use('/api/webhooks', webhooksRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

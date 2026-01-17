@@ -14,6 +14,7 @@ import GoogleOAuthCallback from './pages/GoogleOAuthCallback';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import AdminChat from './pages/AdminChat';
+import MyAvatars from './pages/MyAvatars';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
                   <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/admin-chat" element={<ProtectedRoute requiredRole="admin"><AdminChat /></ProtectedRoute>} />
+                  <Route path="/my-avatars" element={<MyAvatars />} />
                   <Route path="/connections" element={<Connections />} />
                   <Route path="/connections/google/callback" element={<GoogleOAuthCallback />} />
                 </Routes>
