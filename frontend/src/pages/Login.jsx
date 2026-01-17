@@ -90,9 +90,6 @@ function Login() {
             </button>
           </div>
         </form>
-        <div className="text-center text-sm text-gray-600">
-          <p>Default admin: admin@tapverse.ai / admin123</p>
-        </div>
       </div>
     </div>
   );

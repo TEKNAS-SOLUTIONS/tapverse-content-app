@@ -85,6 +85,8 @@ function Breadcrumb() {
           crumbs.push({ label: 'Client', path: `/analytics/client/${params.clientId}` });
         }
       }
+    } else if (path.startsWith('/admin-chat')) {
+      crumbs.push({ label: 'Admin Chat', path: '/admin-chat' });
     } else if (path.startsWith('/admin')) {
       crumbs.push({ label: 'Settings', path: '/admin' });
     }
