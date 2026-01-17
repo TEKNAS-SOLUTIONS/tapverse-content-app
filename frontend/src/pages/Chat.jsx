@@ -144,11 +144,15 @@ export default function Chat() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setError(error.response?.data?.error || error.message || 'Failed to send message. Please try again.');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to send message. Please try again.';
+      setError(errorMessage);
       // Remove user message if send failed
       setMessages(prev => prev.slice(0, -1));
-      if (error.response?.status === 401) {
-        navigate('/login');
+      // Only redirect to login if it's truly a 401 and not a temporary issue
+      if (error.response?.status === 401 && !error.response?.data?.retry) {
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000); // Delay to show error message first
       }
     } finally {
       setSending(false);

@@ -67,12 +67,21 @@ export default function AdminSetup() {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const response = await settingsAPI.getAll();
-      setSettings(response.data.data);
       setError(null);
+      const response = await settingsAPI.getAll();
+      if (response.data.success) {
+        setSettings(response.data.data || []);
+      } else {
+        setError(response.data.error || 'Failed to load settings');
+      }
     } catch (err) {
-      setError('Failed to load settings');
+      const errorMsg = err.response?.data?.error || err.message || 'Failed to load settings';
+      setError(errorMsg);
       console.error('Error loading settings:', err);
+      // If it's a table not found error, suggest migration
+      if (errorMsg.includes('system_settings') || errorMsg.includes('does not exist')) {
+        setError('Settings table not found. Please run database migrations.');
+      }
     } finally {
       setLoading(false);
     }
