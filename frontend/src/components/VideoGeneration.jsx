@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { videoAPI } from '../services/api';
+import { downloadJSON, downloadPDF } from '../utils/export';
 
 function VideoGeneration({ projectId }) {
   const [script, setScript] = useState(null);
@@ -154,13 +155,37 @@ function VideoGeneration({ projectId }) {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Video Script</h3>
-          <button
-            onClick={handleGenerateScript}
-            disabled={loading}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Generating...' : 'Generate Script'}
-          </button>
+          <div className="flex gap-2">
+            {scriptText && (
+              <>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(scriptText);
+                    alert('Script copied to clipboard!');
+                  }}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Copy Script
+                </button>
+                <button
+                  onClick={() => {
+                    const scriptData = script ? { ...script, script: scriptText } : { script: scriptText };
+                    downloadJSON(scriptData, 'video-script');
+                  }}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Export JSON
+                </button>
+              </>
+            )}
+            <button
+              onClick={handleGenerateScript}
+              disabled={loading}
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Generating...' : 'Generate Script'}
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">
