@@ -145,18 +145,18 @@ function ContentRoadmap({ projectId, strategy }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'published': return 'bg-green-600/20 text-green-400 border-green-600/30';
-      case 'generated': return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
-      case 'planned': return 'bg-gray-600/20 text-gray-400 border-gray-600/30';
-      default: return 'bg-gray-600/20 text-gray-400 border-gray-600/30';
+      case 'published': return 'bg-green-100 text-green-700 border-green-200';
+      case 'generated': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'planned': return 'bg-gray-100 text-gray-700 border-gray-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
   if (loading && roadmap.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading content roadmap...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading content roadmap...</p>
       </div>
     );
   }
@@ -166,41 +166,41 @@ function ContentRoadmap({ projectId, strategy }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Content Roadmap</h2>
-          <p className="text-gray-400 text-sm mt-1">12-Month Content Plan</p>
+          <h2 className="text-2xl font-bold text-gray-900">Content Roadmap</h2>
+          <p className="text-gray-600 text-sm mt-1">12-Month Content Plan</p>
         </div>
       </div>
 
       {/* Progress Tracking */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Total Articles</div>
-          <div className="text-2xl font-bold text-white">{totalArticles}</div>
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="text-sm text-gray-600 mb-1">Total Articles</div>
+          <div className="text-2xl font-bold text-gray-900">{totalArticles}</div>
         </div>
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Generated</div>
-          <div className="text-2xl font-bold text-white">{generatedArticles}</div>
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="text-sm text-gray-600 mb-1">Generated</div>
+          <div className="text-2xl font-bold text-gray-900">{generatedArticles}</div>
           <div className="text-xs text-gray-500 mt-1">{generatedPercent}%</div>
         </div>
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Published</div>
-          <div className="text-2xl font-bold text-white">{publishedArticles}</div>
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="text-sm text-gray-600 mb-1">Published</div>
+          <div className="text-2xl font-bold text-gray-900">{publishedArticles}</div>
           <div className="text-xs text-gray-500 mt-1">{publishedPercent}%</div>
         </div>
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Remaining</div>
-          <div className="text-2xl font-bold text-white">{totalArticles - generatedArticles}</div>
+        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="text-sm text-gray-600 mb-1">Remaining</div>
+          <div className="text-2xl font-bold text-gray-900">{totalArticles - generatedArticles}</div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800 rounded-lg p-4 flex flex-wrap gap-4">
+      <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm flex flex-wrap gap-4">
         <div className="flex-1 min-w-[150px]">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Filter by Pillar</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Pillar</label>
           <select
             value={filters.pillar}
             onChange={(e) => setFilters({ ...filters, pillar: e.target.value })}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
           >
             <option value="">All Pillars</option>
             {allPillars.map(pillar => (
@@ -209,11 +209,11 @@ function ContentRoadmap({ projectId, strategy }) {
           </select>
         </div>
         <div className="flex-1 min-w-[150px]">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Filter by Cluster</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Cluster</label>
           <select
             value={filters.cluster}
             onChange={(e) => setFilters({ ...filters, cluster: e.target.value })}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
           >
             <option value="">All Clusters</option>
             {allClusters.map(cluster => (
@@ -222,11 +222,11 @@ function ContentRoadmap({ projectId, strategy }) {
           </select>
         </div>
         <div className="flex-1 min-w-[150px]">
-          <label className="block text-sm font-medium text-gray-300 mb-2">Filter by Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
           >
             <option value="">All Statuses</option>
             <option value="planned">Planned</option>
@@ -237,7 +237,7 @@ function ContentRoadmap({ projectId, strategy }) {
         <div className="flex items-end">
           <button
             onClick={() => setFilters({ pillar: '', cluster: '', status: '', monthRange: { start: 0, end: 11 } })}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
           >
             Clear Filters
           </button>
@@ -245,8 +245,21 @@ function ContentRoadmap({ projectId, strategy }) {
       </div>
 
       {error && (
-        <div className="bg-red-900/50 border border-red-700 rounded-lg p-4">
-          <p className="text-red-300">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-700">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-700 hover:text-red-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       )}
 
@@ -256,12 +269,12 @@ function ContentRoadmap({ projectId, strategy }) {
           {filteredRoadmap.map((month, monthIndex) => (
             <div
               key={monthIndex}
-              className={`flex-shrink-0 w-80 ${monthIndex === currentMonth ? 'ring-2 ring-blue-500' : ''}`}
+              className={`flex-shrink-0 w-80 ${monthIndex === currentMonth ? 'ring-2 ring-orange-500' : ''}`}
             >
-              <div className={`bg-gray-800 rounded-lg p-4 ${monthIndex === currentMonth ? 'bg-blue-900/20' : ''}`}>
-                <h3 className="text-lg font-bold text-white mb-3">
+              <div className={`bg-white rounded-lg p-4 border border-gray-200 shadow-sm ${monthIndex === currentMonth ? 'bg-orange-50' : ''}`}>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
                   {month.month || months[monthIndex]}
-                  {monthIndex === currentMonth && <span className="ml-2 text-blue-400 text-sm">(Current)</span>}
+                  {monthIndex === currentMonth && <span className="ml-2 text-orange-600 text-sm">(Current)</span>}
                 </h3>
                 <div
                   className="space-y-2 min-h-[200px]"
@@ -276,32 +289,32 @@ function ContentRoadmap({ projectId, strategy }) {
                         onDragStart={() => handleDragStart(article, monthIndex)}
                         className={`p-3 rounded-lg border cursor-move transition-all hover:shadow-lg ${
                           getPillarColor(article.pillar)
-                        } border-gray-600`}
+                        } border-gray-300 text-white`}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="text-white font-medium text-sm line-clamp-2">{article.title}</h4>
-                          <span className={`px-2 py-1 rounded text-xs ${getStatusColor(article.status)}`}>
+                          <span className={`px-2 py-1 rounded text-xs border ${getStatusColor(article.status)}`}>
                             {article.status}
                           </span>
                         </div>
                         {article.keyword && (
-                          <p className="text-xs text-gray-300 mb-1">🔑 {article.keyword}</p>
+                          <p className="text-xs text-white/90 mb-1">🔑 {article.keyword}</p>
                         )}
                         {article.pillar && (
-                          <p className="text-xs text-gray-300 mb-1">📚 {article.pillar}</p>
+                          <p className="text-xs text-white/90 mb-1">📚 {article.pillar}</p>
                         )}
                         <div className="flex gap-2 mt-2">
                           {article.status === 'planned' && (
                             <button
                               onClick={() => handleGenerateArticle(article.id)}
-                              className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                              className="text-xs px-2 py-1 bg-white/20 hover:bg-white/30 text-white rounded transition-colors"
                             >
                               Generate
                             </button>
                           )}
                           <button
                             onClick={() => handleDeleteArticle(article.id)}
-                            className="text-xs px-2 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded"
+                            className="text-xs px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                           >
                             Delete
                           </button>
@@ -309,7 +322,7 @@ function ContentRoadmap({ projectId, strategy }) {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-8 text-gray-500 text-sm">
+                    <div className="text-center py-8 text-gray-500 text-sm border-2 border-dashed border-gray-300 rounded-lg">
                       No articles scheduled
                     </div>
                   )}
@@ -321,8 +334,8 @@ function ContentRoadmap({ projectId, strategy }) {
       </div>
 
       {roadmap.length === 0 && (
-        <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400">No roadmap data available. Generate an SEO strategy first.</p>
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <p className="text-gray-600">No roadmap data available. Generate an SEO strategy first.</p>
         </div>
       )}
     </div>

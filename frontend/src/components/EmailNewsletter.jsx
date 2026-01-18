@@ -7,6 +7,7 @@ function EmailNewsletter({ projectId }) {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [selectedNewsletter, setSelectedNewsletter] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (projectId) {
@@ -46,6 +47,7 @@ function EmailNewsletter({ projectId }) {
   const generateNewsletter = async (sourceContentId = null) => {
     try {
       setGenerating(true);
+      setError(null);
       const response = await emailNewslettersAPI.generate({
         projectId,
         sourceContentId,
@@ -56,7 +58,7 @@ function EmailNewsletter({ projectId }) {
       }
     } catch (err) {
       console.error('Error generating newsletter:', err);
-      alert(err.response?.data?.error || 'Failed to generate newsletter');
+      setError(err.response?.data?.error || err.message || 'Failed to generate newsletter');
     } finally {
       setGenerating(false);
     }
@@ -96,12 +98,38 @@ function EmailNewsletter({ projectId }) {
           <button
             onClick={() => generateNewsletter()}
             disabled={generating}
-            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
           >
-            {generating ? 'Generating...' : '+ Generate Newsletter'}
+            {generating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              '+ Generate Newsletter'
+            )}
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-700 hover:text-red-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {generating && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">

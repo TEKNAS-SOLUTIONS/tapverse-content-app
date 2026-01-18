@@ -98,17 +98,17 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty?.toLowerCase()) {
-      case 'low': return 'text-green-400 bg-green-900/30';
-      case 'medium': return 'text-yellow-400 bg-yellow-900/30';
-      case 'high': return 'text-red-400 bg-red-900/30';
-      default: return 'text-gray-400 bg-gray-700';
+      case 'low': return 'text-green-700 bg-green-100';
+      case 'medium': return 'text-yellow-700 bg-yellow-100';
+      case 'high': return 'text-red-700 bg-red-100';
+      default: return 'text-gray-700 bg-gray-100';
     }
   };
 
   const getScoreColor = (score) => {
-    if (score >= 70) return 'text-green-400';
-    if (score >= 40) return 'text-yellow-400';
-    return 'text-gray-400';
+    if (score >= 70) return 'text-green-600';
+    if (score >= 40) return 'text-yellow-600';
+    return 'text-gray-600';
   };
 
   const getIntentIcon = (intent) => {
@@ -139,16 +139,16 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
   const visibleIdeas = ideas.filter(i => i.status !== 'rejected');
 
   return (
-    <div className="bg-gray-800 rounded-xl shadow-xl">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       {/* Header */}
-      <div className="p-6 border-b border-gray-700">
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
               <span className="text-3xl">💡</span>
               Article Ideas
             </h2>
-            <p className="text-gray-400 mt-1">
+            <p className="text-gray-600 mt-1">
               AI-generated content opportunities based on industry & competitor analysis
             </p>
           </div>
@@ -156,15 +156,15 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
           <button
             onClick={handleGenerateIdeas}
             disabled={generating}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 transition-all shadow-lg"
+            className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
           >
             {generating ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">⏳</span>
-                Analyzing & Generating...
-              </span>
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Analyzing & Generating...</span>
+              </>
             ) : (
-              <>🔮 Generate New Ideas</>
+              'Generate New Ideas'
             )}
           </button>
         </div>
@@ -172,28 +172,41 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
 
       <div className="p-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-300">
-            {error}
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{error}</span>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-red-700 hover:text-red-900"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 
         {/* Strategy Insights */}
         {strategyInsights && (
-          <div className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl p-6 border border-blue-800/50">
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <div className="mb-6 bg-orange-50 rounded-xl p-6 border border-orange-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <span>📊</span> Strategy Insights
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               {strategyInsights.pillarContentRecommendation && (
                 <div>
-                  <span className="text-gray-400">Pillar Content:</span>
-                  <p className="text-gray-200">{strategyInsights.pillarContentRecommendation}</p>
+                  <span className="text-gray-600">Pillar Content:</span>
+                  <p className="text-gray-900">{strategyInsights.pillarContentRecommendation}</p>
                 </div>
               )}
               {strategyInsights.quickWins && strategyInsights.quickWins.length > 0 && (
                 <div>
-                  <span className="text-gray-400">Quick Wins:</span>
-                  <p className="text-gray-200">{strategyInsights.quickWins.join(', ')}</p>
+                  <span className="text-gray-600">Quick Wins:</span>
+                  <p className="text-gray-900">{strategyInsights.quickWins.join(', ')}</p>
                 </div>
               )}
             </div>
@@ -202,18 +215,18 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
 
         {/* Ideas List */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400">
-            <span className="animate-spin text-4xl">⏳</span>
-            <p className="mt-4">Loading ideas...</p>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading ideas...</p>
           </div>
         ) : visibleIdeas.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-gray-600 rounded-xl">
+          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
             <div className="text-5xl mb-4">💡</div>
-            <p className="text-xl text-white font-semibold mb-2">No Article Ideas Yet</p>
-            <p className="text-gray-400 mb-6">
+            <p className="text-xl text-gray-900 font-semibold mb-2">No Article Ideas Yet</p>
+            <p className="text-gray-600 mb-6">
               Click "Generate New Ideas" to get AI-powered content suggestions
             </p>
-            <div className="text-left max-w-md mx-auto text-sm text-gray-400">
+            <div className="text-left max-w-md mx-auto text-sm text-gray-600">
               <p className="mb-2">Ideas are based on:</p>
               <ul className="list-disc list-inside space-y-1">
                 <li>Your industry ({client?.industry || 'Not set'})</li>
@@ -228,10 +241,10 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
             {visibleIdeas.map((idea) => (
               <div
                 key={idea.id}
-                className={`bg-gray-700/50 rounded-xl p-5 border transition-all ${
+                className={`bg-white rounded-xl p-5 border transition-all ${
                   selectedIdea?.id === idea.id 
-                    ? 'border-blue-500 shadow-lg shadow-blue-900/20' 
-                    : 'border-gray-600 hover:border-gray-500'
+                    ? 'border-orange-500 shadow-lg shadow-orange-100' 
+                    : 'border-gray-200 hover:border-gray-300'
                 } ${idea.status === 'generated' ? 'opacity-60' : ''}`}
               >
                 {/* Idea Header */}
@@ -239,19 +252,19 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-lg">{getContentTypeIcon(idea.content_type)}</span>
-                      <span className="text-xs text-gray-400 uppercase">{idea.content_type}</span>
+                      <span className="text-xs text-gray-600 uppercase">{idea.content_type}</span>
                       <span className="text-lg">{getIntentIcon(idea.search_intent)}</span>
-                      <span className="text-xs text-gray-400">{idea.search_intent}</span>
+                      <span className="text-xs text-gray-600">{idea.search_intent}</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-white mb-2">{idea.title}</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">{idea.title}</h4>
                     
                     {/* Keyword Info */}
                     <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded-full">
+                      <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full">
                         🎯 {idea.primary_keyword}
                       </span>
                       {(idea.secondary_keywords || []).slice(0, 3).map((kw, i) => (
-                        <span key={i} className="bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded-full">
+                        <span key={i} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
                           {kw}
                         </span>
                       ))}
@@ -265,13 +278,13 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
                         <div className={`text-lg font-bold ${getScoreColor(idea.trending_score)}`}>
                           {idea.trending_score || 0}
                         </div>
-                        <div className="text-xs text-gray-400">Trending</div>
+                        <div className="text-xs text-gray-600">Trending</div>
                       </div>
                       <div className="text-center">
                         <div className={`text-lg font-bold ${getScoreColor(idea.competitor_gap_score)}`}>
                           {idea.competitor_gap_score || 0}
                         </div>
-                        <div className="text-xs text-gray-400">Gap Score</div>
+                        <div className="text-xs text-gray-600">Gap Score</div>
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(idea.estimated_difficulty)}`}>
@@ -282,8 +295,8 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
 
                 {/* Unique Angle */}
                 {idea.unique_angle && (
-                  <div className="mt-3 text-sm text-gray-300 bg-gray-800/50 rounded-lg p-3">
-                    <span className="text-gray-400">💡 Unique Angle:</span> {idea.unique_angle}
+                  <div className="mt-3 text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <span className="text-gray-600">💡 Unique Angle:</span> {idea.unique_angle}
                   </div>
                 )}
 
@@ -292,13 +305,13 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
                   <div className="mt-3">
                     <button
                       onClick={() => setSelectedIdea(selectedIdea?.id === idea.id ? null : idea)}
-                      className="text-sm text-blue-400 hover:text-blue-300"
+                      className="text-sm text-orange-600 hover:text-orange-700"
                     >
                       {selectedIdea?.id === idea.id ? '▼ Hide Outline' : '▶ View Outline'}
                     </button>
                     
                     {selectedIdea?.id === idea.id && (
-                      <div className="mt-2 pl-4 border-l-2 border-gray-600 text-sm text-gray-300">
+                      <div className="mt-2 pl-4 border-l-2 border-gray-300 text-sm text-gray-700">
                         {(typeof idea.outline === 'string' ? JSON.parse(idea.outline) : idea.outline).map((section, i) => (
                           <div key={i} className="py-1">{section}</div>
                         ))}
@@ -309,7 +322,7 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
 
                 {/* Actions */}
                 <div className="mt-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span>📈 {idea.estimated_search_volume}</span>
                     <span>•</span>
                     <span>🏷️ {idea.idea_source}</span>
@@ -317,29 +330,29 @@ function ArticleIdeas({ client, project = null, onArticleGenerated }) {
                   
                   <div className="flex items-center gap-2">
                     {idea.status === 'generated' ? (
-                      <span className="px-4 py-2 bg-green-900/50 text-green-300 rounded-lg text-sm">
+                      <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm">
                         ✓ Article Generated
                       </span>
                     ) : (
                       <>
                         <button
                           onClick={() => handleRejectIdea(idea)}
-                          className="px-3 py-2 text-gray-400 hover:text-red-400 text-sm"
+                          className="px-3 py-2 text-gray-600 hover:text-red-600 text-sm transition-colors"
                         >
                           ✕ Reject
                         </button>
                         <button
                           onClick={() => handleGenerateArticle(idea)}
                           disabled={generatingArticleId === idea.id}
-                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 transition-all text-sm"
+                          className="px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all text-sm flex items-center gap-2"
                         >
                           {generatingArticleId === idea.id ? (
-                            <span className="flex items-center gap-2">
-                              <span className="animate-spin">⏳</span>
-                              Generating...
-                            </span>
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                              <span>Generating...</span>
+                            </>
                           ) : (
-                            <>✨ Generate Article</>
+                            'Generate Article'
                           )}
                         </button>
                       </>

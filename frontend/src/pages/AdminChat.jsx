@@ -12,6 +12,7 @@ export default function AdminChat() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const [insights, setInsights] = useState([]);
@@ -23,10 +24,12 @@ export default function AdminChat() {
   }, []);
 
   useEffect(() => {
-    if (currentConversation) {
+    if (currentConversation?.id) {
       loadMessages(currentConversation.id);
+    } else {
+      setMessages([]);
     }
-  }, [currentConversation]);
+  }, [currentConversation?.id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -55,11 +58,28 @@ export default function AdminChat() {
   };
 
   const loadMessages = async (conversationId) => {
+    if (!conversationId) {
+      setMessages([]);
+      return;
+    }
+    
     try {
+      setLoadingMessages(true);
+      setError(null);
       const response = await chatAPI.getMessages(conversationId);
-      setMessages(response.data.data.messages || []);
+      if (response.data.success) {
+        const loadedMessages = response.data.data.messages || [];
+        setMessages(loadedMessages);
+      } else {
+        setError('Failed to load messages');
+        setMessages([]);
+      }
     } catch (error) {
       console.error('Error loading messages:', error);
+      setError(error.response?.data?.error || error.message || 'Failed to load messages. Please try again.');
+      setMessages([]);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -268,7 +288,12 @@ export default function AdminChat() {
         {currentConversation ? (
           <>
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {messages.length === 0 ? (
+              {loadingMessages ? (
+                <div className="text-center text-gray-500 mt-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
+                  <p className="text-sm">Loading messages...</p>
+                </div>
+              ) : messages.length === 0 ? (
                 <div className="text-center text-gray-500 mt-10">
                   <p className="mb-2">Ask me about any client or portfolio metrics</p>
                   <div className="text-xs text-gray-400 mt-4 space-y-1">
