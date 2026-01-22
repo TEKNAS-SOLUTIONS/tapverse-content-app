@@ -27,3 +27,11 @@ dist-ssr
 coverage
 *.lcov
 
+# Environment variables (NEVER commit these)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!.env.example

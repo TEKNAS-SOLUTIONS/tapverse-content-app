@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
+import { Toaster } from 'react-hot-toast';
+import { ErrorBoundary } from './components/shared/ErrorBoundary';
+import Layout from './components/layout/Layout';
+import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Clients from './pages/Clients';
 import Projects from './pages/Projects';
@@ -12,24 +15,23 @@ import GoogleOAuthCallback from './pages/GoogleOAuthCallback';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
+    <ErrorBoundary>
+      <Router>
+        <Layout>
+          <Toaster position="top-right" />
+          <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/clients" element={<Clients />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/:projectId" element={<ProjectDetail />} />
-          <Route path="/clients/:clientId/projects" element={<Projects />} />
-          <Route path="/admin" element={<AdminSetup />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/analytics/client/:clientId" element={<Analytics />} />
-          <Route path="/analytics/client/:clientId/project/:projectId" element={<Analytics />} />
-          <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
-          <Route path="/connections" element={<Connections />} />
+          <Route path="/clients/:clientId" element={<ClientDetail />} />
+          <Route path="/clients/:clientId/projects" element={<ClientDetail />} />
+          <Route path="/clients/:clientId/projects/:projectId" element={<ProjectDetail />} />
+          <Route path="/settings" element={<AdminSetup />} />
           <Route path="/connections/google/callback" element={<GoogleOAuthCallback />} />
-        </Routes>
-      </Layout>
-    </Router>
+          </Routes>
+        </Layout>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

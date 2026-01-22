@@ -240,22 +240,22 @@ function Clients() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Link
-                    to={`/clients/${client.id}/projects`}
-                    className="px-4 py-2 text-sm bg-slate-800 text-gray-300 rounded-lg hover:bg-slate-700 transition-colors"
+                    to={`/clients/${client.id}`}
+                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    📁 Projects
+                    View Details
                   </Link>
                   <button
                     onClick={() => handleEdit(client)}
-                    className="px-4 py-2 text-sm bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors"
+                    className="px-4 py-2 text-sm bg-slate-700 text-gray-300 rounded-lg hover:bg-slate-600 transition-colors"
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button
                     onClick={() => handleDelete(client.id)}
                     className="px-4 py-2 text-sm bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>

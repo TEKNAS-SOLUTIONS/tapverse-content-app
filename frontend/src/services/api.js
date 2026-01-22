@@ -58,6 +58,9 @@ export const contentAPI = {
   
   // Update content
   update: (id, data) => api.put(`/content/${id}`, data),
+  
+  // Approve content for CMS
+  approve: (data) => api.post('/content/approve', data),
 };
 
 /**
@@ -160,6 +163,15 @@ export const videoAPI = {
   
   // Get custom avatars
   getCustomAvatars: () => api.get('/video/custom-avatars'),
+};
+
+/**
+ * Keyword Analysis API
+ */
+export const keywordAnalysisAPI = {
+  analyze: (data) => api.post('/keyword-analysis/analyze', data),
+  analyzeGaps: (data) => api.post('/keyword-analysis/gaps', data),
+  getByProject: (projectId) => api.get(`/keyword-analysis/project/${projectId}`),
 };
 
 /**

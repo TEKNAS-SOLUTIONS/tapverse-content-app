@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projectsAPI, clientsAPI } from '../services/api';
-import ContentGenerator from '../components/ContentGenerator';
-import ArticleIdeas from '../components/ArticleIdeas';
-import SEOStrategy from '../components/SEOStrategy';
-import GoogleAdsStrategy from '../components/GoogleAdsStrategy';
-import FacebookAdsStrategy from '../components/FacebookAdsStrategy';
-import ContentScheduling from '../components/ContentScheduling';
-import EmailNewsletter from '../components/EmailNewsletter';
-import ContentRoadmap from '../components/ContentRoadmap';
-import StrategyDashboard from '../components/StrategyDashboard';
-import ShopifyStoreAnalysis from '../components/ShopifyStoreAnalysis';
-import LocalSeoAnalysis from '../components/LocalSeoAnalysis';
+import ContentTypeCards from '../components/projects/ContentTypeCards';
+import SEOBlogWorkflow from '../components/content/seo-blog/SEOBlogWorkflow';
+import ProgrammaticSEO from '../components/content/programmatic-seo/ProgrammaticSEO';
 
 function ProjectDetail() {
-  const { projectId } = useParams();
+  const { projectId, clientId } = useParams();
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'seo-strategy', 'google-ads-strategy', 'facebook-ads-strategy', 'ideas', 'roadmap', 'generate', 'scheduling', 'email'
+  const [selectedContentType, setSelectedContentType] = useState(null);
 
   useEffect(() => {
     loadProject();
@@ -35,7 +27,8 @@ function ProjectDetail() {
         setProject(projectRes.data.data);
         
         // Load client info
-        const clientRes = await clientsAPI.getById(projectRes.data.data.client_id);
+        const clientIdToUse = clientId || projectRes.data.data.client_id;
+        const clientRes = await clientsAPI.getById(clientIdToUse);
         if (clientRes.data.success) {
           setClient(clientRes.data.data);
         }
@@ -61,8 +54,11 @@ function ProjectDetail() {
       <div className="text-center py-16">
         <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-md mx-auto">
           <p className="text-red-300">Error: {error}</p>
-          <Link to="/projects" className="mt-4 inline-block text-blue-400 hover:text-blue-300">
-            ← Back to Projects
+          <Link 
+            to={clientId ? `/clients/${clientId}` : '/clients'} 
+            className="mt-4 inline-block text-blue-400 hover:text-blue-300"
+          >
+            ← Back
           </Link>
         </div>
       </div>
@@ -73,8 +69,11 @@ function ProjectDetail() {
     return (
       <div className="text-center py-16">
         <p className="text-gray-400">Project not found</p>
-        <Link to="/projects" className="mt-4 inline-block text-blue-400 hover:text-blue-300">
-          ← Back to Projects
+        <Link 
+          to={clientId ? `/clients/${clientId}` : '/clients'} 
+          className="mt-4 inline-block text-blue-400 hover:text-blue-300"
+        >
+          ← Back
         </Link>
       </div>
     );
@@ -85,9 +84,15 @@ function ProjectDetail() {
   return (
     <div className="space-y-6">
       {/* Project Header */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-slate-900 rounded-xl p-6 border border-slate-800">
         <div className="flex justify-between items-start">
           <div>
+            <Link 
+              to={clientId ? `/clients/${clientId}` : '/clients'} 
+              className="text-blue-400 hover:text-blue-300 mb-4 inline-block"
+            >
+              ← Back to {client ? client.company_name : 'Client'}
+            </Link>
             <h1 className="text-3xl font-bold text-white">{project.project_name}</h1>
             {client && (
               <p className="mt-1 text-gray-400">
@@ -98,283 +103,57 @@ function ProjectDetail() {
           <span className={`px-3 py-1 text-sm font-medium rounded-full ${
             project.status === 'completed' ? 'bg-green-900 text-green-200' :
             project.status === 'processing' ? 'bg-yellow-900 text-yellow-200' :
-            'bg-gray-700 text-gray-300'
+            'bg-slate-700 text-gray-300'
           }`}>
-            {project.status}
+            {project.status || 'active'}
           </span>
         </div>
-
-        {/* Project Details Grid */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Content Types */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Content Types</h3>
-            <div className="flex flex-wrap gap-1">
-              {projectTypes.map((type) => (
-                <span key={type} className="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded">
-                  {type}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Keywords */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Keywords</h3>
-            <div className="flex flex-wrap gap-1">
-              {project.keywords && project.keywords.length > 0 ? (
-                project.keywords.map((kw, idx) => (
-                  <span key={idx} className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded">
-                    {kw}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-500 text-sm">No keywords set</span>
-              )}
-            </div>
-          </div>
-
-          {/* Content Preferences */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Content Style</h3>
-            <span className="text-white capitalize">{project.content_preferences || 'Professional'}</span>
-          </div>
-
-          {/* Target Audience */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Target Audience</h3>
-            <p className="text-white text-sm line-clamp-2">
-              {project.target_audience || client?.target_audience || 'Not specified'}
-            </p>
-          </div>
-        </div>
-
-        {/* Unique Angle */}
-        {project.unique_angle && (
-          <div className="mt-4 bg-gray-700/50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Unique Angle</h3>
-            <p className="text-white">{project.unique_angle}</p>
-          </div>
-        )}
       </div>
 
-      {/* Client Brand Info (if available) */}
-      {client && (client.brand_voice || client.brand_tone) && (
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">🎨 Brand Guidelines</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {client.brand_tone && (
-              <div>
-                <span className="text-sm text-gray-400">Brand Tone:</span>
-                <span className="ml-2 text-white capitalize">{client.brand_tone}</span>
-              </div>
-            )}
-            {client.brand_voice && (
-              <div className="md:col-span-2">
-                <span className="text-sm text-gray-400 block mb-1">Brand Voice:</span>
-                <p className="text-white text-sm bg-gray-700/50 p-3 rounded">{client.brand_voice}</p>
-              </div>
-            )}
-          </div>
+      {/* Content Type Cards - Horizontal at top */}
+      {!selectedContentType && (
+        <ContentTypeCards
+          projectTypes={projectTypes}
+          onSelectType={setSelectedContentType}
+        />
+      )}
+
+      {/* Content Workflow */}
+      {selectedContentType === 'seo_blog' && (
+        <div>
+          <button
+            onClick={() => setSelectedContentType(null)}
+            className="mb-4 text-blue-400 hover:text-blue-300"
+          >
+            ← Back to Content Types
+          </button>
+          <SEOBlogWorkflow
+            projectId={projectId}
+            clientId={client?.id}
+            project={project}
+            client={client}
+          />
         </div>
       )}
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 bg-gray-800 p-2 rounded-xl flex-wrap">
-        <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'dashboard'
-              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          📊 Strategy Dashboard
-          <span className="ml-2 text-sm opacity-75">Overview</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('seo-strategy')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'seo-strategy'
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          🎯 SEO Strategy
-          <span className="ml-2 text-sm opacity-75">Comprehensive Plan</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('google-ads-strategy')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'google-ads-strategy'
-              ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          🔍 Google Ads
-          <span className="ml-2 text-sm opacity-75">Campaign Strategy</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('facebook-ads-strategy')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'facebook-ads-strategy'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          📘 Facebook Ads
-          <span className="ml-2 text-sm opacity-75">Social Strategy</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('ideas')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'ideas'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          💡 Article Ideas
-          <span className="ml-2 text-sm opacity-75">Analyze & Plan</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('generate')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'generate'
-              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          ✨ Direct Generate
-          <span className="ml-2 text-sm opacity-75">Quick Content</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('scheduling')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'scheduling'
-              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          📅 Schedule
-          <span className="ml-2 text-sm opacity-75">Publish Content</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('roadmap')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'roadmap'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          📅 Content Roadmap
-          <span className="ml-2 text-sm opacity-75">12-Month Plan</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('email')}
-          className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-            activeTab === 'email'
-              ? 'bg-gradient-to-r from-yellow-600 to-orange-600 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          ✉️ Email
-          <span className="ml-2 text-sm opacity-75">Newsletters</span>
-        </button>
-        {client?.primary_business_type === 'shopify' && (
+      {selectedContentType === 'programmatic_seo' && (
+        <div>
           <button
-            onClick={() => setActiveTab('shopify-analysis')}
-            className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-              activeTab === 'shopify-analysis'
-                ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
+            onClick={() => setSelectedContentType(null)}
+            className="mb-4 text-blue-400 hover:text-blue-300"
           >
-            🛒 Shopify Store
-            <span className="ml-2 text-sm opacity-75">SEO Analysis</span>
+            ← Back to Content Types
           </button>
-        )}
-        {client?.primary_business_type === 'local' && (
-          <button
-            onClick={() => setActiveTab('local-seo')}
-            className={`flex-1 min-w-[150px] py-3 px-4 rounded-lg font-medium transition-all ${
-              activeTab === 'local-seo'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            📍 Local SEO
-            <span className="ml-2 text-sm opacity-75">Analysis</span>
-          </button>
-        )}
-      </div>
-
-      {/* Content Area */}
-      {activeTab === 'dashboard' ? (
-        <StrategyDashboard 
-          projectId={projectId}
-          clientData={client}
-          projectData={project}
-        />
-      ) : activeTab === 'seo-strategy' ? (
-        <SEOStrategy 
-          projectId={projectId}
-          clientData={client}
-          projectData={project}
-        />
-      ) : activeTab === 'google-ads-strategy' ? (
-        <GoogleAdsStrategy 
-          projectId={projectId}
-          clientData={client}
-          projectData={project}
-        />
-      ) : activeTab === 'facebook-ads-strategy' ? (
-        <FacebookAdsStrategy 
-          projectId={projectId}
-          clientData={client}
-          projectData={project}
-        />
-      ) : activeTab === 'ideas' ? (
-        <ArticleIdeas 
-          client={client}
-          project={project}
-          onArticleGenerated={loadProject}
-        />
-      ) : activeTab === 'scheduling' ? (
-        <ContentScheduling 
-          projectId={projectId}
-          clientId={client?.id}
-        />
-      ) : activeTab === 'email' ? (
-        <EmailNewsletter 
-          projectId={projectId}
-        />
-      ) : activeTab === 'roadmap' ? (
-        <ContentRoadmap 
-          projectId={projectId}
-          strategy={null}
-        />
-      ) : activeTab === 'shopify-analysis' ? (
-        <ShopifyStoreAnalysis 
-          clientId={client?.id}
-          clientData={client}
-        />
-      ) : activeTab === 'local-seo' ? (
-        <LocalSeoAnalysis 
-          clientId={client?.id}
-          projectId={projectId}
-          clientData={client}
-          projectData={project}
-        />
-      ) : (
-        <ContentGenerator 
-          project={project} 
-          client={client}
-          onContentGenerated={loadProject}
-        />
+          <ProgrammaticSEO
+            projectId={projectId}
+            clientId={client?.id}
+            project={project}
+            client={client}
+          />
+        </div>
       )}
     </div>
   );
 }
 
 export default ProjectDetail;
-

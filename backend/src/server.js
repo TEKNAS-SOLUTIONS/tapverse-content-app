@@ -1,8 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
 import { config } from './config/config.js';
-import pool from './db/index.js';
+import { checkDatabaseHealth, closePool } from './core/database.js';
+import { closeRedis } from './core/cache.js';
+import { closeAllQueues } from './queues/index.js';
+import { logger } from './core/logger.js';
+import { errorHandler, notFoundHandler, asyncHandler } from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { requestTimeout } from './middleware/timeout.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
 import clientsRouter from './routes/clients.js';
 import projectsRouter from './routes/projects.js';
 import contentRouter from './routes/content.js';
@@ -23,37 +29,41 @@ import contentEvidenceRouter from './routes/contentEvidence.js';
 import shopifyRouter from './routes/shopify.js';
 import localSeoRouter from './routes/localSeo.js';
 import connectionsRouter from './routes/connections.js';
+import cmsRouter from './routes/cms.js';
 
 const app = express();
 
-// Middleware
+// Middleware Stack (in order)
+// 1. CORS
 app.use(cors({ 
   origin: config.frontend.url || 'http://localhost:3000',
   credentials: true
 }));
+
+// 2. Request timeout (30 seconds default)
+app.use(requestTimeout(30000));
+
+// 3. Request logging (adds request ID)
+app.use(requestLogger);
+
+// 4. Body parsing
 app.use(express.json());
-if (process.env.NODE_ENV !== 'test') {
-  app.use(morgan('dev'));
-}
+
+// 5. Rate limiting (general API limiter)
+app.use('/api', apiLimiter);
 
 // Health check
-app.get('/health', async (req, res) => {
-  try {
-    // Test database connection
-    await pool.query('SELECT 1');
-    res.json({ 
-      status: 'ok', 
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      status: 'error', 
-      database: 'disconnected',
-      error: error.message 
-    });
-  }
-});
+app.get('/health', asyncHandler(async (req, res) => {
+  const dbHealth = await checkDatabaseHealth();
+  
+  const status = dbHealth.healthy ? 200 : 503;
+  res.status(status).json({ 
+    status: dbHealth.healthy ? 'ok' : 'error',
+    database: dbHealth.healthy ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString(),
+    ...(dbHealth.error && { error: dbHealth.error })
+  });
+}));
 
 // API routes
 app.get('/api', (req, res) => {
@@ -81,31 +91,85 @@ app.use('/api/content-evidence', contentEvidenceRouter);
 app.use('/api/shopify', shopifyRouter);
 app.use('/api/local-seo', localSeoRouter);
 app.use('/api/connections', connectionsRouter);
+app.use('/api/cms', cmsRouter);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: config.nodeEnv === 'development' ? err.message : undefined
-  });
-});
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+// 404 handler (after all routes)
+app.use(notFoundHandler);
 
 // Export app for testing
 export { app };
 
+// Graceful shutdown handler
+const gracefulShutdown = async (signal) => {
+  logger.info({ signal }, 'Received shutdown signal, starting graceful shutdown');
+  
+  // Close server
+  if (server) {
+    server.close(async () => {
+      logger.info('HTTP server closed');
+      
+      // Close database connections
+      try {
+        await closePool();
+      } catch (error) {
+        logger.error({ err: error }, 'Error closing database pool');
+      }
+      
+      // Close Redis connections
+      try {
+        await closeRedis();
+      } catch (error) {
+        logger.error({ err: error }, 'Error closing Redis connection');
+      }
+      
+      // Close job queues
+      try {
+        await closeAllQueues();
+      } catch (error) {
+        logger.error({ err: error }, 'Error closing job queues');
+      }
+      
+      logger.info('Graceful shutdown complete');
+      process.exit(0);
+    });
+    
+    // Force close after 10 seconds
+    setTimeout(() => {
+      logger.error('Forced shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  }
+};
+
 // Start server only if not in test environment
+let server;
 if (process.env.NODE_ENV !== 'test') {
   const PORT = config.port;
   
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${config.nodeEnv}`);
+  server = app.listen(PORT, () => {
+    logger.info({
+      port: PORT,
+      environment: config.nodeEnv,
+    }, 'Server started');
+  });
+  
+  // Handle shutdown signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (error) => {
+    logger.error({ err: error }, 'Uncaught exception');
+    gracefulShutdown('uncaughtException');
+  });
+  
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error({ reason, promise }, 'Unhandled promise rejection');
+    gracefulShutdown('unhandledRejection');
   });
 }
 
