@@ -745,29 +745,6 @@ function Clients() {
                       Delete
                     </button>
                   </div>
-<<<<<<< HEAD
-                </div>
-                <div className="flex items-center gap-2">
-                  <Link
-                    to={`/clients/${client.id}`}
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    View Details
-                  </Link>
-                  <button
-                    onClick={() => handleEdit(client)}
-                    className="px-4 py-2 text-sm bg-slate-700 text-gray-300 rounded-lg hover:bg-slate-600 transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(client.id)}
-                    className="px-4 py-2 text-sm bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
-                  >
-                    Delete
-                  </button>
-=======
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
                 </div>
               </div>
             ))}

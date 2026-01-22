@@ -97,17 +97,12 @@ export const contentAPI = {
   // Update content
   update: (id, data) => api.put(`/content/${id}`, data),
   
-<<<<<<< HEAD
-  // Approve content for CMS
-  approve: (data) => api.post('/content/approve', data),
-=======
   // Update content status
   updateStatus: (id, status, options = {}) => 
     api.put(`/content/${id}/status`, { status, ...options }),
   
   // Get status history
   getStatusHistory: (id) => api.get(`/content/${id}/status-history`),
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
 };
 
 /**

@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projectsAPI, clientsAPI } from '../services/api';
-<<<<<<< HEAD
-import ContentTypeCards from '../components/projects/ContentTypeCards';
-import SEOBlogWorkflow from '../components/content/seo-blog/SEOBlogWorkflow';
-import ProgrammaticSEO from '../components/content/programmatic-seo/ProgrammaticSEO';
-=======
 import ContentGenerator from '../components/ContentGenerator';
 import ArticleIdeas from '../components/ArticleIdeas';
 import SEOStrategy from '../components/SEOStrategy';
@@ -20,7 +15,6 @@ import LocalSeoAnalysis from '../components/LocalSeoAnalysis';
 import ProgrammaticSeo from '../components/ProgrammaticSeo';
 import ClientChat from '../components/ClientChat';
 import VideoGeneration from '../components/VideoGeneration';
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
 
 function ProjectDetail() {
   const { projectId, clientId } = useParams();
@@ -29,6 +23,7 @@ function ProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedContentType, setSelectedContentType] = useState(null);
+  const [activeTab, setActiveTab] = useState('generate');
 
   useEffect(() => {
     loadProject();
@@ -43,13 +38,6 @@ function ProjectDetail() {
       if (projectRes.data.success && projectRes.data.data) {
         setProject(projectRes.data.data);
         
-<<<<<<< HEAD
-        // Load client info
-        const clientIdToUse = clientId || projectRes.data.data.client_id;
-        const clientRes = await clientsAPI.getById(clientIdToUse);
-        if (clientRes.data.success) {
-          setClient(clientRes.data.data);
-=======
         // Load client info if client_id exists
         if (projectRes.data.data.client_id) {
           try {
@@ -61,7 +49,6 @@ function ProjectDetail() {
             console.error('Error loading client:', clientErr);
             // Continue without client data - don't fail the whole page
           }
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
         }
       } else {
         setError(projectRes.data.error || 'Project not found');
@@ -86,20 +73,10 @@ function ProjectDetail() {
   if (error) {
     return (
       <div className="text-center py-16">
-<<<<<<< HEAD
-        <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-md mx-auto">
-          <p className="text-red-300">Error: {error}</p>
-          <Link 
-            to={clientId ? `/clients/${clientId}` : '/clients'} 
-            className="mt-4 inline-block text-blue-400 hover:text-blue-300"
-          >
-            ← Back
-=======
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <p className="text-red-700">Error: {error}</p>
           <Link to="/projects" className="mt-4 inline-block text-orange-600 hover:text-orange-700">
             ← Back to Projects
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
           </Link>
         </div>
       </div>
@@ -109,18 +86,9 @@ function ProjectDetail() {
   if (!project) {
     return (
       <div className="text-center py-16">
-<<<<<<< HEAD
-        <p className="text-gray-400">Project not found</p>
-        <Link 
-          to={clientId ? `/clients/${clientId}` : '/clients'} 
-          className="mt-4 inline-block text-blue-400 hover:text-blue-300"
-        >
-          ← Back
-=======
         <p className="text-gray-600">Project not found</p>
         <Link to="/projects" className="mt-4 inline-block text-orange-600 hover:text-orange-700">
           ← Back to Projects
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
         </Link>
       </div>
     );
@@ -131,23 +99,10 @@ function ProjectDetail() {
   return (
     <div className="space-y-6">
       {/* Project Header */}
-<<<<<<< HEAD
-      <div className="bg-slate-900 rounded-xl p-6 border border-slate-800">
-        <div className="flex justify-between items-start">
-          <div>
-            <Link 
-              to={clientId ? `/clients/${clientId}` : '/clients'} 
-              className="text-blue-400 hover:text-blue-300 mb-4 inline-block"
-            >
-              ← Back to {client ? client.company_name : 'Client'}
-            </Link>
-            <h1 className="text-3xl font-bold text-white">{project.project_name}</h1>
-=======
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{project.project_name}</h1>
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
             {client && (
               <p className="mt-1 text-gray-600">
                 Client: <span className="text-orange-600">{client.company_name}</span>
@@ -155,54 +110,13 @@ function ProjectDetail() {
             )}
           </div>
           <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-<<<<<<< HEAD
-            project.status === 'completed' ? 'bg-green-900 text-green-200' :
-            project.status === 'processing' ? 'bg-yellow-900 text-yellow-200' :
-            'bg-slate-700 text-gray-300'
-=======
             project.status === 'completed' ? 'bg-green-100 text-green-700' :
             project.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
             'bg-gray-100 text-gray-700'
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
           }`}>
             {project.status || 'active'}
           </span>
         </div>
-<<<<<<< HEAD
-      </div>
-
-      {/* Content Type Cards - Horizontal at top */}
-      {!selectedContentType && (
-        <ContentTypeCards
-          projectTypes={projectTypes}
-          onSelectType={setSelectedContentType}
-        />
-      )}
-
-      {/* Content Workflow */}
-      {selectedContentType === 'seo_blog' && (
-        <div>
-          <button
-            onClick={() => setSelectedContentType(null)}
-            className="mb-4 text-blue-400 hover:text-blue-300"
-          >
-            ← Back to Content Types
-          </button>
-          <SEOBlogWorkflow
-            projectId={projectId}
-            clientId={client?.id}
-            project={project}
-            client={client}
-          />
-        </div>
-      )}
-
-      {selectedContentType === 'programmatic_seo' && (
-        <div>
-          <button
-            onClick={() => setSelectedContentType(null)}
-            className="mb-4 text-blue-400 hover:text-blue-300"
-=======
 
         {/* Project Details Grid */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -388,19 +302,9 @@ function ProjectDetail() {
                 ? 'bg-orange-600 text-white shadow-lg hover:bg-orange-700'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
           >
             ← Back to Content Types
           </button>
-<<<<<<< HEAD
-          <ProgrammaticSEO
-            projectId={projectId}
-            clientId={client?.id}
-            project={project}
-            client={client}
-          />
-        </div>
-=======
         )}
         {/* Local SEO available for all clients */}
         <button
@@ -524,7 +428,6 @@ function ProjectDetail() {
           client={client}
           onContentGenerated={loadProject}
         />
->>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
       )}
     </div>
   );
