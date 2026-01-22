@@ -13,9 +13,12 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "axios": "^1.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.20.0",
+<<<<<<< HEAD
     "axios": "^1.6.2",
     "docx": "^8.2.2",
     "file-saver": "^2.0.5",
@@ -23,10 +26,13 @@
     "react-hot-toast": "^2.4.1",
     "react-error-boundary": "^4.0.11",
     "@react-google-maps/api": "^2.19.3"
+=======
+    "recharts": "^3.6.0"
+>>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
   },
   "devDependencies": {
-    "@testing-library/react": "^14.1.2",
     "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^1.0.4",

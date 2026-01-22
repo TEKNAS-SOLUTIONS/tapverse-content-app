@@ -99,10 +99,10 @@ function Projects() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'completed': return 'bg-green-600/20 text-green-400 border-green-600/30';
-      case 'processing': return 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30';
-      case 'failed': return 'bg-red-600/20 text-red-400 border-red-600/30';
-      default: return 'bg-slate-600/20 text-slate-400 border-slate-600/30';
+      case 'completed': return 'bg-green-100 text-green-700 border-green-200';
+      case 'processing': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'failed': return 'bg-red-100 text-red-700 border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
@@ -120,7 +120,7 @@ function Projects() {
     return (
       <div>
         <div className="mb-4">
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-gray-900">
             {editingProject ? 'Edit Project' : 'Create Project'}
           </h1>
         </div>
@@ -137,10 +137,10 @@ function Projects() {
   return (
     <div>
       <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">Projects</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
         <button
           onClick={handleCreate}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
         >
           + Create Project
         </button>
@@ -148,14 +148,14 @@ function Projects() {
 
       {!clientId && (
         <div className="mb-6">
-          <label htmlFor="client-filter" className="block text-sm font-medium text-gray-300 mb-2">
+          <label htmlFor="client-filter" className="block text-sm font-medium text-gray-700 mb-2">
             Filter by Client
           </label>
           <select
             id="client-filter"
             value={selectedClientId}
             onChange={handleClientFilter}
-            className="block w-full max-w-xs px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="block w-full max-w-xs px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             <option value="">All Clients</option>
             {clients.map((client) => (
@@ -168,23 +168,23 @@ function Projects() {
       )}
 
       {error && (
-        <div className="mb-4 p-4 bg-red-900/50 border border-red-500 rounded-lg">
-          <p className="text-red-300">Error: {error}</p>
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">Error: {error}</p>
         </div>
       )}
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="text-gray-400 mt-4">Loading projects...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Loading projects...</p>
         </div>
       ) : projects.length === 0 ? (
-        <div className="text-center py-12 bg-slate-900 rounded-xl border border-slate-800">
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
           <span className="text-6xl mb-4 block">📁</span>
-          <p className="text-gray-400 text-lg">No projects found.</p>
+          <p className="text-gray-600 text-lg">No projects found.</p>
           <button
             onClick={handleCreate}
-            className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="mt-4 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
           >
             Create Your First Project
           </button>
@@ -194,12 +194,12 @@ function Projects() {
           {projects.map((project) => {
             const client = clients.find((c) => c.id === project.client_id);
             return (
-              <div key={project.id} className="bg-slate-900 rounded-xl border border-slate-800 p-6 hover:border-slate-700 transition-colors">
+              <div key={project.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:border-gray-300 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">{getTypeIcon(project.project_type)}</span>
-                      <h3 className="text-xl font-semibold text-white">
+                      <h3 className="text-xl font-semibold text-gray-900">
                         {project.project_name}
                       </h3>
                       <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(project.status)}`}>
@@ -207,19 +207,19 @@ function Projects() {
                       </span>
                     </div>
                     
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-3">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-3">
                       {client && (
-                        <span className="bg-slate-800 px-2 py-1 rounded">
+                        <span className="bg-gray-100 px-2 py-1 rounded text-gray-700">
                           👤 {client.company_name}
                         </span>
                       )}
                       {project.project_type && (
-                        <span className="bg-slate-800 px-2 py-1 rounded">
+                        <span className="bg-gray-100 px-2 py-1 rounded text-gray-700">
                           {project.project_type.toUpperCase()}
                         </span>
                       )}
                       {project.content_preferences && (
-                        <span className="bg-slate-800 px-2 py-1 rounded">
+                        <span className="bg-gray-100 px-2 py-1 rounded text-gray-700">
                           {project.content_preferences}
                         </span>
                       )}
@@ -228,12 +228,12 @@ function Projects() {
                     {project.keywords && project.keywords.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-3">
                         {project.keywords.slice(0, 5).map((keyword, idx) => (
-                          <span key={idx} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded">
+                          <span key={idx} className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded">
                             {keyword}
                           </span>
                         ))}
                         {project.keywords.length > 5 && (
-                          <span className="px-2 py-1 text-xs bg-slate-700 text-gray-400 rounded">
+                          <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
                             +{project.keywords.length - 5} more
                           </span>
                         )}
@@ -241,7 +241,7 @@ function Projects() {
                     )}
 
                     {project.target_audience && (
-                      <p className="text-sm text-gray-500 line-clamp-2">
+                      <p className="text-sm text-gray-700 line-clamp-2">
                         <strong>Audience:</strong> {project.target_audience}
                       </p>
                     )}
@@ -250,19 +250,19 @@ function Projects() {
                   <div className="flex items-center gap-2 ml-4">
                     <Link
                       to={`/projects/${project.id}`}
-                      className="px-4 py-2 text-sm bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors"
+                      className="px-4 py-2 text-sm bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors border border-orange-200"
                     >
                       👁️ View
                     </Link>
                     <button
                       onClick={() => handleEdit(project)}
-                      className="px-4 py-2 text-sm bg-slate-800 text-gray-300 rounded-lg hover:bg-slate-700 transition-colors"
+                      className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                     >
                       ✏️ Edit
                     </button>
                     <button
                       onClick={() => handleDelete(project.id)}
-                      className="px-4 py-2 text-sm bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                      className="px-4 py-2 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
                     >
                       🗑️ Delete
                     </button>

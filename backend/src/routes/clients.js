@@ -22,6 +22,99 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/clients/dashboard/metrics - Get dashboard metrics
+router.get('/dashboard/metrics', async (req, res) => {
+  try {
+    const { clientId } = req.query;
+    
+    if (clientId) {
+      // Client-specific metrics
+      const client = await getClientById(clientId);
+      if (!client) {
+        return res.status(404).json({ success: false, error: 'Client not found' });
+      }
+
+      // Get projects count
+      const projectsResult = await pool.query(
+        'SELECT COUNT(*) as count FROM projects WHERE client_id = $1',
+        [clientId]
+      );
+      const activeProjects = parseInt(projectsResult.rows[0]?.count || 0);
+
+      // Get content count
+      const contentResult = await pool.query(
+        `SELECT COUNT(*) as count FROM content c
+         JOIN projects p ON c.project_id = p.id
+         WHERE p.client_id = $1`,
+        [clientId]
+      );
+      const contentGenerated = parseInt(contentResult.rows[0]?.count || 0);
+
+      // Get keywords count (from projects)
+      const keywordsResult = await pool.query(
+        `SELECT COUNT(DISTINCT keyword) as count
+         FROM projects, unnest(keywords) as keyword
+         WHERE client_id = $1 AND keywords IS NOT NULL`,
+        [clientId]
+      );
+      const keywordsTracked = parseInt(keywordsResult.rows[0]?.count || 0);
+
+      // Get rank tracking data (if table exists)
+      let rankingChanges = 0;
+      try {
+        const rankResult = await pool.query(
+          'SELECT COUNT(*) as count FROM keyword_rankings WHERE client_id = $1',
+          [clientId]
+        );
+        rankingChanges = parseInt(rankResult.rows[0]?.count || 0);
+      } catch (err) {
+        // Table might not exist yet, ignore
+        console.log('Keyword rankings table not found, skipping');
+      }
+
+      res.json({
+        success: true,
+        data: {
+          activeProjects,
+          contentGenerated,
+          keywordsTracked,
+          rankingChanges,
+          trafficEstimate: 0, // Placeholder
+        },
+      });
+    } else {
+      // All clients metrics
+      const clientsResult = await pool.query(
+        'SELECT COUNT(*) as count FROM clients WHERE is_active = TRUE'
+      );
+      const totalClients = parseInt(clientsResult.rows[0]?.count || 0);
+
+      const projectsResult = await pool.query(
+        'SELECT COUNT(*) as count FROM projects'
+      );
+      const activeProjects = parseInt(projectsResult.rows[0]?.count || 0);
+
+      const contentResult = await pool.query(
+        'SELECT COUNT(*) as count FROM content'
+      );
+      const contentGenerated = parseInt(contentResult.rows[0]?.count || 0);
+
+      res.json({
+        success: true,
+        data: {
+          totalClients,
+          activeProjects,
+          contentGenerated,
+          revenue: 0, // Placeholder
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching dashboard metrics:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // GET /api/clients/:id - Get client by ID
 router.get('/:id', async (req, res) => {
   try {

@@ -32,8 +32,21 @@ export async function generateVideoScript(projectData, clientData = {}, duration
                        duration <= 90 ? '75-90 seconds' :
                        duration <= 120 ? '100-120 seconds' : '150-180 seconds';
 
-  const systemPrompt = `You are a professional video scriptwriter for AI avatar videos. 
-Create engaging, natural-sounding scripts that work well with AI avatars.
+  // Build comprehensive context for SEO and conversion optimization
+  const companyName = clientData.company_name || 'Our company';
+  const industry = clientData.industry || '';
+  const location = clientData.location || '';
+  const uniqueSellingPoints = clientData.unique_selling_points || '';
+  const brandVoice = clientData.brand_voice || '';
+  const services = projectData.project_types || [];
+  const competitors = clientData.competitors || [];
+  
+  // Extract local keywords and service-specific terms
+  const localKeywords = location ? [location, ...(location.split(',').map(l => l.trim()))] : [];
+  const serviceKeywords = services.length > 0 ? services : (keywords.length > 1 ? keywords.slice(1) : []);
+  
+  const systemPrompt = `You are a professional video scriptwriter and conversion copywriter for AI avatar videos. 
+Create highly effective, SEO-optimized scripts that drive conversions while working naturally with AI avatars.
 
 CRITICAL RULES:
 - Write ONLY the spoken words - no labels, markers, or instructions
@@ -45,18 +58,75 @@ CRITICAL RULES:
 - Keep total length ${durationText}
 - Make it sound human and engaging, not robotic
 - DO NOT include any formatting like "Title:", "Hook:", "Script:", bullet points, or numbering
-- The script field should contain ONLY what the avatar will say aloud`;
+- The script field should contain ONLY what the avatar will say aloud
 
-  const userPrompt = `Create a video script about: "${primaryKeyword}"
+CONTENT QUALITY REQUIREMENTS:
+- Include LOCAL SEO keywords naturally (location names, suburbs, regions)
+- Include SERVICE-SPECIFIC keywords (specific services offered)
+- Highlight UNIQUE VALUE PROPOSITION (what makes this company different)
+- Add SOCIAL PROOF elements (testimonials, ratings, client count)
+- Include SPECIFIC BENEFITS (concrete advantages, not generic statements)
+- Add EMOTIONAL HOOK in first 5 seconds
+- Include STRONG CALL-TO-ACTION (specific, action-oriented)
+- Use CONVERSION-OPTIMIZED language (benefits-focused, not feature-focused)`;
 
+  const userPrompt = `Create a highly effective, conversion-focused video script for: ${companyName}
+
+PRIMARY TOPIC: "${primaryKeyword}"
+INDUSTRY: ${industry}
+${location ? `LOCATION: ${location}` : ''}
+${services.length > 0 ? `SERVICES: ${services.join(', ')}` : ''}
+${uniqueSellingPoints ? `UNIQUE SELLING POINTS: ${uniqueSellingPoints}` : ''}
 TARGET AUDIENCE: ${targetAudience || 'General business audience'}
-TONE: ${brandTone}
-COMPANY: ${clientData.company_name || 'Our company'}
+BRAND VOICE: ${brandVoice || brandTone}
 DURATION: ${durationText}
 
-Create a script with a natural flow: hook to grab attention, main content with key points, and a call to action.
+CRITICAL REQUIREMENTS - MUST INCLUDE:
 
-IMPORTANT: The "script" field must contain ONLY the exact words to be spoken. No labels, no markers, no formatting - just natural speech.
+1. LOCAL SEO OPTIMIZATION:
+   ${localKeywords.length > 0 ? `- Naturally include these location keywords: ${localKeywords.join(', ')}` : '- Include location-specific terms if applicable'}
+   - Mention local market expertise
+   - Reference specific suburbs/regions served
+
+2. SERVICE-SPECIFIC KEYWORDS:
+   ${serviceKeywords.length > 0 ? `- Include these services naturally: ${serviceKeywords.join(', ')}` : '- Include specific service types'}
+   - Mention specific offerings
+   - Use industry-specific terminology
+
+3. UNIQUE VALUE PROPOSITION:
+   ${uniqueSellingPoints ? `- Highlight: ${uniqueSellingPoints}` : '- Differentiate from competitors'}
+   - Show what makes this company special
+   - Mention specific strengths or achievements
+
+4. SOCIAL PROOF:
+   - Include client count, ratings, or testimonials (if applicable)
+   - Reference years of experience or expertise
+   - Mention awards or recognition (if applicable)
+
+5. SPECIFIC BENEFITS:
+   - Use concrete benefits (e.g., "15% more for your property", "Sell in 23 days average")
+   - Include specific numbers or metrics
+   - Show clear value to the viewer
+
+6. EMOTIONAL HOOK (First 5 seconds):
+   - Start with an emotional or benefit-driven statement
+   - Create immediate connection with viewer
+   - Address a pain point or desire
+
+7. STRONG CALL-TO-ACTION:
+   - Specific action (e.g., "Call us on [number]", "Visit [website]", "Book your free consultation")
+   - Create urgency if appropriate
+   - Make it easy to act
+
+Create a script with this structure:
+- HOOK (emotional, benefit-driven, 5-10 seconds)
+- PROBLEM (what viewers struggle with)
+- SOLUTION (what ${companyName} offers)
+- SOCIAL PROOF (why choose us)
+- BENEFITS (specific advantages)
+- CALL TO ACTION (specific next step)
+
+IMPORTANT: The "script" field must contain ONLY the exact words to be spoken. No labels, no markers, no formatting - just natural speech that incorporates all the SEO and conversion elements above naturally.
 
 Format the output as JSON:
 {

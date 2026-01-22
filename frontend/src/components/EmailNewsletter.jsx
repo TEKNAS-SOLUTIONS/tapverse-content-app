@@ -7,6 +7,7 @@ function EmailNewsletter({ projectId }) {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [selectedNewsletter, setSelectedNewsletter] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (projectId) {
@@ -46,7 +47,9 @@ function EmailNewsletter({ projectId }) {
   const generateNewsletter = async (sourceContentId = null) => {
     try {
       setGenerating(true);
-      const response = await emailNewslettersAPI.generate(projectId, {
+      setError(null);
+      const response = await emailNewslettersAPI.generate({
+        projectId,
         sourceContentId,
       });
       if (response.data.success) {
@@ -55,7 +58,7 @@ function EmailNewsletter({ projectId }) {
       }
     } catch (err) {
       console.error('Error generating newsletter:', err);
-      alert(err.response?.data?.error || 'Failed to generate newsletter');
+      setError(err.response?.data?.error || err.message || 'Failed to generate newsletter');
     } finally {
       setGenerating(false);
     }
@@ -64,8 +67,8 @@ function EmailNewsletter({ projectId }) {
   if (loading && newsletters.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Loading newsletters...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading newsletters...</p>
       </div>
     );
   }
@@ -74,14 +77,14 @@ function EmailNewsletter({ projectId }) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Email Newsletters</h2>
-          <p className="text-gray-400 text-sm mt-1">Generate email newsletters from blog content</p>
+          <h2 className="text-2xl font-bold text-gray-900">Email Newsletters</h2>
+          <p className="text-gray-600 text-sm mt-1">Generate email newsletters from blog content</p>
         </div>
         <div className="flex gap-2">
           {content.length > 0 && (
             <select
               onChange={(e) => e.target.value && generateNewsletter(e.target.value)}
-              className="bg-gray-700 text-white rounded-lg p-2 text-sm"
+              className="bg-white border border-gray-300 text-gray-900 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
               disabled={generating}
             >
               <option value="">Generate from blog...</option>
@@ -95,30 +98,65 @@ function EmailNewsletter({ projectId }) {
           <button
             onClick={() => generateNewsletter()}
             disabled={generating}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
           >
-            {generating ? 'Generating...' : '+ Generate Newsletter'}
+            {generating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              '+ Generate Newsletter'
+            )}
           </button>
         </div>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-700 hover:text-red-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {generating && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <p className="ml-4 text-gray-600 font-medium">Generating your newsletter...</p>
+          </div>
+        </div>
+      )}
+
       {newsletters.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-              <h3 className="text-white font-semibold mb-3">Newsletters</h3>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-2">
+              <h3 className="text-gray-900 font-semibold mb-3">Newsletters</h3>
               {newsletters.map((newsletter) => (
                 <button
                   key={newsletter.id}
                   onClick={() => setSelectedNewsletter(newsletter)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  className={`w-full text-left p-3 rounded-lg transition-colors border ${
                     selectedNewsletter?.id === newsletter.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      ? 'bg-orange-600 text-white border-orange-600'
+                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
                   }`}
                 >
                   <div className="text-sm font-medium truncate">{newsletter.subject_line}</div>
-                  <div className="text-xs mt-1 opacity-75">
+                  <div className={`text-xs mt-1 ${selectedNewsletter?.id === newsletter.id ? 'text-orange-100' : 'text-gray-500'}`}>
                     {new Date(newsletter.created_at).toLocaleDateString()}
                   </div>
                 </button>
@@ -128,35 +166,35 @@ function EmailNewsletter({ projectId }) {
 
           <div className="lg:col-span-2">
             {selectedNewsletter && (
-              <div className="bg-gray-800 rounded-lg p-6 space-y-4">
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Subject Line</h3>
-                  <p className="text-gray-300">{selectedNewsletter.subject_line}</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Subject Line</h3>
+                  <p className="text-gray-700">{selectedNewsletter.subject_line}</p>
                 </div>
 
                 {selectedNewsletter.preview_text && (
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Preview Text</h3>
-                    <p className="text-gray-300">{selectedNewsletter.preview_text}</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Preview Text</h3>
+                    <p className="text-gray-700">{selectedNewsletter.preview_text}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Email Body</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Email Body</h3>
                   <div
-                    className="bg-white rounded-lg p-4 text-gray-800"
+                    className="bg-gray-50 rounded-lg p-4 text-gray-900 border border-gray-200"
                     dangerouslySetInnerHTML={{ __html: selectedNewsletter.email_body }}
                   />
                 </div>
 
                 {selectedNewsletter.cta_text && (
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Call to Action</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Call to Action</h3>
                     <a
                       href={selectedNewsletter.cta_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="inline-block px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                     >
                       {selectedNewsletter.cta_text}
                     </a>
@@ -167,11 +205,12 @@ function EmailNewsletter({ projectId }) {
           </div>
         </div>
       ) : (
-        <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400 mb-4">No newsletters generated yet</p>
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
+          <p className="text-gray-600 mb-4">No newsletters generated yet</p>
+          <p className="text-gray-500 text-sm mb-6">Generate email newsletters from blog content</p>
           <button
             onClick={() => generateNewsletter()}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
           >
             Generate Your First Newsletter
           </button>

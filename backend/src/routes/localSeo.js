@@ -30,14 +30,7 @@ router.post('/analyze', async (req, res) => {
 
     const clientData = clientResult.rows[0];
 
-    // Check if client is local business type
-    if (clientData.primary_business_type !== 'local') {
-      return res.status(400).json({
-        success: false,
-        error: 'Client must have primary_business_type set to "local"',
-      });
-    }
-
+    // Note: Local SEO is now available for all clients (not just local business types)
     // Fetch project data
     const projectResult = await pool.query('SELECT * FROM projects WHERE id = $1', [projectId]);
     if (projectResult.rows.length === 0) {

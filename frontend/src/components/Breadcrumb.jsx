@@ -85,8 +85,10 @@ function Breadcrumb() {
           crumbs.push({ label: 'Client', path: `/analytics/client/${params.clientId}` });
         }
       }
+    } else if (path.startsWith('/admin-chat')) {
+      crumbs.push({ label: 'Admin Chat', path: '/admin-chat' });
     } else if (path.startsWith('/admin')) {
-      crumbs.push({ label: 'Admin Setup', path: '/admin' });
+      crumbs.push({ label: 'Settings', path: '/admin' });
     }
 
     setBreadcrumbs(crumbs);
@@ -98,19 +100,19 @@ function Breadcrumb() {
   }
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-400 mb-6" aria-label="Breadcrumb">
+    <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
       {breadcrumbs.map((crumb, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <span className="text-gray-500">/</span>}
+          {index > 0 && <span className="text-gray-400">/</span>}
           {crumb.path ? (
             <Link
               to={crumb.path}
-              className="hover:text-white transition-colors"
+              className="hover:text-orange-500 transition-colors text-gray-600"
             >
               {crumb.label}
             </Link>
           ) : (
-            <span className="text-white font-medium">{crumb.label}</span>
+            <span className="text-gray-900 font-medium">{crumb.label}</span>
           )}
         </React.Fragment>
       ))}
@@ -119,4 +121,3 @@ function Breadcrumb() {
 }
 
 export default Breadcrumb;
-

@@ -6,6 +6,7 @@ function ContentScheduling({ projectId, clientId }) {
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     contentId: '',
     platform: 'linkedin',
@@ -50,6 +51,7 @@ function ContentScheduling({ projectId, clientId }) {
     e.preventDefault();
     try {
       setLoading(true);
+      setError(null);
       const response = await schedulingAPI.schedule({
         projectId,
         clientId,
@@ -68,7 +70,7 @@ function ContentScheduling({ projectId, clientId }) {
       }
     } catch (err) {
       console.error('Error scheduling content:', err);
-      alert(err.response?.data?.error || 'Failed to schedule content');
+      setError(err.response?.data?.error || err.message || 'Failed to schedule content');
     } finally {
       setLoading(false);
     }
@@ -77,11 +79,12 @@ function ContentScheduling({ projectId, clientId }) {
   const handleCancel = async (scheduleId) => {
     if (!confirm('Are you sure you want to cancel this schedule?')) return;
     try {
+      setError(null);
       await schedulingAPI.cancel(scheduleId);
       loadSchedules();
     } catch (err) {
       console.error('Error cancelling schedule:', err);
-      alert('Failed to cancel schedule');
+      setError(err.response?.data?.error || err.message || 'Failed to cancel schedule');
     }
   };
 
@@ -99,29 +102,57 @@ function ContentScheduling({ projectId, clientId }) {
     }
   };
 
+  if (loading && schedules.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading schedules...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Content Scheduling</h2>
-          <p className="text-gray-400 text-sm mt-1">Schedule content for publishing across platforms</p>
+          <h2 className="text-2xl font-bold text-gray-900">Content Scheduling</h2>
+          <p className="text-gray-600 text-sm mt-1">Schedule content for publishing across platforms</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
         >
           {showForm ? 'Cancel' : '+ Schedule Content'}
         </button>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-red-700">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-700 hover:text-red-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {showForm && (
-        <form onSubmit={handleSchedule} className="bg-gray-800 rounded-lg p-6 space-y-4">
+        <form onSubmit={handleSchedule} className="bg-white rounded-lg p-6 space-y-4 border border-gray-200 shadow-sm">
           <div>
-            <label className="block text-gray-300 mb-2">Content</label>
+            <label className="block text-gray-700 mb-2">Content</label>
             <select
               value={formData.contentId}
               onChange={(e) => setFormData({ ...formData, contentId: e.target.value })}
-              className="w-full bg-gray-700 text-white rounded-lg p-2"
+              className="w-full bg-white border border-gray-300 text-gray-900 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               required
             >
               <option value="">Select content...</option>
@@ -135,11 +166,11 @@ function ContentScheduling({ projectId, clientId }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-300 mb-2">Platform</label>
+              <label className="block text-gray-700 mb-2">Platform</label>
               <select
                 value={formData.platform}
                 onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                className="w-full bg-gray-700 text-white rounded-lg p-2"
+                className="w-full bg-white border border-gray-300 text-gray-900 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 required
               >
                 <option value="linkedin">LinkedIn</option>
@@ -152,11 +183,11 @@ function ContentScheduling({ projectId, clientId }) {
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2">Content Type</label>
+              <label className="block text-gray-700 mb-2">Content Type</label>
               <select
                 value={formData.contentType}
                 onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
-                className="w-full bg-gray-700 text-white rounded-lg p-2"
+                className="w-full bg-white border border-gray-300 text-gray-900 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 required
               >
                 <option value="blog">Blog</option>
@@ -169,12 +200,12 @@ function ContentScheduling({ projectId, clientId }) {
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2">Scheduled Date & Time</label>
+            <label className="block text-gray-700 mb-2">Scheduled Date & Time</label>
             <input
               type="datetime-local"
               value={formData.scheduledAt}
               onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
-              className="w-full bg-gray-700 text-white rounded-lg p-2"
+              className="w-full bg-white border border-gray-300 text-gray-900 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               required
             />
           </div>
@@ -182,34 +213,46 @@ function ContentScheduling({ projectId, clientId }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+            className="w-full px-6 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
           >
-            {loading ? 'Scheduling...' : 'Schedule Content'}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Scheduling...</span>
+              </>
+            ) : (
+              'Schedule Content'
+            )}
           </button>
         </form>
       )}
 
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h3 className="text-xl font-bold text-white mb-4">Scheduled Content</h3>
-        {schedules.length === 0 ? (
-          <p className="text-gray-400">No scheduled content yet</p>
+      <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Scheduled Content</h3>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-2 text-gray-600 text-sm">Loading schedules...</p>
+          </div>
+        ) : schedules.length === 0 ? (
+          <p className="text-gray-600 text-center py-8">No scheduled content yet</p>
         ) : (
           <div className="space-y-3">
             {schedules.map((schedule) => (
-              <div key={schedule.id} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center">
+              <div key={schedule.id} className="bg-gray-50 rounded-lg p-4 flex justify-between items-center border border-gray-200 hover:shadow-md transition-shadow">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(schedule.status)}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(schedule.status)}`}>
                       {schedule.status}
                     </span>
-                    <span className="text-white font-semibold capitalize">{schedule.platform}</span>
-                    <span className="text-gray-400 text-sm">{schedule.content_type}</span>
+                    <span className="text-gray-900 font-semibold capitalize">{schedule.platform}</span>
+                    <span className="text-gray-600 text-sm">{schedule.content_type}</span>
                   </div>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-gray-700 text-sm">
                     Scheduled: {formatDate(schedule.scheduled_at)}
                   </p>
                   {schedule.published_at && (
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Published: {formatDate(schedule.published_at)}
                     </p>
                   )}
@@ -217,7 +260,7 @@ function ContentScheduling({ projectId, clientId }) {
                 {schedule.status === 'scheduled' && (
                   <button
                     onClick={() => handleCancel(schedule.id)}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
                   >
                     Cancel
                   </button>

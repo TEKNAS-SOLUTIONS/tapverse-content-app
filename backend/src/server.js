@@ -29,7 +29,22 @@ import contentEvidenceRouter from './routes/contentEvidence.js';
 import shopifyRouter from './routes/shopify.js';
 import localSeoRouter from './routes/localSeo.js';
 import connectionsRouter from './routes/connections.js';
+<<<<<<< HEAD
 import cmsRouter from './routes/cms.js';
+=======
+import programmaticSeoRouter from './routes/programmaticSeo.js';
+import authRouter from './routes/auth.js';
+import tasksRouter from './routes/tasks.js';
+import contentStatusRouter from './routes/contentStatus.js';
+import exportRouter from './routes/export.js';
+import rankTrackingRouter from './routes/rankTracking.js';
+import reportsRouter from './routes/reports.js';
+import contentIdeasRouter from './routes/contentIdeas.js';
+import chatRouter from './routes/chat.js';
+import adminChatRouter from './routes/adminChat.js';
+import avatarsRouter from './routes/avatars.js';
+import webhooksRouter from './routes/webhooks.js';
+>>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
 
 const app = express();
 
@@ -91,7 +106,22 @@ app.use('/api/content-evidence', contentEvidenceRouter);
 app.use('/api/shopify', shopifyRouter);
 app.use('/api/local-seo', localSeoRouter);
 app.use('/api/connections', connectionsRouter);
+<<<<<<< HEAD
 app.use('/api/cms', cmsRouter);
+=======
+app.use('/api/programmatic-seo', programmaticSeoRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/tasks', tasksRouter);
+app.use('/api/content', contentStatusRouter);
+app.use('/api/export', exportRouter);
+app.use('/api/rank-tracking', rankTrackingRouter);
+app.use('/api/reports', reportsRouter);
+app.use('/api/content-ideas', contentIdeasRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/admin-chat', adminChatRouter);
+app.use('/api/avatars', avatarsRouter);
+app.use('/api/webhooks', webhooksRouter);
+>>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

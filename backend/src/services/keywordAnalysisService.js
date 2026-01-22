@@ -166,9 +166,9 @@ CURRENT KEYWORDS: ${keywords.length > 0 ? keywords.join(', ') : 'None provided -
 COMPETITORS: ${competitors.length > 0 ? competitors.join(', ') : 'None specified'}
 ${realDataContext}
 
-Analyze and provide:
+Analyze and provide a COMPREHENSIVE keyword analysis with MINIMUM 50 KEYWORDS TOTAL:
 
-1. KEYWORD OPPORTUNITIES (10-15 keywords)
+1. KEYWORD OPPORTUNITIES (15-20 keywords)
    - For each keyword, provide:
      * keyword: the keyword phrase
      * search_volume: ${realKeywordData ? 'REAL monthly search volume from DataForSEO (use exact numbers)' : 'estimated monthly searches (high/medium/low)'}
@@ -179,30 +179,31 @@ Analyze and provide:
      * priority: high/medium/low
      * rationale: why this keyword is valuable
 
-2. COMPETITOR KEYWORD GAPS (5-8 opportunities)
+2. COMPETITOR KEYWORD GAPS (10-15 keywords)
    - Keywords competitors rank for that the client should target
-   - For each: keyword, competitor, difficulty, opportunity_score
+   - For each: keyword, competitor, difficulty, opportunity_score (1-100), search_volume
 
-3. INDUSTRY TRENDS (5-8 trending topics)
-   - Current trending topics in the industry
-   - For each: topic, trend_direction (rising/stable/declining), relevance_score (1-100)
+3. INDUSTRY TRENDS (8-10 trending topics)
+   - Current trending topics in the industry with related keywords
+   - For each: topic, trend_direction (rising/stable/declining), relevance_score (1-100), related_keywords (3-5 keywords per topic)
 
-4. LONG-TAIL OPPORTUNITIES (8-10 keywords)
+4. LONG-TAIL OPPORTUNITIES (15-20 keywords)
    - Specific, lower competition keywords
-   - For each: keyword, search_volume, difficulty, conversion_potential (high/medium/low)
+   - For each: keyword, search_volume, difficulty, conversion_potential (high/medium/low), intent
 
-5. KEYWORD CLUSTERS (3-5 clusters)
+5. KEYWORD CLUSTERS (5-7 clusters with 3-5 keywords each)
    - Group related keywords into content themes
-   - For each: cluster_name, primary_keyword, supporting_keywords, content_recommendations
+   - For each: cluster_name, primary_keyword, supporting_keywords (3-5 keywords), content_recommendations
 
-6. QUICK WINS (5-8 keywords)
+6. QUICK WINS (10-15 keywords)
    - Low difficulty, high opportunity keywords for immediate targeting
-   - For each: keyword, difficulty, potential_traffic, time_to_rank
+   - For each: keyword, difficulty, potential_traffic, time_to_rank, priority
 
 7. ANALYSIS SUMMARY
    - Overall keyword strategy recommendation
-   - Top 3 priority keywords to target first
+   - Top 10 priority keywords to target first (not just 3)
    - Expected results timeline
+   - Total keywords analyzed: ${realKeywordData ? 'Should match total provided above' : '50+ keywords'}
 
 Format as VALID JSON${realKeywordData ? ' (use REAL numbers from DataForSEO when available)' : ''}:
 {

@@ -179,7 +179,7 @@ function renderInlineMarkdown(text) {
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       const boldText = part.slice(2, -2);
-      return <strong key={i} className="font-semibold text-white">{boldText}</strong>;
+      return <strong key={i} className="font-semibold text-gray-900">{boldText}</strong>;
     }
     return part;
   });
@@ -202,7 +202,7 @@ function ContentRenderer({ content }) {
       if (currentParagraph.length > 0) {
         const joinedText = currentParagraph.join(' ');
         elements.push(
-          <p key={elements.length} className="text-gray-200 leading-relaxed mb-4">
+          <p key={elements.length} className="text-gray-700 leading-relaxed mb-4">
             {renderInlineMarkdown(joinedText)}
           </p>
         );
@@ -213,7 +213,7 @@ function ContentRenderer({ content }) {
     const flushList = () => {
       if (listItems.length > 0) {
         elements.push(
-          <ul key={elements.length} className="list-disc list-inside space-y-2 mb-4 text-gray-200 ml-4">
+          <ul key={elements.length} className="list-disc list-inside space-y-2 mb-4 text-gray-700 ml-4">
             {listItems.map((item, i) => (
               <li key={i} className="leading-relaxed">{renderInlineMarkdown(item)}</li>
             ))}
@@ -236,7 +236,7 @@ function ContentRenderer({ content }) {
         flushParagraph();
         flushList();
         elements.push(
-          <h4 key={elements.length} className="text-lg font-semibold text-white mt-6 mb-3">
+          <h4 key={elements.length} className="text-lg font-semibold text-gray-900 mt-6 mb-3">
             {renderInlineMarkdown(trimmedLine.slice(4))}
           </h4>
         );
@@ -247,7 +247,7 @@ function ContentRenderer({ content }) {
         flushParagraph();
         flushList();
         elements.push(
-          <h3 key={elements.length} className="text-xl font-bold text-white mt-8 mb-4 pb-2 border-b border-gray-700">
+          <h3 key={elements.length} className="text-xl font-bold text-gray-900 mt-8 mb-4 pb-2 border-b border-gray-300">
             {renderInlineMarkdown(trimmedLine.slice(3))}
           </h3>
         );
@@ -258,7 +258,7 @@ function ContentRenderer({ content }) {
         flushParagraph();
         flushList();
         elements.push(
-          <h2 key={elements.length} className="text-2xl font-bold text-white mt-6 mb-4">
+          <h2 key={elements.length} className="text-2xl font-bold text-gray-900 mt-6 mb-4">
             {renderInlineMarkdown(trimmedLine.slice(2))}
           </h2>
         );
@@ -295,7 +295,7 @@ function ContentRenderer({ content }) {
   };
 
   return (
-    <div className="prose prose-invert max-w-none">
+    <div className="prose max-w-none text-gray-700">
       {renderFormattedContent(content)}
     </div>
   );
@@ -617,21 +617,24 @@ function ContentGenerator({ project, client, onContentGenerated }) {
     const content = generatedContent[type];
     if (!content) {
       return (
-        <div className="text-center py-16 bg-gray-700/20 rounded-xl border-2 border-dashed border-gray-600">
+        <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
           <div className="text-4xl mb-4">{CONTENT_TYPE_CONFIG[type]?.icon}</div>
-          <p className="text-gray-400 mb-6">No {CONTENT_TYPE_CONFIG[type]?.label} generated yet</p>
+          <p className="text-gray-600 mb-6">No {CONTENT_TYPE_CONFIG[type]?.label} generated yet</p>
           <button
             onClick={() => handleGenerateSingle(type)}
             disabled={generating}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-600 transition-all shadow-lg"
+            className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all shadow-lg flex items-center gap-2 mx-auto"
           >
             {generating && generatingType === type ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">⏳</span>
-                Generating...
-              </span>
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
             ) : (
-              <>✨ Generate {CONTENT_TYPE_CONFIG[type]?.label}</>
+              <>
+                <span>✨</span>
+                <span>Generate {CONTENT_TYPE_CONFIG[type]?.label}</span>
+              </>
             )}
           </button>
         </div>
@@ -640,17 +643,22 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
     if (content.error) {
       return (
-        <div className="bg-red-900/20 border border-red-700 rounded-xl p-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">❌</span>
-            <span className="text-red-300 font-medium">Generation Failed</span>
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-red-700 font-medium">Generation Failed</span>
           </div>
-          <p className="text-red-200 mb-4">{content.error}</p>
+          <p className="text-red-600 mb-4">{content.error}</p>
           <button
             onClick={() => handleGenerateSingle(type)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2"
           >
-            🔄 Try Again
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Try Again</span>
           </button>
         </div>
       );
@@ -678,32 +686,44 @@ function ContentGenerator({ project, client, onContentGenerated }) {
     return (
       <div className="space-y-6">
         {/* Stats Bar */}
-        <div className="flex items-center justify-between bg-gray-700/30 rounded-lg p-4">
-          <div className="flex items-center gap-6 text-sm text-gray-400">
+        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="flex items-center gap-6 text-sm text-gray-600">
             <span>📊 {wordCount.toLocaleString()} words</span>
             <span>⏱️ ~{Math.ceil(wordCount / 200)} min read</span>
-            <span className="text-green-400">✓ {content.status || 'Ready'}</span>
+            <span className="text-green-600">✓ {content.status || 'Ready'}</span>
           </div>
           <div className="flex items-center gap-2">
             <CopyButton text={plainText} label="Copy All" size="md" />
             <button
               onClick={() => handleGenerateSingle(type)}
               disabled={generating}
-              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-600"
+              className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              🔄 Regenerate
+              {generating && generatingType === type ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Regenerate</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Title Section */}
         {content.title && (
-          <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-xl p-6 border border-blue-800/50">
+          <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">SEO Title</span>
-                <h3 className="text-2xl font-bold text-white mt-2 leading-tight">{content.title}</h3>
-                <span className="text-xs text-gray-400 mt-2 inline-block">{content.title.length}/60 characters</span>
+                <span className="text-xs font-semibold text-orange-600 uppercase tracking-wider">SEO Title</span>
+                <h3 className="text-2xl font-bold text-gray-900 mt-2 leading-tight">{content.title}</h3>
+                <span className="text-xs text-gray-600 mt-2 inline-block">{content.title.length}/60 characters</span>
               </div>
               <CopyButton text={content.title} label="Copy" size="sm" />
             </div>
@@ -712,12 +732,12 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Meta Description */}
         {content.meta_description && (
-          <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Meta Description</span>
-                <p className="text-gray-200 mt-2 leading-relaxed">{content.meta_description}</p>
-                <span className="text-xs text-gray-400 mt-2 inline-block">{content.meta_description.length}/160 characters</span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Meta Description</span>
+                <p className="text-gray-700 mt-2 leading-relaxed">{content.meta_description}</p>
+                <span className="text-xs text-gray-600 mt-2 inline-block">{content.meta_description.length}/160 characters</span>
               </div>
               <CopyButton text={content.meta_description} label="Copy" size="sm" />
             </div>
@@ -726,13 +746,13 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Keywords */}
         {content.keywords && content.keywords.length > 0 && (
-          <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/50">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Target Keywords</span>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Target Keywords</span>
             <div className="flex flex-wrap gap-2 mt-3">
               {content.keywords.map((kw, idx) => (
                 <span 
                   key={idx} 
-                  className="bg-blue-900/50 text-blue-300 text-sm px-3 py-1.5 rounded-full border border-blue-700/50 cursor-pointer hover:bg-blue-800/50 transition-colors"
+                  className="bg-orange-100 text-orange-700 text-sm px-3 py-1.5 rounded-full border border-orange-200 cursor-pointer hover:bg-orange-200 transition-colors"
                   onClick={() => {
                     navigator.clipboard.writeText(kw);
                     setToast(`Copied: ${kw}`);
@@ -747,20 +767,20 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Main Content */}
         {content.content && (
-          <div className="bg-gray-700/30 rounded-xl border border-gray-600/50 overflow-hidden">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
             {/* Section Header */}
             <div 
-              className="flex items-center justify-between p-4 bg-gray-700/50 cursor-pointer hover:bg-gray-700/70 transition-colors"
+              className="flex items-center justify-between p-4 bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors border-b border-gray-200"
               onClick={() => toggleSection('content')}
             >
               <div className="flex items-center gap-3">
                 <span className="text-lg">{expandedSections.content ? '📖' : '📕'}</span>
-                <span className="font-semibold text-white">Article Content</span>
-                <span className="text-sm text-gray-400">({wordCount.toLocaleString()} words)</span>
+                <span className="font-semibold text-gray-900">Article Content</span>
+                <span className="text-sm text-gray-600">({wordCount.toLocaleString()} words)</span>
               </div>
               <div className="flex items-center gap-2">
                 <CopyButton text={content.content} label="Copy Content" size="sm" />
-                <span className="text-gray-400 text-xl">
+                <span className="text-gray-600 text-xl">
                   {expandedSections.content ? '▼' : '▶'}
                 </span>
               </div>
@@ -768,7 +788,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             
             {/* Content Body */}
             {expandedSections.content && (
-              <div className="p-6 max-h-[600px] overflow-y-auto custom-scrollbar">
+              <div className="p-6 max-h-[600px] overflow-y-auto custom-scrollbar bg-white">
                 <ContentRenderer content={content.content} />
               </div>
             )}
@@ -786,12 +806,12 @@ function ContentGenerator({ project, client, onContentGenerated }) {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-pink-900/40 to-orange-900/40 rounded-lg p-4 border border-pink-700/30">
+        <div className="flex items-center justify-between bg-orange-50 rounded-lg p-4 border border-orange-200">
           <div className="flex items-center gap-4">
             <span className="text-3xl">🎨</span>
             <div>
-              <h3 className="text-xl font-bold text-white">Social Media Creatives</h3>
-              <span className="text-sm text-gray-400">
+              <h3 className="text-xl font-bold text-gray-900">Social Media Creatives</h3>
+              <span className="text-sm text-gray-600">
                 {images.length} variations for {IMAGE_PLATFORMS.find(p => p.value === platform)?.label || platform}
               </span>
             </div>
@@ -799,9 +819,21 @@ function ContentGenerator({ project, client, onContentGenerated }) {
           <button
             onClick={() => handleGenerateSingle(type)}
             disabled={generating}
-            className="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-600"
+            className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            🔄 Regenerate
+            {generating && generatingType === type ? (
+              <>
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Regenerate</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -809,7 +841,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
         {images.length > 0 && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {images.map((image, idx) => (
-              <div key={idx} className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 group">
+              <div key={idx} className="bg-white rounded-xl overflow-hidden border border-gray-200 group shadow-sm hover:shadow-md transition-shadow">
                 {image.url ? (
                   <img
                     src={image.url}
@@ -823,20 +855,20 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                     className="w-full h-48 object-cover"
                   />
                 ) : (
-                  <div className="w-full h-48 bg-gray-700 flex items-center justify-center text-gray-400">
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400">
                     No image
                   </div>
                 )}
                 <div className="p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Variation {idx + 1}</span>
+                    <span className="text-sm text-gray-600">Variation {idx + 1}</span>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => {
                           const url = image.url || `data:image/png;base64,${image.base64}`;
                           window.open(url, '_blank');
                         }}
-                        className="text-xs px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
+                        className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                       >
                         🔍 View
                       </button>
@@ -854,7 +886,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                             console.error('Download failed:', e);
                           }
                         }}
-                        className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="text-xs px-2 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
                       >
                         ⬇️ Download
                       </button>
@@ -868,22 +900,22 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Prompt Used */}
         {prompt && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
+          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-lg">💬</span>
-                <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Prompt Used</span>
+                <span className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Prompt Used</span>
               </div>
               <CopyButton text={prompt} label="Copy" size="sm" />
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">{prompt}</p>
+            <p className="text-gray-700 text-sm leading-relaxed">{prompt}</p>
           </div>
         )}
 
         {/* Tips */}
-        <div className="bg-gray-700/30 rounded-xl p-5">
-          <h4 className="text-sm font-semibold text-gray-300 mb-3">💡 Next Steps</h4>
-          <ul className="text-sm text-gray-400 space-y-2">
+        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">💡 Next Steps</h4>
+          <ul className="text-sm text-gray-600 space-y-2">
             <li>• Click on any image to view full size</li>
             <li>• Download and add text overlays in Canva or Figma</li>
             <li>• Use consistent colors from your brand palette</li>
@@ -916,12 +948,12 @@ function ContentGenerator({ project, client, onContentGenerated }) {
     return (
       <div className="space-y-6">
         {/* Video Script Header */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-purple-900/40 to-pink-900/40 rounded-lg p-4 border border-purple-700/30">
+        <div className="flex items-center justify-between bg-orange-50 rounded-lg p-4 border border-orange-200">
           <div className="flex items-center gap-4">
             <span className="text-3xl">🎬</span>
             <div>
-              <h3 className="text-xl font-bold text-white">{title}</h3>
-              <span className="text-sm text-gray-400">Duration: {duration}</span>
+              <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+              <span className="text-sm text-gray-600">Duration: {duration}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -929,43 +961,55 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             <button
               onClick={() => handleGenerateSingle(type)}
               disabled={generating}
-              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-600"
+              className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              🔄 Regenerate
+              {generating && generatingType === type ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Regenerate</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Hook Section */}
         {hook && (
-          <div className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 rounded-xl p-5 border border-yellow-700/30">
+          <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🎯</span>
-                <span className="text-sm font-semibold text-yellow-400 uppercase tracking-wider">Opening Hook</span>
+                <span className="text-sm font-semibold text-yellow-700 uppercase tracking-wider">Opening Hook</span>
               </div>
               <CopyButton text={hook} label="Copy" size="sm" />
             </div>
-            <p className="text-white text-lg font-medium italic">"{hook}"</p>
+            <p className="text-gray-900 text-lg font-medium italic">"{hook}"</p>
           </div>
         )}
 
         {/* Full Script */}
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="text-lg">📜</span>
-              <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Full Script</span>
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Full Script</span>
             </div>
             <CopyButton text={script} label="Copy" size="sm" />
           </div>
-          <div className="bg-gray-900 rounded-lg p-4 max-h-96 overflow-y-auto">
-            <pre className="text-gray-200 whitespace-pre-wrap font-sans leading-relaxed text-sm">
+          <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto border border-gray-200">
+            <pre className="text-gray-700 whitespace-pre-wrap font-sans leading-relaxed text-sm">
               {script.split('[PAUSE]').map((segment, idx, arr) => (
                 <span key={idx}>
                   {segment}
                   {idx < arr.length - 1 && (
-                    <span className="inline-block bg-blue-900/50 text-blue-300 text-xs px-2 py-0.5 rounded mx-1">⏸ PAUSE</span>
+                    <span className="inline-block bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded mx-1">⏸ PAUSE</span>
                   )}
                 </span>
               ))}
@@ -975,15 +1019,15 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Key Points */}
         {keyPoints.length > 0 && (
-          <div className="bg-gray-700/30 rounded-xl p-5">
+          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">📌</span>
-              <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Key Points</span>
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Key Points</span>
             </div>
             <ul className="space-y-2">
               {keyPoints.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-gray-200">
-                  <span className="text-blue-400 mt-1">•</span>
+                <li key={idx} className="flex items-start gap-2 text-gray-700">
+                  <span className="text-orange-600 mt-1">•</span>
                   {point}
                 </li>
               ))}
@@ -993,43 +1037,43 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Call to Action */}
         {cta && (
-          <div className="bg-gradient-to-r from-green-900/30 to-teal-900/30 rounded-xl p-5 border border-green-700/30">
+          <div className="bg-green-50 rounded-xl p-5 border border-green-200">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🎯</span>
-                <span className="text-sm font-semibold text-green-400 uppercase tracking-wider">Call to Action</span>
+                <span className="text-sm font-semibold text-green-700 uppercase tracking-wider">Call to Action</span>
               </div>
               <CopyButton text={cta} label="Copy" size="sm" />
             </div>
-            <p className="text-white font-medium">{cta}</p>
+            <p className="text-gray-900 font-medium">{cta}</p>
           </div>
         )}
 
         {/* Thumbnail Suggestion */}
         {thumbnail && (
-          <div className="bg-gray-700/30 rounded-xl p-5">
+          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">🖼️</span>
-              <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Thumbnail Suggestion</span>
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Thumbnail Suggestion</span>
             </div>
-            <p className="text-gray-300">{thumbnail}</p>
+            <p className="text-gray-700">{thumbnail}</p>
           </div>
         )}
 
         {/* Create Video Section */}
-        <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 rounded-xl p-6 border border-purple-700/30">
-          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span>🎥</span> Create AI Avatar Video
           </h4>
           
           {/* Voice & Avatar Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">🎭 Select Avatar</label>
+              <label className="block text-sm text-gray-700 mb-2">🎭 Select Avatar</label>
               <select
                 value={selectedAvatar}
                 onChange={(e) => setSelectedAvatar(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               >
                 <option value="">Select avatar...</option>
                 {avatars.map((avatar) => (
@@ -1040,11 +1084,11 @@ function ContentGenerator({ project, client, onContentGenerated }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">🎤 Select Voice</label>
+              <label className="block text-sm text-gray-700 mb-2">🎤 Select Voice</label>
               <select
                 value={selectedVoice}
                 onChange={(e) => setSelectedVoice(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               >
                 <option value="">Select voice...</option>
                 {voices.map((voice) => (
@@ -1089,31 +1133,31 @@ function ContentGenerator({ project, client, onContentGenerated }) {
               }
             }}
             disabled={generating || !selectedAvatar || !selectedVoice}
-            className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {generating && generatingType === 'video_creation' ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">⏳</span>
-                Creating Video...
-              </span>
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Creating Video...</span>
+              </>
             ) : (
               <>
-                <span>🎬</span> Create Video with HeyGen
+                <span>🎬</span> <span>Create Video with HeyGen</span>
               </>
             )}
           </button>
           
           {/* Video Status */}
           {content.videoId && (
-            <div className="mt-4 p-3 bg-gray-700/50 rounded-lg">
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-400">
-                  Video ID: <code className="text-blue-400">{content.videoId}</code>
+                <span className="text-sm text-gray-600">
+                  Video ID: <code className="text-orange-600 font-mono">{content.videoId}</code>
                 </span>
                 <span className={`text-sm font-semibold ${
-                  content.videoStatus === 'completed' ? 'text-green-400' : 
-                  content.videoStatus === 'failed' ? 'text-red-400' : 
-                  'text-yellow-400'
+                  content.videoStatus === 'completed' ? 'text-green-600' : 
+                  content.videoStatus === 'failed' ? 'text-red-600' : 
+                  'text-yellow-600'
                 }`}>
                   {content.videoStatus === 'completed' ? '✅ Ready' : 
                    content.videoStatus === 'failed' ? '❌ Failed' : 
@@ -1126,7 +1170,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                     href={content.videoUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="block px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg text-center transition-all"
+                    className="block px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg text-center transition-all"
                   >
                     🎥 Watch Video
                   </a>
@@ -1135,7 +1179,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       <img 
                         src={content.thumbnailUrl} 
                         alt="Video thumbnail" 
-                        className="w-full rounded-lg border border-gray-600"
+                        className="w-full rounded-lg border border-gray-300"
                       />
                     </div>
                   )}
@@ -1149,7 +1193,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             </div>
           )}
           
-          <p className="mt-3 text-xs text-gray-500">
+          <p className="mt-3 text-xs text-gray-600">
             HeyGen will create an AI avatar video with voiceover. Processing may take 2-5 minutes.
           </p>
         </div>
@@ -1164,33 +1208,45 @@ function ContentGenerator({ project, client, onContentGenerated }) {
     return (
       <div className="space-y-6">
         {/* Stats Bar */}
-        <div className="flex items-center justify-between bg-gray-700/30 rounded-lg p-4">
-          <div className="flex items-center gap-6 text-sm text-gray-400">
+        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="flex items-center gap-6 text-sm text-gray-600">
             <span>📊 {ads.length} ad variation{ads.length > 1 ? 's' : ''}</span>
-            <span className="text-green-400">✓ {content.status || 'Ready'}</span>
+            <span className="text-green-600">✓ {content.status || 'Ready'}</span>
           </div>
           <button
             onClick={() => handleGenerateSingle(type)}
             disabled={generating}
-            className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-600"
+            className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            🔄 Regenerate
+            {generating && generatingType === type ? (
+              <>
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Regenerate</span>
+              </>
+            )}
           </button>
         </div>
 
         {/* Headlines (for Google Ads) */}
         {isGoogle && content.headlines && content.headlines.length > 0 && (
-          <div className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 rounded-xl p-6 border border-yellow-700/30">
+          <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">🔍 Headlines (30 chars max)</span>
+              <span className="text-xs font-semibold text-yellow-700 uppercase tracking-wider">🔍 Headlines (30 chars max)</span>
               <CopyButton text={content.headlines.join('\n')} label="Copy All" size="sm" />
             </div>
             <div className="space-y-2">
               {content.headlines.map((headline, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-gray-800/50 rounded-lg p-3">
-                  <span className="text-white font-medium">{headline}</span>
+                <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
+                  <span className="text-gray-900 font-medium">{headline}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">{headline.length}/30</span>
+                    <span className="text-xs text-gray-600">{headline.length}/30</span>
                     <CopyButton text={headline} label="" size="sm" />
                   </div>
                 </div>
@@ -1201,18 +1257,18 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Descriptions (for Google Ads) */}
         {isGoogle && content.descriptions && content.descriptions.length > 0 && (
-          <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">📝 Descriptions (90 chars max)</span>
+              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">📝 Descriptions (90 chars max)</span>
               <CopyButton text={content.descriptions.join('\n\n')} label="Copy All" size="sm" />
             </div>
             <div className="space-y-3">
               {content.descriptions.map((desc, idx) => (
-                <div key={idx} className="bg-gray-800/50 rounded-lg p-4">
+                <div key={idx} className="bg-white rounded-lg p-4 border border-gray-200">
                   <div className="flex items-start justify-between gap-4">
-                    <p className="text-gray-200 flex-1">{desc}</p>
+                    <p className="text-gray-700 flex-1">{desc}</p>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs text-gray-400">{desc.length}/90</span>
+                      <span className="text-xs text-gray-600">{desc.length}/90</span>
                       <CopyButton text={desc} label="" size="sm" />
                     </div>
                   </div>
@@ -1224,9 +1280,9 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Single Ad Format (for Facebook/fallback) */}
         {ads.map((ad, idx) => (
-          <div key={idx} className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+          <div key={idx} className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 {isGoogle ? '' : `Ad Variation ${idx + 1}`}
               </span>
               <CopyButton 
@@ -1239,9 +1295,9 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             {/* Headline */}
             {ad.headline && (
               <div className="mb-4">
-                <span className="text-xs text-gray-500 uppercase">Headline</span>
+                <span className="text-xs text-gray-600 uppercase">Headline</span>
                 <div className="flex items-center justify-between mt-1">
-                  <h4 className="text-xl font-bold text-white">{ad.headline}</h4>
+                  <h4 className="text-xl font-bold text-gray-900">{ad.headline}</h4>
                   <CopyButton text={ad.headline} label="" size="sm" />
                 </div>
               </div>
@@ -1250,9 +1306,9 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             {/* Body */}
             {ad.body_text && (
               <div className="mb-4">
-                <span className="text-xs text-gray-500 uppercase">Body Text</span>
+                <span className="text-xs text-gray-600 uppercase">Body Text</span>
                 <div className="flex items-start justify-between mt-1 gap-4">
-                  <p className="text-gray-200 leading-relaxed flex-1">{ad.body_text}</p>
+                  <p className="text-gray-700 leading-relaxed flex-1">{ad.body_text}</p>
                   <CopyButton text={ad.body_text} label="" size="sm" />
                 </div>
               </div>
@@ -1261,8 +1317,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
             {/* CTA */}
             {ad.cta_text && (
               <div className="flex items-center gap-4">
-                <span className="text-xs text-gray-500 uppercase">Call to Action:</span>
-                <span className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">
+                <span className="text-xs text-gray-600 uppercase">Call to Action:</span>
+                <span className="bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold">
                   {ad.cta_text}
                 </span>
               </div>
@@ -1270,11 +1326,11 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
             {/* Keywords */}
             {ad.target_keywords && ad.target_keywords.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-600">
-                <span className="text-xs text-gray-500 uppercase">Target Keywords</span>
+              <div className="mt-4 pt-4 border-t border-gray-300">
+                <span className="text-xs text-gray-600 uppercase">Target Keywords</span>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {ad.target_keywords.map((kw, i) => (
-                    <span key={i} className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded">
+                    <span key={i} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded border border-gray-200">
                       {kw}
                     </span>
                   ))}
@@ -1288,30 +1344,40 @@ function ContentGenerator({ project, client, onContentGenerated }) {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl shadow-xl">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       {/* Toast Notification */}
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
       {/* Header */}
-      <div className="p-6 border-b border-gray-700">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+      <div className="p-6 border-b border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <span className="text-3xl">🚀</span>
           Content Generator
         </h2>
-        <p className="text-gray-400 mt-1">Generate AI-powered content for your project</p>
+        <p className="text-gray-600 mt-1">Generate AI-powered content for your project</p>
       </div>
 
       <div className="p-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-300 flex items-center gap-3">
-            <span className="text-xl">⚠️</span>
-            {error}
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-center gap-3">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-700 hover:text-red-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         )}
 
         {/* Content Type Selection */}
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Select content types</h3>
+          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4">Select content types</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {projectTypes.map((type) => {
               const config = CONTENT_TYPE_CONFIG[type];
@@ -1325,8 +1391,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                   onClick={() => handleTypeToggle(type)}
                   className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${
                     selectedTypes.includes(type)
-                      ? 'border-blue-500 bg-blue-900/30 shadow-lg shadow-blue-900/20'
-                      : 'border-gray-600 hover:border-gray-500 hover:bg-gray-700/50'
+                      ? 'border-orange-500 bg-orange-50 shadow-lg shadow-orange-100'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -1335,15 +1401,15 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                         type="checkbox"
                         checked={selectedTypes.includes(type)}
                         onChange={() => handleTypeToggle(type)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded bg-gray-600"
+                        className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded bg-white"
                       />
                       <span className="text-2xl">{config.icon}</span>
                     </div>
-                    {hasContent && <span className="text-green-400 text-lg">✓</span>}
+                    {hasContent && <span className="text-green-600 text-lg">✓</span>}
                   </div>
                   <div className="mt-2">
-                    <span className="text-white font-medium block">{config.label}</span>
-                    <span className="text-gray-400 text-xs">{config.description}</span>
+                    <span className="text-gray-900 font-medium block">{config.label}</span>
+                    <span className="text-gray-600 text-xs">{config.description}</span>
                   </div>
                 </div>
               );
@@ -1353,16 +1419,16 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Video Options Panel - Show when video types are selected */}
         {(selectedTypes.includes('ai_video') || selectedTypes.includes('video')) && (
-          <div className="mb-6 bg-gradient-to-r from-purple-900/40 to-pink-900/40 rounded-xl p-6 border border-purple-700/50">
+          <div className="mb-6 bg-orange-50 rounded-xl p-6 border border-orange-200">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">🎬</span>
-              <h3 className="text-lg font-semibold text-white">Video Options</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Video Options</h3>
             </div>
             
             <div className="space-y-6">
               {/* Duration Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   📏 Video Duration
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -1373,12 +1439,12 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       onClick={() => setVideoDuration(option.value)}
                       className={`p-3 rounded-lg border-2 transition-all text-center ${
                         videoDuration === option.value
-                          ? 'border-purple-500 bg-purple-900/50 text-white'
-                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-100 text-gray-900'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       <div className="font-bold text-lg">{option.label}</div>
-                      <div className="text-xs text-gray-400">{option.description}</div>
+                      <div className="text-xs text-gray-600">{option.description}</div>
                     </button>
                   ))}
                 </div>
@@ -1386,13 +1452,13 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
               {/* Voice Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   🎤 Voice (HeyGen)
                 </label>
                 {loadingVoices ? (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <span className="animate-spin">⏳</span>
-                    Loading voices...
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                    <span>Loading voices...</span>
                   </div>
                 ) : voices.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1403,13 +1469,13 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                         onClick={() => setSelectedVoice(voice.voice_id)}
                         className={`p-3 rounded-lg border-2 transition-all text-left ${
                           selectedVoice === voice.voice_id
-                            ? 'border-blue-500 bg-blue-900/50 text-white'
-                            : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                            ? 'border-orange-500 bg-orange-100 text-gray-900'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                         }`}
                       >
                         <div className="font-medium truncate">{voice.name}</div>
                         {voice.labels && (
-                          <div className="text-xs text-gray-400 truncate mt-1">
+                          <div className="text-xs text-gray-600 truncate mt-1">
                             {voice.labels.accent || voice.labels.gender || 'Professional'}
                           </div>
                         )}
@@ -1417,7 +1483,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-gray-600 text-sm">
                     No voices available. Please configure HeyGen API key in Admin Setup.
                   </div>
                 )}
@@ -1425,7 +1491,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                   <select
                     value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
-                    className="mt-3 w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   >
                     <option value="">-- All Voices --</option>
                     {voices.map((voice) => (
@@ -1439,13 +1505,13 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
               {/* Avatar Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   🎭 Avatar (HeyGen)
                 </label>
                 {loadingAvatars ? (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <span className="animate-spin">⏳</span>
-                    Loading avatars...
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                    <span>Loading avatars...</span>
                   </div>
                 ) : avatars.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -1456,8 +1522,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                         onClick={() => setSelectedAvatar(avatar.avatar_id)}
                         className={`p-2 rounded-lg border-2 transition-all text-center ${
                           selectedAvatar === avatar.avatar_id
-                            ? 'border-purple-500 bg-purple-900/50'
-                            : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                            ? 'border-orange-500 bg-orange-100'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
                         }`}
                       >
                         {avatar.preview_image_url ? (
@@ -1467,21 +1533,21 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                             className="w-full h-16 object-cover rounded-md mb-2"
                           />
                         ) : (
-                          <div className="w-full h-16 bg-gray-700 rounded-md mb-2 flex items-center justify-center text-2xl">
+                          <div className="w-full h-16 bg-gray-100 rounded-md mb-2 flex items-center justify-center text-2xl">
                             👤
                           </div>
                         )}
-                        <div className="font-medium text-sm text-white truncate">
+                        <div className="font-medium text-sm text-gray-900 truncate">
                           {avatar.avatar_name || 'Avatar'}
                         </div>
                         {avatar.gender && (
-                          <div className="text-xs text-gray-400">{avatar.gender}</div>
+                          <div className="text-xs text-gray-600">{avatar.gender}</div>
                         )}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-gray-600 text-sm">
                     No avatars available. Please configure HeyGen API key in Admin Setup.
                   </div>
                 )}
@@ -1489,7 +1555,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                   <select
                     value={selectedAvatar}
                     onChange={(e) => setSelectedAvatar(e.target.value)}
-                    className="mt-3 w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500"
+                    className="mt-3 w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   >
                     <option value="">-- All Avatars --</option>
                     {avatars.map((avatar) => (
@@ -1502,20 +1568,20 @@ function ContentGenerator({ project, client, onContentGenerated }) {
               </div>
 
               {/* Info Box */}
-              <div className="bg-gray-800/50 rounded-lg p-4 text-sm">
+              <div className="bg-orange-50 rounded-lg p-4 text-sm border border-orange-200">
                 <div className="flex items-start gap-3">
-                  <span className="text-blue-400">ℹ️</span>
-                  <div className="text-gray-300">
+                  <span className="text-orange-600">ℹ️</span>
+                  <div className="text-gray-700">
                     <p className="mb-2">
                       The AI will generate a video script optimized for{' '}
-                      <strong className="text-white">
+                      <strong className="text-gray-900">
                         {VIDEO_DURATION_OPTIONS.find(o => o.value === videoDuration)?.label}
                       </strong>
                       {selectedVoice && voices.find(v => v.voice_id === selectedVoice) && (
-                        <> with <strong className="text-blue-400">{voices.find(v => v.voice_id === selectedVoice)?.name}</strong> voice</>
+                        <> with <strong className="text-orange-600">{voices.find(v => v.voice_id === selectedVoice)?.name}</strong> voice</>
                       )}.
                     </p>
-                    <p className="text-gray-400">HeyGen will be used to create the final AI avatar video with voiceover.</p>
+                    <p className="text-gray-600">HeyGen will be used to create the final AI avatar video with voiceover.</p>
                   </div>
                 </div>
               </div>
@@ -1525,16 +1591,16 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Image Options Panel - Show when social_creative is selected */}
         {selectedTypes.includes('social_creative') && (
-          <div className="mb-6 bg-gradient-to-r from-pink-900/40 to-orange-900/40 rounded-xl p-6 border border-pink-700/50">
+          <div className="mb-6 bg-orange-50 rounded-xl p-6 border border-orange-200">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">🎨</span>
-              <h3 className="text-lg font-semibold text-white">Social Media Creative Options</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Social Media Creative Options</h3>
             </div>
             
             <div className="space-y-6">
               {/* Platform Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   📱 Platform
                 </label>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -1548,8 +1614,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       }}
                       className={`p-3 rounded-lg border-2 transition-all text-center ${
                         imagePlatform === platform.value
-                          ? 'border-pink-500 bg-pink-900/50 text-white'
-                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-100 text-gray-900'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       <div className="text-2xl mb-1">{platform.icon}</div>
@@ -1561,7 +1627,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
               {/* Content Type Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   📐 Format
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -1572,8 +1638,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       onClick={() => setImageContentType(type)}
                       className={`px-4 py-2 rounded-lg border transition-all capitalize ${
                         imageContentType === type
-                          ? 'border-pink-500 bg-pink-900/50 text-white'
-                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-100 text-gray-900'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       {type}
@@ -1584,7 +1650,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
               {/* Style Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   🎭 Visual Style
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -1595,8 +1661,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       onClick={() => setImageStyle(style.value)}
                       className={`px-3 py-2 rounded-lg border transition-all text-sm ${
                         imageStyle === style.value
-                          ? 'border-orange-500 bg-orange-900/50 text-white'
-                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                          ? 'border-orange-500 bg-orange-100 text-gray-900'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       {style.label}
@@ -1607,7 +1673,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
               {/* Mood Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   💫 Mood
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -1618,8 +1684,8 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                       onClick={() => setImageMood(mood.value)}
                       className={`px-3 py-2 rounded-lg border transition-all text-sm ${
                         imageMood === mood.value
-                          ? 'border-yellow-500 bg-yellow-900/50 text-white'
-                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                          ? 'border-yellow-500 bg-yellow-100 text-gray-900'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       {mood.label}
@@ -1629,16 +1695,16 @@ function ContentGenerator({ project, client, onContentGenerated }) {
               </div>
 
               {/* Info Box */}
-              <div className="bg-gray-800/50 rounded-lg p-4 text-sm">
+              <div className="bg-orange-50 rounded-lg p-4 text-sm border border-orange-200">
                 <div className="flex items-start gap-3">
-                  <span className="text-pink-400">ℹ️</span>
-                  <div className="text-gray-300">
+                  <span className="text-orange-600">ℹ️</span>
+                  <div className="text-gray-700">
                     <p className="mb-2">
-                      Generating <strong className="text-white">{imageContentType}</strong> for{' '}
-                      <strong className="text-pink-400">{IMAGE_PLATFORMS.find(p => p.value === imagePlatform)?.label}</strong>{' '}
-                      in <strong className="text-orange-400">{IMAGE_STYLES.find(s => s.value === imageStyle)?.label}</strong> style.
+                      Generating <strong className="text-gray-900">{imageContentType}</strong> for{' '}
+                      <strong className="text-orange-600">{IMAGE_PLATFORMS.find(p => p.value === imagePlatform)?.label}</strong>{' '}
+                      in <strong className="text-orange-700">{IMAGE_STYLES.find(s => s.value === imageStyle)?.label}</strong> style.
                     </p>
-                    <p className="text-gray-400">Leonardo.ai will generate 4 high-quality variations with brand consistency.</p>
+                    <p className="text-gray-600">Leonardo.ai will generate 4 high-quality variations with brand consistency.</p>
                   </div>
                 </div>
               </div>
@@ -1651,18 +1717,18 @@ function ContentGenerator({ project, client, onContentGenerated }) {
           <button
             onClick={handleGenerateAll}
             disabled={generating || selectedTypes.length === 0}
-            className="w-full py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white text-lg font-bold rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:via-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.01]"
+            className="w-full py-4 bg-orange-600 text-white text-lg font-bold rounded-xl hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.01] flex items-center justify-center gap-2"
           >
             {generating ? (
-              <span className="flex items-center justify-center gap-3">
-                <span className="animate-spin text-2xl">⏳</span>
-                Generating {CONTENT_TYPE_CONFIG[generatingType]?.label || 'Content'}...
-              </span>
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Generating {CONTENT_TYPE_CONFIG[generatingType]?.label || 'Content'}...</span>
+              </>
             ) : (
-              <span className="flex items-center justify-center gap-2">
+              <>
                 <span className="text-2xl">✨</span>
-                Generate All Selected Content
-              </span>
+                <span>Generate All Selected Content</span>
+              </>
             )}
           </button>
         </div>
@@ -1671,7 +1737,7 @@ function ContentGenerator({ project, client, onContentGenerated }) {
         {Object.keys(generatedContent).length > 0 && (
           <div>
             {/* Tab Headers */}
-            <div className="flex space-x-1 bg-gray-700/50 p-1.5 rounded-xl mb-6">
+            <div className="flex space-x-1 bg-gray-100 p-1.5 rounded-xl mb-6 border border-gray-200">
               {projectTypes.map((type) => {
                 const config = CONTENT_TYPE_CONFIG[type];
                 const hasContent = generatedContent[type];
@@ -1683,14 +1749,14 @@ function ContentGenerator({ project, client, onContentGenerated }) {
                     onClick={() => setActiveTab(type)}
                     className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                       activeTab === type
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                        : 'text-gray-300 hover:bg-gray-600/50'
+                        ? 'bg-orange-600 text-white shadow-lg'
+                        : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     <span className="text-lg">{config?.icon}</span>
                     <span className="hidden lg:inline">{config?.label}</span>
-                    {hasContent && !hasError && <span className="text-green-400 text-sm">✓</span>}
-                    {hasError && <span className="text-red-400 text-sm">✗</span>}
+                    {hasContent && !hasError && <span className="text-green-600 text-sm">✓</span>}
+                    {hasError && <span className="text-red-600 text-sm">✗</span>}
                   </button>
                 );
               })}
@@ -1705,10 +1771,10 @@ function ContentGenerator({ project, client, onContentGenerated }) {
 
         {/* Empty State */}
         {Object.keys(generatedContent).length === 0 && !generating && (
-          <div className="text-center py-16 border-2 border-dashed border-gray-600 rounded-xl bg-gray-700/20">
+          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
             <div className="text-5xl mb-4">✨</div>
-            <p className="text-xl text-white font-semibold mb-2">Ready to Create Amazing Content</p>
-            <p className="text-gray-400">Select content types above and click "Generate All" to get started</p>
+            <p className="text-xl text-gray-900 font-semibold mb-2">Ready to Create Amazing Content</p>
+            <p className="text-gray-600">Select content types above and click "Generate All" to get started</p>
           </div>
         )}
       </div>

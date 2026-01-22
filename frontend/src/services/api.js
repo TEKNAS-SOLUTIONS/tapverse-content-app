@@ -7,6 +7,42 @@ const api = axios.create({
   },
 });
 
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle 401 errors (unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Auth API
+ */
+export const authAPI = {
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (data) => api.post('/auth/register', data),
+  getMe: () => api.get('/auth/me'),
+  getAllUsers: () => api.get('/auth/users'),
+  updateUser: (id, data) => api.put(`/auth/users/${id}`, data),
+  updatePassword: (id, currentPassword, newPassword) => 
+    api.post(`/auth/users/${id}/password`, { currentPassword, newPassword }),
+  deleteUser: (id) => api.delete(`/auth/users/${id}`),
+};
+
 /**
  * Clients API
  */
@@ -16,6 +52,8 @@ export const clientsAPI = {
   create: (data) => api.post('/clients', data),
   update: (id, data) => api.put(`/clients/${id}`, data),
   delete: (id) => api.delete(`/clients/${id}`),
+  getDashboardMetrics: (clientId = null) => 
+    api.get('/clients/dashboard/metrics', { params: clientId ? { clientId } : {} }),
 };
 
 /**
@@ -59,8 +97,17 @@ export const contentAPI = {
   // Update content
   update: (id, data) => api.put(`/content/${id}`, data),
   
+<<<<<<< HEAD
   // Approve content for CMS
   approve: (data) => api.post('/content/approve', data),
+=======
+  // Update content status
+  updateStatus: (id, status, options = {}) => 
+    api.put(`/content/${id}/status`, { status, ...options }),
+  
+  // Get status history
+  getStatusHistory: (id) => api.get(`/content/${id}/status-history`),
+>>>>>>> 81af4489c65415405e981b88b6e6dc07cb6c9104
 };
 
 /**
@@ -102,67 +149,53 @@ export const imagesAPI = {
   
   // Image to image (variations)
   imageToImage: (imageUrl, prompt, options = {}) => 
-    api.post('/images/leonardo/img2img', { imageUrl, prompt, ...options }),
-  
-  // Upscale image
-  upscale: (imageId) => api.post('/images/leonardo/upscale', { imageId }),
-  
-  // Remove background
-  removeBackground: (imageId) => api.post('/images/leonardo/remove-bg', { imageId }),
-  
-  // Get API credits
-  getCredits: () => api.get('/images/leonardo/credits'),
-  
-  // Brand style management
-  saveBrandStyle: (clientId, brandStyle) => 
-    api.post(`/images/brand-style/${clientId}`, brandStyle),
-  
-  getBrandStyle: (clientId) => 
-    api.get(`/images/brand-style/${clientId}`),
+    api.post('/images/image-to-image', { imageUrl, prompt, ...options }),
 };
 
 /**
- * Video API
+ * Custom Avatars API
+ */
+export const avatarsAPI = {
+  // Create Instant Avatar
+  createInstantAvatar: (formData) => api.post('/avatars/create-instant-avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  // Get all custom avatars for current user
+  getAll: () => api.get('/avatars'),
+  // Get avatar by ID
+  getById: (id) => api.get(`/avatars/${id}`),
+  // Check avatar status
+  checkStatus: (id) => api.post(`/avatars/${id}/check-status`),
+  // Delete avatar
+  delete: (id) => api.delete(`/avatars/${id}`),
+};
+
+/**
+ * Video Generation API
  */
 export const videoAPI = {
   // Generate video script
-  generateScript: (projectId, duration = 60) => 
-    api.post('/video/generate-script', { project_id: projectId, duration }),
+  generateScript: (projectId) => 
+    api.post('/video/generate-script', { project_id: projectId }),
   
   // Create video with HeyGen
-  createVideo: (scriptText, avatarId, voiceId) => 
-    api.post('/video/create', { script_text: scriptText, avatar_id: avatarId, voice_id: voiceId }),
+  create: (scriptId, scriptText, avatarId, voiceId) => 
+    api.post('/video/create', { script_id: scriptId, script_text: scriptText, avatar_id: avatarId, voice_id: voiceId }),
   
-  // Check video status
+  // Check video generation status
   checkStatus: (videoId) => api.get(`/video/status/${videoId}`),
+  
+  // Get videos for a project
+  getByProject: (projectId) => api.get(`/video/project/${projectId}`),
+  
+  // Delete video
+  delete: (videoId) => api.delete(`/video/${videoId}`),
   
   // Get available avatars
   getAvatars: () => api.get('/video/avatars'),
   
   // Get available voices
   getVoices: () => api.get('/video/voices'),
-  
-  // Generate voiceover
-  generateVoiceover: (text, voiceId) => 
-    api.post('/video/voiceover', { text, voice_id: voiceId }),
-  
-  // Create custom avatar from photo
-  createAvatarFromPhoto: (formData) => 
-    api.post('/video/create-avatar-photo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }),
-  
-  // Create custom avatar from video
-  createAvatarFromVideo: (formData) => 
-    api.post('/video/create-avatar-video', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }),
-  
-  // Check custom avatar training status
-  checkAvatarStatus: (avatarId) => api.get(`/video/avatar-status/${avatarId}`),
-  
-  // Get custom avatars
-  getCustomAvatars: () => api.get('/video/custom-avatars'),
 };
 
 /**
@@ -178,107 +211,47 @@ export const keywordAnalysisAPI = {
  * Article Ideas API
  */
 export const articleIdeasAPI = {
-  // Generate new article ideas for a client
-  generate: (clientId, projectId = null, count = 10) => 
-    api.post('/article-ideas/generate', { client_id: clientId, project_id: projectId, count }),
-  
-  // Get ideas for a client
-  getByClient: (clientId) => api.get(`/article-ideas/client/${clientId}`),
-  
-  // Get ideas for a project
+  generate: (data) => api.post('/article-ideas/generate', data),
   getByProject: (projectId) => api.get(`/article-ideas/project/${projectId}`),
-  
-  // Generate full article from an idea
-  generateArticle: (ideaId, projectId) => 
-    api.post(`/article-ideas/${ideaId}/generate-article`, { project_id: projectId }),
-  
-  // Update idea status
-  update: (id, data) => api.patch(`/article-ideas/${id}`, data),
-  
-  // Delete an idea
+  update: (id, data) => api.put(`/article-ideas/${id}`, data),
   delete: (id) => api.delete(`/article-ideas/${id}`),
-  
-  // Get trending topics for an industry
-  getTrending: (industry, keywords = []) => 
-    api.post('/article-ideas/trending', { industry, keywords }),
+  generateArticle: (ideaId) => api.post(`/article-ideas/${ideaId}/generate-article`),
 };
 
 /**
  * SEO Strategy API
  */
 export const seoStrategyAPI = {
-  // Generate new SEO strategy for a project
-  generate: (projectId, clientData = {}, projectData = {}) =>
-    api.post('/seo-strategy/generate', { projectId, clientData, projectData }),
-  
-  // Get strategies for a project
+  generate: (data) => api.post('/seo-strategy/generate', data),
   getByProject: (projectId) => api.get(`/seo-strategy/project/${projectId}`),
-  
-  // Get specific strategy by ID
-  getById: (id) => api.get(`/seo-strategy/${id}`),
-  
-  // Update strategy
   update: (id, data) => api.put(`/seo-strategy/${id}`, data),
-  
-  // Delete strategy
-  delete: (id) => api.delete(`/seo-strategy/${id}`),
 };
 
 /**
  * Google Ads Strategy API
  */
 export const googleAdsStrategyAPI = {
-  // Generate new Google Ads strategy for a project
-  generate: (projectId, clientData = {}, projectData = {}) =>
-    api.post('/google-ads-strategy/generate', { projectId, clientData, projectData }),
-  
-  // Get strategies for a project
+  generate: (data) => api.post('/google-ads-strategy/generate', data),
   getByProject: (projectId) => api.get(`/google-ads-strategy/project/${projectId}`),
-  
-  // Get specific strategy by ID
-  getById: (id) => api.get(`/google-ads-strategy/${id}`),
-  
-  // Update strategy
   update: (id, data) => api.put(`/google-ads-strategy/${id}`, data),
-  
-  // Delete strategy
-  delete: (id) => api.delete(`/google-ads-strategy/${id}`),
 };
 
 /**
  * Facebook Ads Strategy API
  */
 export const facebookAdsStrategyAPI = {
-  // Generate new Facebook Ads strategy for a project
-  generate: (projectId, clientData = {}, projectData = {}) =>
-    api.post('/facebook-ads-strategy/generate', { projectId, clientData, projectData }),
-  
-  // Get strategies for a project
+  generate: (data) => api.post('/facebook-ads-strategy/generate', data),
   getByProject: (projectId) => api.get(`/facebook-ads-strategy/project/${projectId}`),
-  
-  // Get specific strategy by ID
-  getById: (id) => api.get(`/facebook-ads-strategy/${id}`),
-  
-  // Update strategy
   update: (id, data) => api.put(`/facebook-ads-strategy/${id}`, data),
-  
-  // Delete strategy
-  delete: (id) => api.delete(`/facebook-ads-strategy/${id}`),
 };
 
 /**
- * Content Scheduling API
+ * Scheduling API
  */
 export const schedulingAPI = {
   schedule: (data) => api.post('/scheduling/schedule', data),
-  getByProject: (projectId, filters = {}) => {
-    const params = new URLSearchParams(filters);
-    return api.get(`/scheduling/project/${projectId}?${params}`);
-  },
-  getById: (id) => api.get(`/scheduling/${id}`),
-  updateStatus: (id, status, additionalData = {}) =>
-    api.put(`/scheduling/${id}/status`, { status, ...additionalData }),
-  cancel: (id) => api.post(`/scheduling/${id}/cancel`),
+  getByProject: (projectId) => api.get(`/scheduling/project/${projectId}`),
+  update: (id, data) => api.put(`/scheduling/${id}`, data),
   delete: (id) => api.delete(`/scheduling/${id}`),
 };
 
@@ -286,128 +259,69 @@ export const schedulingAPI = {
  * Email Newsletters API
  */
 export const emailNewslettersAPI = {
-  generate: (projectId, options = {}) =>
-    api.post('/email-newsletters/generate', { projectId, ...options }),
+  generate: (data) => api.post('/email-newsletters/generate', data),
   getByProject: (projectId) => api.get(`/email-newsletters/project/${projectId}`),
-  getById: (id) => api.get(`/email-newsletters/${id}`),
-  update: (id, data) => api.put(`/email-newsletters/${id}`, data),
-  delete: (id) => api.delete(`/email-newsletters/${id}`),
 };
 
 /**
  * Analytics API
  */
 export const analyticsAPI = {
-  record: (data) => api.post('/analytics/record', data),
-  getByProject: (projectId, dateRange = {}) => {
-    const params = new URLSearchParams();
-    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
-    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
-    return api.get(`/analytics/project/${projectId}?${params}`);
-  },
-  getByClient: (clientId, dateRange = {}) => {
-    const params = new URLSearchParams();
-    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
-    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
-    return api.get(`/analytics/client/${clientId}?${params}`);
-  },
-  getTopContent: (projectId, limit = 10, metric = 'views') =>
-    api.get(`/analytics/top-content/${projectId}?limit=${limit}&metric=${metric}`),
-  getSummary: (clientId, projectId = null, period = 'monthly') => {
-    const params = new URLSearchParams({ clientId, period });
-    if (projectId) params.append('projectId', projectId);
-    return api.get(`/analytics/summary?${params}`);
-  },
-  getPlatformBreakdown: (clientId, projectId = null, dateRange = {}) => {
-    const params = new URLSearchParams({ clientId });
-    if (projectId) params.append('projectId', projectId);
-    if (dateRange.startDate) params.append('startDate', dateRange.startDate);
-    if (dateRange.endDate) params.append('endDate', dateRange.endDate);
-    return api.get(`/analytics/platform-breakdown?${params}`);
-  },
+  getByClient: (clientId) => api.get(`/analytics/client/${clientId}`),
+  getByProject: (projectId) => api.get(`/analytics/project/${projectId}`),
+  getByContent: (contentId) => api.get(`/analytics/content/${contentId}`),
+  track: (data) => api.post('/analytics/track', data),
 };
 
 /**
  * Content Roadmap API
  */
 export const contentRoadmapAPI = {
-  getByProject: (projectId) => api.get(`/roadmap/${projectId}`),
-  reorder: (projectId, articles) => api.put(`/roadmap/${projectId}/reorder`, { articles }),
-  generateArticle: (projectId, articleId) => api.post(`/roadmap/${projectId}/generate-article`, { articleId }),
-  updateArticle: (projectId, articleId, data) => api.put(`/roadmap/${projectId}/article/${articleId}`, data),
-  deleteArticle: (projectId, articleId) => api.delete(`/roadmap/${projectId}/article/${articleId}`),
+  generate: (data) => api.post('/roadmap/generate', data),
+  getByProject: (projectId) => api.get(`/roadmap/project/${projectId}`),
 };
 
 /**
  * Dashboard API
  */
 export const dashboardAPI = {
+  getStats: () => api.get('/dashboard/stats'),
   getByProject: (projectId) => api.get(`/dashboard/${projectId}`),
 };
 
 /**
  * Content Evidence API
- * For generating transparent, evidence-based analysis for content
  */
 export const contentEvidenceAPI = {
-  // Generate enhanced evidence analysis (90%+ confidence without paid APIs)
-  generate: (params) => api.post('/content-evidence/generate', params),
-  
-  // Get evidence for existing content
-  getByContentId: (contentId) => api.get(`/content-evidence/${contentId}`),
+  generate: (data) => api.post('/content-evidence/generate', data),
 };
 
 /**
- * Shopify Store API
- * For connecting and analyzing Shopify stores
+ * Shopify API
  */
 export const shopifyAPI = {
-  // Connect Shopify store
-  connect: (clientId, storeUrl, accessToken) =>
-    api.post('/shopify/connect', { client_id: clientId, store_url: storeUrl, access_token: accessToken }),
-  
-  // Get store connection for client
-  getStore: (clientId) => api.get(`/shopify/stores/${clientId}`),
-  
-  // Run store analysis
-  analyze: (clientId, options = {}) =>
-    api.post(`/shopify/analyze/${clientId}`, { options }),
-  
-  // Get analysis history
-  getAnalyses: (clientId, limit = 10) =>
-    api.get(`/shopify/analyses/${clientId}?limit=${limit}`),
-  
-  // Get specific analysis
-  getAnalysis: (analysisId) => api.get(`/shopify/analysis/${analysisId}`),
+  analyze: (data) => api.post('/shopify/analyze', data),
+  getByClient: (clientId) => api.get(`/shopify/client/${clientId}`),
 };
 
 /**
  * Local SEO API
- * For local businesses (dentists, plumbers, salons, etc.)
  */
 export const localSeoAPI = {
-  // Generate local SEO analysis
-  analyze: (clientId, projectId, location, websiteUrl) =>
+  analyze: (clientId, projectId, location, websiteUrl) => 
     api.post('/local-seo/analyze', { clientId, projectId, location, websiteUrl }),
-  
-  // Generate local schema markup
-  generateSchema: (schemaData) =>
-    api.post('/local-seo/schema', schemaData),
+  generateSchema: (data) => api.post('/local-seo/schema', data),
 };
 
 /**
- * API Connections API
- * For managing Google, Facebook, and other API connections
+ * Connections API
  */
 export const connectionsAPI = {
   // Get all connections
   getAll: () => api.get('/connections'),
   
-  // Get specific connection
-  getById: (id) => api.get(`/connections/${id}`),
-  
-  // Get all active connections (for assignment to clients)
-  getAllAvailable: () => api.get('/connections/all-available'),
+  // Get connections for a client
+  getByClient: (clientId) => api.get(`/connections/client/${clientId}`),
   
   // Get available connections for a client
   getAvailableForClient: (clientId) => api.get(`/connections/available/${clientId}`),
@@ -433,5 +347,98 @@ export const connectionsAPI = {
   delete: (id) => api.delete(`/connections/${id}`),
 };
 
-export default api;
+/**
+ * Programmatic SEO API
+ */
+export const programmaticSeoAPI = {
+  getSuggestions: (input, types) => api.get('/programmatic-seo/suggestions', { params: { input, types } }),
+  generate: (data) => api.post('/programmatic-seo/generate', data),
+  generateBatch: (data) => api.post('/programmatic-seo/generate-batch', data),
+  getByProject: (projectId) => api.get(`/programmatic-seo/project/${projectId}`),
+};
 
+/**
+ * Tasks API
+ */
+export const tasksAPI = {
+  create: (data) => api.post('/tasks', data),
+  getAll: (filters) => api.get('/tasks', { params: filters }),
+  getByClient: (clientId, filters) => api.get(`/tasks/client/${clientId}`, { params: filters }),
+  getMyTasks: (filters) => api.get('/tasks/my-tasks', { params: filters }),
+  getById: (id) => api.get(`/tasks/${id}`),
+  update: (id, data) => api.put(`/tasks/${id}`, data),
+  delete: (id) => api.delete(`/tasks/${id}`),
+  generateMonthly: () => api.post('/tasks/generate-monthly'),
+};
+
+/**
+ * Export API
+ */
+export const exportAPI = {
+  keywords: (params) => {
+    const queryString = new URLSearchParams(params).toString();
+    window.open(`/api/export/keywords?${queryString}`, '_blank');
+  },
+  content: (params) => {
+    const queryString = new URLSearchParams(params).toString();
+    window.open(`/api/export/content?${queryString}`, '_blank');
+  },
+  tasks: (params) => {
+    const queryString = new URLSearchParams(params).toString();
+    window.open(`/api/export/tasks?${queryString}`, '_blank');
+  },
+};
+
+/**
+ * Rank Tracking API
+ */
+export const rankTrackingAPI = {
+  record: (data) => api.post('/rank-tracking/record', data),
+  getByClient: (clientId, filters) => api.get(`/rank-tracking/client/${clientId}`, { params: filters }),
+  getTrends: (clientId, months = 6) => api.get(`/rank-tracking/client/${clientId}/trends`, { params: { months } }),
+  getSummary: (clientId) => api.get(`/rank-tracking/client/${clientId}/summary`),
+};
+
+/**
+ * Reports API
+ */
+export const reportsAPI = {
+  generateMonthly: (data) => api.post('/reports/monthly/generate', data),
+  saveMonthly: (data) => api.post('/reports/monthly/save', data),
+  getMonthlyByClient: (clientId) => api.get(`/reports/monthly/client/${clientId}`),
+  getMonthlyById: (id) => api.get(`/reports/monthly/${id}`),
+  updateMonthly: (id, data) => api.put(`/reports/monthly/${id}`, data),
+};
+
+/**
+ * Content Ideas & Gaps API
+ */
+export const contentIdeasAPI = {
+  generate: (clientId, projectId = null) => api.post('/content-ideas/generate', { clientId, projectId }),
+};
+
+/**
+ * Chat API
+ */
+export const chatAPI = {
+  createConversation: (data) => api.post('/chat/conversations', data),
+  getConversations: (chatType, clientId = null) => 
+    api.get('/chat/conversations', { params: { chatType, clientId } }),
+  getConversation: (id) => api.get(`/chat/conversations/${id}`),
+  getMessages: (id) => api.get(`/chat/conversations/${id}/messages`),
+  sendMessage: (id, message, options = {}) => 
+    api.post(`/chat/conversations/${id}/messages`, { message, ...options }),
+  updateTitle: (id, title) => api.put(`/chat/conversations/${id}/title`, { title }),
+  deleteConversation: (id) => api.delete(`/chat/conversations/${id}`),
+};
+
+/**
+ * Admin Chat API
+ */
+export const adminChatAPI = {
+  sendMessage: (id, message, model) => api.post(`/admin-chat/conversations/${id}/messages`, { message, model }),
+  getInsights: (filters) => api.get('/admin-chat/insights', { params: filters }),
+  generateRecommendations: () => api.post('/admin-chat/generate-recommendations'),
+};
+
+export default api;
