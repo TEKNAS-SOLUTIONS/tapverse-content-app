@@ -100,7 +100,7 @@ npm install
 **Check frontend/.env exists:**
 ```powershell
 # Should contain:
-VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg
+VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY_HERE
 ```
 
 ## Quick Test Script

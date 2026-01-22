@@ -20,7 +20,7 @@ npm install
 
 **Frontend .env** (create `frontend/.env`):
 ```
-VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg
+VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY_HERE
 ```
 
 **Backend .env** (if not exists, copy from `backend/.env.example`):

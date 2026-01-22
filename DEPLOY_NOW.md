@@ -68,7 +68,7 @@ Make sure your server has the `.env` files configured:
 
 1. **Frontend `.env`** (in `/root/tapverse-content-creation/frontend/.env`):
    ```
-   VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg
+   VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY_HERE
    ```
 
 2. **Backend `.env`** (already configured, but verify):

@@ -22,7 +22,7 @@ cd /root/tapverse-content-creation && \
 git pull origin main && \
 cd backend && npm install && npm run db:migrate && \
 cd ../frontend && npm install && \
-echo "VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg" >> .env && \
+echo "VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY_HERE" >> .env && \
 rm -rf dist/ node_modules/.vite && \
 npm run build && \
 cd .. && \

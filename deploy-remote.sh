@@ -30,7 +30,7 @@ npm install
 # Add Google Places API key if not exists
 if ! grep -q "VITE_GOOGLE_PLACES_API_KEY" .env 2>/dev/null; then
     echo "🔑 Adding Google Places API key..."
-    echo "VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg" >> .env
+    echo "VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY_HERE" >> .env
 fi
 
 # Build frontend
