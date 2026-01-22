@@ -13,7 +13,7 @@ This will:
 - ✅ Create frontend .env with Google Places API key
 - ✅ Install dependencies if needed
 - ✅ Start backend on port 5001
-- ✅ Start frontend on port 3000
+- ✅ Start frontend on port 5173
 - ✅ Open in separate windows
 
 ### Option 2: Manual Start
@@ -48,7 +48,7 @@ npm run dev
 - [ ] Logo at top of sidebar
 
 ### 2. Dashboard
-- [ ] Visit http://localhost:3000/
+- [ ] Visit http://localhost:5173/
 - [ ] Should show Dashboard (not old welcome page)
 - [ ] Stats cards visible
 - [ ] Quick actions section
