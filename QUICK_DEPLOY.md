@@ -1,51 +1,57 @@
-# Quick Deploy to Server
+# Quick Deploy to app.tapverse.ai
 
-## Server IP: 77.42.67.166
+## After GitHub is Updated
 
-### Step 1: Upload Files
+Since your GitHub workspace has been updated, here's how to deploy to the server:
 
-**Option A: Using SCP (from your local machine)**
+### Step 1: SSH into Server
 ```bash
-scp -r . your-user@77.42.67.166:/home/your-user/tapverse-content-creation
+ssh root@77.42.67.166
 ```
 
-**Option B: Using Git**
-```bash
-# On server
-git clone <your-repo-url>
-cd tapverse-content-creation
-```
-
-### Step 2: Run Setup
+### Step 2: Pull and Deploy (Copy-Paste This Entire Block)
 
 ```bash
-ssh your-user@77.42.67.166
-cd tapverse-content-creation
-chmod +x setup-server.sh
-./setup-server.sh
+cd /root/tapverse-content-creation && \
+git pull origin main && \
+cd backend && npm install && npm run db:migrate && \
+cd ../frontend && npm install && \
+echo "VITE_GOOGLE_PLACES_API_KEY=AIzaSyDX9d2X9taZXh7WIp1BuH6C0px9gAqYtqg" >> .env && \
+npm run build && \
+cd .. && \
+lsof -ti:5001 | xargs kill -9 2>/dev/null || true && \
+lsof -ti:3001 | xargs kill -9 2>/dev/null || true && \
+sleep 2 && \
+cd backend && nohup npm run dev > /tmp/backend.log 2>&1 & \
+cd ../frontend && nohup npm run preview > /tmp/frontend.log 2>&1 & \
+sleep 5 && \
+curl http://localhost:5001/health && \
+systemctl reload nginx && \
+echo "✅ Deployed! Check: https://app.tapverse.ai"
 ```
 
-### Step 3: Configure
-
+### Step 3: Verify
 ```bash
-cd backend
-nano .env  # Edit with your API keys and database password
-npm run db:migrate
-npm test
+curl https://app.tapverse.ai/health
 ```
 
-### Step 4: Start Services
+## Or Use the Verify Script
 
+After deploying, check status:
 ```bash
-# Backend
-cd backend && npm run dev
-
-# Frontend (in another terminal)
-cd frontend && npm run dev
+chmod +x verify-deployment.sh
+./verify-deployment.sh
 ```
 
-**Access:**
-- Backend: http://77.42.67.166:3001
-- Frontend: http://77.42.67.166:5173
+## What Gets Deployed
 
-Once tests pass ✅, we proceed!
+✅ All latest code from GitHub
+✅ New architecture (error handling, logging, caching)
+✅ Left sidebar navigation
+✅ Dashboard page
+✅ Clients with nested projects
+✅ SEO Blog workflow
+✅ Programmatic SEO workflow
+✅ CMS integration
+✅ Export functionality
+✅ Google Places API integration
