@@ -10,6 +10,11 @@ function Sidebar() {
     { path: '/settings', label: 'Settings', icon: '⚙️' },
   ];
   
+  // Filter out Settings if not admin (optional - can be removed if all users should see it)
+  // const user = JSON.parse(localStorage.getItem('user') || '{}');
+  // const isAdmin = user.role === 'admin';
+  // const filteredNavItems = isAdmin ? navItems : navItems.filter(item => item.path !== '/settings');
+  
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
