@@ -15,11 +15,11 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // Allow external connections on dev server
-    port: 3000,
+    port: 5173, // Changed from 3000 to avoid conflicts
     allowedHosts: ['app.tapverse.ai', '77.42.67.166', 'localhost', '127.0.0.1'], // Allow these hosts
     proxy: {
       '/api': {
-        target: 'http://localhost:3001', // Backend on same server
+        target: 'http://localhost:5001', // Backend API port
         changeOrigin: true,
       },
     },

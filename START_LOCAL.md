@@ -42,11 +42,11 @@ Backend will run on: http://localhost:5001
 cd frontend
 npm run dev
 ```
-Frontend will run on: http://localhost:3000
+Frontend will run on: http://localhost:5173
 
 ### Step 4: Test
 
-1. Open browser: http://localhost:3000
+1. Open browser: http://localhost:5173
 2. You should see:
    - ✅ Left sidebar with Home, Clients, Settings
    - ✅ Dashboard page (not old welcome page)
@@ -70,8 +70,8 @@ Frontend will run on: http://localhost:3000
 netstat -ano | findstr :5001
 taskkill /PID <PID> /F
 
-# Find and kill process on port 3000
-netstat -ano | findstr :3000
+# Find and kill process on port 5173
+netstat -ano | findstr :5173
 taskkill /PID <PID> /F
 ```
 
